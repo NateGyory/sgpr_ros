@@ -1,0 +1,19 @@
+<launch>
+
+<node
+  pkg="sgpr_ros"
+  type="sgpr_ros"
+  name="sgpr_ros_node"
+  output="screen"
+/>
+
+<node
+  pkg="sgpr_ros"
+  type="sgpr_analysis.py"
+  name="sgpr_analysis_node"
+  output="screen"
+/>
+
+<rosparam file="$(find sgpr_ros)/config/params.yaml" />
+
+</launch>

@@ -1,0 +1,7 @@
+# The dataset dir must contain the 3RScan, Matterport3D, or SemanticKitti
+# top level directories
+# Ex: $dataset_dir/(SemanticKitti or/and 3RScan or/and Matterport3D)
+dataset_dir: "/home/nate/Datasets"
+
+# Options are: 3RScan, Matterport3D, or SemanticKittI
+dataset_to_use: "3RScan"
