@@ -8,13 +8,12 @@
  *
  *  Data loader for Matterport3D dataset
  */
-class Matterport3D: public DataLoader
-{
+class Matterport3D : public DataLoader {
 public:
-  Matterport3D();
+  Matterport3D() = default;
   ~Matterport3D() = default;
 
-  void GetSemanticCloudMap() override;
+  void ParseConfig() override{};
 };
 
 #endif // !MATTERPORT_3D

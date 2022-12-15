@@ -8,13 +8,12 @@
  *
  *  Data loader for SemanticKitti dataset
  */
-class SemanticKitti: public DataLoader
-{
+class SemanticKitti : public DataLoader {
 public:
-  SemanticKitti();
+  SemanticKitti() = default;
   ~SemanticKitti() = default;
 
-  void GetSemanticCloudMap() override;
+  void ParseConfig() override{};
 };
 
 #endif // !SEMANTIC_KITTI

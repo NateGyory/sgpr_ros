@@ -1,7 +1,13 @@
 # The dataset dir must contain the 3RScan, Matterport3D, or SemanticKitti
 # top level directories
 # Ex: $dataset_dir/(SemanticKitti or/and 3RScan or/and Matterport3D)
-dataset_dir: "/home/nate/Datasets"
+dataset_dir: "/home/nate/Datasets/3RScan"
 
-# Options are: 3RScan, Matterport3D, or SemanticKittI
-dataset_to_use: "3RScan"
+# Enum options are:
+#   0: 3RScan
+#   1: Matterport3D
+#   2: SemanticKittI
+dataset: 0
+
+# The working dir for this ros pkg
+ros_pkg_dir: "/home/nate/Development/catkin_ws/src/sgpr_ros"

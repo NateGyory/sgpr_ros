@@ -3,19 +3,22 @@
 
 #include <DataLoaders/DataLoader.h>
 #include <iostream>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 /*! \class 3RScanDataLoader
  *  \brief Data loader for 3RScan datset
  *
  *  Data loader for 3RScan dataset
  */
-class RScanDataLoader: public DataLoader
-{
+
+class RScanDataLoader : public DataLoader {
 public:
-  RScanDataLoader();
+  RScanDataLoader() = default; 
   ~RScanDataLoader() = default;
 
-  void GetSemanticCloudMap() override;
+  void ParseConfig() override;
 };
 
 #endif // !RSCAN_DATA_LOADER
