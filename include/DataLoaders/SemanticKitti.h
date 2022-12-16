@@ -13,7 +13,7 @@ public:
   SemanticKitti() = default;
   ~SemanticKitti() = default;
 
-  void ParseConfig() override{};
+  void ParseConfig(scene_map_t &scene_map) override{};
 };
 
 #endif // !SEMANTIC_KITTI

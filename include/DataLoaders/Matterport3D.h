@@ -13,7 +13,7 @@ public:
   Matterport3D() = default;
   ~Matterport3D() = default;
 
-  void ParseConfig() override{};
+  void ParseConfig(scene_map_t &scene_map) override{};
 };
 
 #endif // !MATTERPORT_3D

@@ -18,7 +18,7 @@ public:
   RScanDataLoader() = default; 
   ~RScanDataLoader() = default;
 
-  void ParseConfig() override;
+  void ParseConfig(scene_map_t &scene_map) override;
 };
 
 #endif // !RSCAN_DATA_LOADER

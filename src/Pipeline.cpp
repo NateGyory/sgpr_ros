@@ -2,23 +2,26 @@
 
 void Pipeline::PostProcess(int dataset) {
   initDataLoader(dataset);
-  mDataLoader->ParseConfig();
+  mDataLoader->ParseConfig(mSceneMap);
 
-  // For all reference scans
-  // 1) Process PointCloud
-  // 2) Process Radius
-  // 3) Process Laplacian
-  // 4) Process Eigenvalues
-  // 5) Create keyframe
-  // 6) Populate KeyFrameDB with this info
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          &Processing::PointCloud::ExtractObjectPointClouds);
+
+  // 2) TODO Process Radius
+  // 3) TODO Process Laplacian
+  // 4) TODO Process Eigenvalues
+  // 5) TODO Create keyframe
+  // 6) TODO Populate KeyFrameDB with this info
 
   // For all query scans 
-  // 1) Process PointCloud
-  // 2) Process Radius
-  // 3) Process Laplacian
-  // 4) Process Eigenvalues
-  // 5) Create keyframe
-  // 6) Match keyframe against KeyframeDB
+  // 1) TODO Process PointCloud
+  // 2) TODO Process Radius
+  // 3) TODO Process Laplacian
+  // 4) TODO Process Eigenvalues
+  // 5) TODO Create keyframe
+  // 6) TODO Match keyframe against KeyframeDB
 }
 
 void Pipeline::initDataLoader(int dataset) {

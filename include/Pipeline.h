@@ -3,13 +3,17 @@
 
 #include <memory>
 #include <string>
+#include <vector>
+#include <algorithm>
 
 #include "DataLoaders/DataLoader.h"
 #include "DataLoaders/Matterport3D.h"
 #include "DataLoaders/RScanDataLoader.h"
 #include "DataLoaders/SemanticKitti.h"
+#include "Scene.h"
 
 #include <KeyFrames/KeyFrameDB.h>
+#include <Processing/PointCloud.hpp>
 
 class Pipeline {
 public:
@@ -22,6 +26,7 @@ public:
 private:
   void initDataLoader(int dataset);
 
+  scene_map_t mSceneMap;
   spDataLoader mDataLoader;
   spKeyFrameDB mKeyFrameDB;
 };

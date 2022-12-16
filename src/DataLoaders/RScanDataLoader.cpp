@@ -8,7 +8,7 @@ std::string make_string(const char *x)
         return x;
 }
 
-void RScanDataLoader::ParseConfig() {
+void RScanDataLoader::ParseConfig(scene_map_t &scene_map) {
   std::string dataset_dir, config_dir, rscan_json, config_json, objects_json;
 
   ros::param::get("ros_pkg_dir", config_dir);
@@ -58,7 +58,7 @@ void RScanDataLoader::ParseConfig() {
       ref_scene.spectral_objects.push_back(sp_object);
     }
 
-    mSceneMap[ref_scene.scan_id] = ref_scene;
+    scene_map[ref_scene.scan_id] = ref_scene;
 
     // For each reference scan we need to find all the query scans and populate the queryscan map
     for (auto const &scan : refQueryMapData["scans"]) {
@@ -91,7 +91,7 @@ void RScanDataLoader::ParseConfig() {
             query_scene.spectral_objects.push_back(sp_object);
           }
 
-          mSceneMap[query_scene.scan_id] = query_scene;
+          scene_map[query_scene.scan_id] = query_scene;
         }
       }
     }
