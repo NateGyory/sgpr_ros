@@ -8,37 +8,36 @@ void Pipeline::PostProcess(int dataset) {
   std::for_each(
           mSceneMap.begin(),
           mSceneMap.end(),
-          [&](std::pair<std::string, Scene> &pair) {
+          [](std::pair<const std::string, Scene> &pair) {
             Processing::PointCloud::ExtractObjectPointClouds(pair.second);
           });
-
-  std::cout << "Hello" << std::endl;
+  
 
   // TODO find radius distribution
-  //std::for_each(
-  //        mSceneMap.begin(),
-  //        mSceneMap.end(),
-  //        [&](std::pair<std::string, Scene> &pair) {
-  //          Processing::PointCloud::MinimallyConnectedAdaptiveRadius(pair.second);
-  //        });
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::PointCloud::MinimallyConnectedAdaptiveRadius(pair.second);
+          });
 
   // 3) TODO Process Laplacian
-  //std::for_each(
-  //        mSceneMap.begin(),
-  //        mSceneMap.end(),
-  //        [](std::pair<std::string, Scene> &pair) {
-  //          Processing::Laplacian::IDWLaplacian(pair.second);
-  //        });
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::Laplacian::IDWLaplacian(pair.second);
+          });
 
-  //// 4) TODO Process Eigenvalues
-  //std::for_each(
-  //        mSceneMap.begin(),
-  //        mSceneMap.end(),
-  //        [](std::pair<std::string, Scene> &pair) {
-  //          Processing::Eigen::Eigendecomposition(pair.second, -1);
-  //        });
+  // 4) TODO Process Eigenvalues
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::Eigen::Eigendecomposition(pair.second, 50);
+          });
 
-  //// 5) TODO Create keyframe
+  // 5) TODO Create keyframe
   //std::for_each(
   //        mSceneMap.begin(),
   //        mSceneMap.end(),

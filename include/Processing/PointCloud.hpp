@@ -7,14 +7,14 @@
 #include <boost/smart_ptr/make_shared_array.hpp>
 #include <pcl/common/io.h>
 #include <pcl/filters/conditional_removal.h>
+#include <pcl/filters/voxel_grid.h>
 #include <pcl/io/ply_io.h>
 
 namespace Processing {
 namespace PointCloud {
 
 inline void computeMCAR(SpectralObject &spectral_object) {
-  pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
-  kdTree.setInputCloud(spectral_object.cloud);
+  spectral_object.kdTree.setInputCloud(spectral_object.cloud);
 
   int size = spectral_object.cloud->size();
 
@@ -23,7 +23,8 @@ inline void computeMCAR(SpectralObject &spectral_object) {
     std::vector<int> indicies_found;
     std::vector<float> squaredDistances;
 
-    kdTree.radiusSearch(i, radius, indicies_found, squaredDistances, 2);
+    spectral_object.kdTree.radiusSearch(i, radius, indicies_found,
+                                        squaredDistances, 2);
     int num_edges = indicies_found.size() - 1;
 
     if (num_edges == 0) {
@@ -69,10 +70,27 @@ inline void findObjectPointCloud(SpectralObject &spectral_object,
   condrem.setInputCloud(cloud);
   condrem.filter(*cloud_filtered);
 
-  // TODO Filter after Testing here!!!
+  // TODO implement better filtering algorithm
+  double leafInc = 0.01;
+  double leafValue = 0.01;
+  while (cloud_filtered->points.size() > 1000) {
 
-  pcl::copyPointCloud(*cloud_filtered, *spectral_object.cloud);
-  cloud_filtered.reset();
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr vox_cloud(
+        new pcl::PointCloud<pcl::PointXYZRGB>);
+
+    pcl::VoxelGrid<pcl::PointXYZRGB> sor;
+
+    sor.setInputCloud(cloud_filtered);
+    sor.setLeafSize(leafValue, leafValue, leafValue);
+    sor.filter(*vox_cloud);
+
+    cloud_filtered = vox_cloud;
+    leafValue += leafInc;
+  }
+
+  spectral_object.cloud = cloud_filtered;
+  //pcl::copyPointCloud(*cloud_filtered, *spectral_object.cloud);
+  //cloud_filtered.reset();
 }
 
 inline void ExtractObjectPointClouds(Scene &scene) {
@@ -89,7 +107,7 @@ inline void ExtractObjectPointClouds(Scene &scene) {
 
 inline void MinimallyConnectedAdaptiveRadius(Scene &scene) {
   std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
-                computeMCAR);
+                &computeMCAR);
 }
 
 }; // namespace PointCloud

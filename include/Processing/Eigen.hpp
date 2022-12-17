@@ -9,15 +9,22 @@ inline void eigendecompose(SpectralObject &spectral_object, int max_eigs) {
   arma::vec eigval;
   arma::mat eigvec;
 
-  int eig_n = ( max_eigs == -1 ) ? spectral_object.laplacian.n_cols - 1 : max_eigs;
+  int eig_n =
+      (max_eigs == -1) ? spectral_object.laplacian.n_cols - 1 : max_eigs;
+
+  if (max_eigs >= spectral_object.cloud->size() - 1) {
+    std::cout << "Skipping" << std::endl;
+    return;
+  }
 
   auto start = std::chrono::steady_clock::now();
   arma::eigs_sym(eigval, eigvec, spectral_object.laplacian, eig_n);
   auto end = std::chrono::steady_clock::now();
   std::cout << "Elapsed time in miliseconds: "
-       << std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-              .count()
-       << " ms" << std::endl;
+            << std::chrono::duration_cast<std::chrono::milliseconds>(end -
+                                                                     start)
+                   .count()
+            << " ms" << std::endl;
 
   spectral_object.eigenvalues = eigval;
 }

@@ -18,7 +18,7 @@ inline void setSmallestDistance(SpectralObject &spectral_object) {
   spectral_object.smallest_distance = min;
 }
 
-inline void idwCompute(SpectralObject spectral_object) {
+inline void idwCompute(SpectralObject &spectral_object) {
 
   setSmallestDistance(spectral_object);
   double bias = 1.0 - spectral_object.smallest_distance;
@@ -26,7 +26,7 @@ inline void idwCompute(SpectralObject spectral_object) {
   unsigned int max_nn = 1000;
 
   int size = spectral_object.cloud->size();
-  int ret = spectral_object.laplacian(size, size);
+  spectral_object.laplacian = arma::sp_mat(size, size);
 
   for (int i = 0; i < size; i++) {
     std::vector<int> indicies_found;

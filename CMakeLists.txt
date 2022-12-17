@@ -21,6 +21,8 @@ find_package(PCL REQUIRED)
 find_package(Armadillo REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Matplot++ REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(glfw3 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
 )
@@ -34,5 +36,21 @@ catkin_package(
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS "src/*.cpp")
 
 add_executable(sgpr_ros ${SRCS})
-target_link_libraries(sgpr_ros PRIVATE ${PCL_LIBRARIES} ${ARMADILLO_LIBRARIES} nlohmann_json::nlohmann_json Matplot++::matplot ${catkin_LIBRARIES})
-target_include_directories(sgpr_ros PRIVATE ${PCL_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include ${ARMADILLO_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+
+target_link_libraries(sgpr_ros PRIVATE
+    nlohmann_json::nlohmann_json
+    Matplot++::matplot
+    glfw
+    ${PCL_LIBRARIES}
+    ${ARMADILLO_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${catkin_LIBRARIES}
+)
+
+target_include_directories(sgpr_ros PRIVATE
+    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/include/GUI
+    ${PCL_INCLUDE_DIRS}
+    ${ARMADILLO_INCLUDE_DIRS}
+    ${catkin_INCLUDE_DIRS}
+)
