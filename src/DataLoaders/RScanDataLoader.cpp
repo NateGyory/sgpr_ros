@@ -29,7 +29,7 @@ void RScanDataLoader::ParseConfig(scene_map_t &scene_map) {
 
   std::string ply_file = configData["ply_filename"].get<std::string>();
 
-  // TODO
+  // TODO do this in parallel in future
   for (auto const &reference_scan : configData["reference_scans"]) {
     Scene ref_scene;
     ref_scene.scan_id = reference_scan["scan_id"].get<std::string>();
@@ -54,13 +54,14 @@ void RScanDataLoader::ParseConfig(scene_map_t &scene_map) {
       sp_object.label = obj["label"].get<std::string>();
       sp_object.ply_color = obj["ply_color"].get<std::string>();
 
-      //ply_color.erase(0, 1);
+      sp_object.ply_color.erase(0, 1);
       ref_scene.spectral_objects.push_back(sp_object);
     }
 
     scene_map[ref_scene.scan_id] = ref_scene;
 
     // For each reference scan we need to find all the query scans and populate the queryscan map
+    // TODO do this in parallel
     for (auto const &scan : refQueryMapData["scans"]) {
       if (scan["reference"] == ref_scene.scan_id) {
         std::vector<json> query_scans = scan["scans"];
@@ -87,7 +88,7 @@ void RScanDataLoader::ParseConfig(scene_map_t &scene_map) {
             sp_object.label = obj["label"].get<std::string>();
             sp_object.ply_color = obj["ply_color"].get<std::string>();
 
-            //ply_color.erase(0, 1);
+            sp_object.ply_color.erase(0, 1);
             query_scene.spectral_objects.push_back(sp_object);
           }
 

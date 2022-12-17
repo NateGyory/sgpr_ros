@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 
@@ -15,13 +16,15 @@ struct SpectralObject {
   std::string label;
   std::string ply_color; // Consider deleting this not sure if useful
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud;
-  double radius;
+  pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
+  double mcar; // minimally connected adaptive radius
+  double smallest_distance;
   arma::sp_mat laplacian;
   arma::vec eigenvalues;
 };
 
 /*! \struct Scene
- *  \brief Struct containing scene info 
+ *  \brief Struct containing scene info
  *
  *  Struct containing scene info
  */

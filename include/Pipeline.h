@@ -13,7 +13,10 @@
 #include "Scene.h"
 
 #include <KeyFrames/KeyFrameDB.h>
+
 #include <Processing/PointCloud.hpp>
+#include <Processing/Laplacian.hpp>
+#include <Processing/Eigen.hpp>
 
 class Pipeline {
 public:
