@@ -23,8 +23,15 @@ public:
   Pipeline() = default;
   ~Pipeline() = default;
 
-  void PostProcess(int dataset);
-  void RealTime(){};
+  void PostProcess(int dataset); // NOTE: not using
+  void RealTime(){}; // NOTE: not using
+                     //
+  void ParseDataset(int dataset);
+  void ExtractObjectPointClouds();
+  void MCAR();
+  void IDW();
+  void Eigs();
+
 
 private:
   void initDataLoader(int dataset);

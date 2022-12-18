@@ -11,8 +11,10 @@ std::string make_string(const char *x)
 void RScanDataLoader::ParseConfig(scene_map_t &scene_map) {
   std::string dataset_dir, config_dir, rscan_json, config_json, objects_json;
 
-  ros::param::get("ros_pkg_dir", config_dir);
-  ros::param::get("dataset_dir", dataset_dir);
+//  ros::param::get("ros_pkg_dir", config_dir);
+//  ros::param::get("dataset_dir", dataset_dir);
+  config_dir = "/home/nate/Development/catkin_ws/src/sgpr_ros";
+  dataset_dir = "/home/nate/Datasets/3RScan";
 
   config_dir += "/config/3RScan";
   rscan_json = config_dir + "/" + "3RScan.json";

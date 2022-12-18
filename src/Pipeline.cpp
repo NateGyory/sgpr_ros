@@ -1,5 +1,57 @@
 #include <Pipeline.h>
 
+void Pipeline::ParseDataset(int dataset) {
+  std::cout << "Parsing Dataset" << std::endl;
+  mSceneMap.clear();
+  initDataLoader(dataset);
+  mDataLoader->ParseConfig(mSceneMap);
+  std::cout << "Finished Parsing Dataset" << std::endl;
+}
+
+void Pipeline::ExtractObjectPointClouds() {
+  std::cout << "ExtractObjectPointClouds" << std::endl;
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::PointCloud::ExtractObjectPointClouds(pair.second);
+          });
+  std::cout << "Finished ExtractObjectPointClouds" << std::endl;
+}
+
+void Pipeline::MCAR() {
+  std::cout << "MCAR" << std::endl;
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::PointCloud::MinimallyConnectedAdaptiveRadius(pair.second);
+          });
+  std::cout << "Finished MCAR" << std::endl;
+}
+
+void Pipeline::IDW() {
+  std::cout << "IDW" << std::endl;
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::Laplacian::IDWLaplacian(pair.second);
+          });
+  std::cout << "Finished IDW" << std::endl;
+}
+
+void Pipeline::Eigs() {
+  std::cout << "eigs" << std::endl;
+  std::for_each(
+          mSceneMap.begin(),
+          mSceneMap.end(),
+          [](std::pair<const std::string, Scene> &pair) {
+            Processing::Eigen::Eigendecomposition(pair.second, 50);
+          });
+  std::cout << "Finished eigs" << std::endl;
+}
+
 void Pipeline::PostProcess(int dataset) {
   initDataLoader(dataset);
   mDataLoader->ParseConfig(mSceneMap);
