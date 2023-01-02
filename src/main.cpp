@@ -52,6 +52,109 @@ GLFWwindow *initGUI() {
   return window;
 }
 
+void novelMethodTesting(Pipeline &pl) {
+  ImGui::LabelText("label", "Value");
+
+  ImGui::Combo("Choose PointCloud 1", &ImGuiState::point_cloud_idx1, ImGuiState::pointclouds,
+               IM_ARRAYSIZE(ImGuiState::pointclouds));
+
+
+  ImGui::Combo("Choose PointCloud 2", &ImGuiState::point_cloud_idx2, ImGuiState::pointclouds,
+               IM_ARRAYSIZE(ImGuiState::pointclouds));
+
+  // NOTE: Need to implement later when changing between datasets
+  // if (ImGuiState::DidDatasetChange()) {
+  //  ImGuiState::dataset_parsed = false;
+  //}
+
+  // ImGui::NewLine();
+
+  // Button to call ParseConfig
+  if (ImGui::Button("Button 1")) {
+    pl.ParseDataset(ImGuiState::dataset_idx);
+    ImGuiState::dataset_parsed = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::IsDatasetParsed())
+      ? ImGui::Text("Success! Parsed Dataset")
+      : ImGui::Text("Click to Parse Dataset Config");
+
+  // Extract object point clouds
+  if (!ImGuiState::IsDatasetParsed()) {
+    ImGui::BeginDisabled();
+  }
+
+  if (ImGui::Button("Button 2")) {
+    pl.ExtractObjectPointClouds();
+    ImGuiState::obj_pc = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::ExtractedObjectPointClouds())
+      ? ImGui::Text("Success! Extracted Object Point Clouds")
+      : ImGui::Text("Click to Extract Object Point Clouds");
+
+  if (!ImGuiState::IsDatasetParsed())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::ExtractedObjectPointClouds()) {
+    ImGui::BeginDisabled();
+  }
+
+  if (ImGui::Button("Button 3")) {
+    pl.MCAR();
+    ImGuiState::mcar = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::ComputedMCAR()) ? ImGui::Text("Success! MCAR Calculated")
+                               : ImGui::Text("Click to Compute MCAR");
+
+  if (!ImGuiState::ExtractedObjectPointClouds())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::ComputedMCAR()) {
+    ImGui::BeginDisabled();
+  }
+
+  if (ImGui::Button("Button 4")) {
+    pl.IDW();
+    ImGuiState::idw = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::ComputedIDW()) ? ImGui::Text("Success! IDW Calculated")
+                              : ImGui::Text("Click to Compute IDW");
+
+  if (!ImGuiState::ComputedMCAR())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::ComputedIDW()) {
+    ImGui::BeginDisabled();
+  }
+
+  if (ImGui::Button("Button 5")) {
+    pl.Eigs();
+    ImGuiState::eigs = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues Calculated")
+                               : ImGui::Text("Click to Compute Eigenvalues");
+
+  if (!ImGuiState::ComputedIDW())
+    ImGui::EndDisabled();
+}
+
+void datasetComparisonTesting(Pipeline &pl) {
+
+  // Dropdown selectable box. dataset_idx holds the value for the dataset to
+  // use
+  ImGui::Combo("Choose Dataset", &ImGuiState::dataset_idx, ImGuiState::datasets,
+               IM_ARRAYSIZE(ImGuiState::datasets));
+}
+
 int main(int argc, char **argv) {
 
   GLFWwindow *window = initGUI();
@@ -69,102 +172,16 @@ int main(int argc, char **argv) {
     ImGui::NewFrame();
 
     ImGui::Begin("Pipeline");
+    ImGui::SetWindowFontScale(5.0f);
 
-    // Beginning of the label value headers for window interaction
-    ImGui::LabelText("label", "Value");
-
-    // Dropdown selectable box. dataset_idx holds the value for the dataset to
-    // use
-    ImGui::Combo("Choose Dataset", &ImGuiState::dataset_idx,
-                 ImGuiState::datasets, IM_ARRAYSIZE(ImGuiState::datasets));
-    // ImGui::SameLine();
-
-    // NOTE: Need to implement later when changing between datasets
-    // if (ImGuiState::DidDatasetChange()) {
-    //  ImGuiState::dataset_parsed = false;
-    //}
-
-    // ImGui::NewLine();
-
-    // Button to call ParseConfig
-    if (ImGui::Button("Button 1")) {
-      pl.ParseDataset(ImGuiState::dataset_idx);
-      ImGuiState::dataset_parsed = true;
+    if (ImGui::TreeNode("Novel Methods Testing")) {
+      novelMethodTesting(pl);
+      ImGui::TreePop();
     }
-
-    ImGui::SameLine();
-    (ImGuiState::IsDatasetParsed())
-        ? ImGui::Text("Success! Parsed Dataset")
-        : ImGui::Text("Click to Parse Dataset Config");
-
-    // Extract object point clouds
-    if (!ImGuiState::IsDatasetParsed()) {
-      ImGui::BeginDisabled();
+    if (ImGui::TreeNode("Dataset Comparison Testing")) {
+      datasetComparisonTesting(pl);
+      ImGui::TreePop();
     }
-
-    if (ImGui::Button("Button 2")) {
-      pl.ExtractObjectPointClouds();
-      ImGuiState::obj_pc = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::ExtractedObjectPointClouds())
-        ? ImGui::Text("Success! Extracted Object Point Clouds")
-        : ImGui::Text("Click to Extract Object Point Clouds");
-
-    if (!ImGuiState::IsDatasetParsed())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::ExtractedObjectPointClouds()) {
-      ImGui::BeginDisabled();
-    }
-
-    if (ImGui::Button("Button 3")) {
-      pl.MCAR();
-      ImGuiState::mcar = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::ComputedMCAR())
-        ? ImGui::Text("Success! MCAR Calculated")
-        : ImGui::Text("Click to Compute MCAR");
-
-    if (!ImGuiState::ExtractedObjectPointClouds())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::ComputedMCAR()) {
-      ImGui::BeginDisabled();
-    }
-
-    if (ImGui::Button("Button 4")) {
-      pl.IDW();
-      ImGuiState::idw = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::ComputedIDW())
-        ? ImGui::Text("Success! IDW Calculated")
-        : ImGui::Text("Click to Compute IDW");
-
-    if (!ImGuiState::ComputedMCAR())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::ComputedIDW()) {
-      ImGui::BeginDisabled();
-    }
-
-    if (ImGui::Button("Button 5")) {
-      pl.Eigs();
-      ImGuiState::eigs = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::ComputedEigs())
-        ? ImGui::Text("Success! Eigenvalues Calculated")
-        : ImGui::Text("Click to Compute Eigenvalues");
-
-    if (!ImGuiState::ComputedIDW())
-      ImGui::EndDisabled();
 
     // ImGui::Text("This is some useful text."); // Display some text (you can
     //  use a format strings too)
@@ -230,21 +247,21 @@ int main(int argc, char **argv) {
   // ros::init(argc, argv, "sgpr_ros_node");
   // ros::NodeHandle n;
 
-  int dataset;
-  ros::param::get("dataset", dataset);
+  // int dataset;
+  // ros::param::get("dataset", dataset);
 
-  switch (dataset) {
-  case 0:
-  case 1:
-    pl.PostProcess(dataset);
-    break;
-  case 2:
-    pl.RealTime();
-    break;
-  default:
-    //   ROS_DEBUG("NOT SUPPORTED");
-    break;
-  }
+  // switch (dataset) {
+  // case 0:
+  // case 1:
+  //   pl.PostProcess(dataset);
+  //   break;
+  // case 2:
+  //   pl.RealTime();
+  //   break;
+  // default:
+  //   //   ROS_DEBUG("NOT SUPPORTED");
+  //   break;
+  // }
 
   // ROS_DEBUG("Done Processing");
 

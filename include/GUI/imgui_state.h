@@ -1,8 +1,12 @@
 #include "imgui.h"
 namespace ImGuiState {
+
 inline const char *datasets[] = {"3RScan", "Matterport3D", "SemanticKitti"};
+inline const char *pointclouds[] = {"/home/nate/Datasets/teddyPly/b1.ply", "/home/nate/Datasets/teddyPly/b2.ply"};
 
 inline static int dataset_idx = 0;
+inline static int point_cloud_idx1= 0;
+inline static int point_cloud_idx2= 1;
 inline static bool dataset_parsed = false;
 inline static bool obj_pc= false;
 inline static bool mcar = false;
