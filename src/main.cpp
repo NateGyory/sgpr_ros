@@ -1,5 +1,8 @@
 #include <iostream>
+#include <pcl/common/io.h>
+#include <pcl/point_cloud.h>
 #include <string>
+#include <thread>
 
 #include <ros/console.h>
 #include <ros/param.h>
@@ -15,8 +18,42 @@
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
+using namespace std::chrono_literals;
+
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
+void RunVizThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
+                  pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2) {
+
+  pcl::visualization::PCLVisualizer::Ptr viewer(
+      new pcl::visualization::PCLVisualizer("3D Viewer"));
+  viewer->initCameraParameters();
+
+  int v1(0);
+  viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v1);
+  viewer->setBackgroundColor(0, 0, 0, v1);
+  viewer->addPointCloud<pcl::PointXYZ>(cloud1, "Cloud 1", v1);
+
+  int v2(0);
+  viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v2);
+  viewer->setBackgroundColor(0.3, 0.3, 0.3, v2);
+  viewer->addPointCloud<pcl::PointXYZ>(cloud2, "Cloud 2", v2);
+
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 1");
+  viewer->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 2");
+  viewer->addCoordinateSystem(1.0);
+
+  while (!viewer->wasStopped()) {
+    viewer->spinOnce(100);
+    std::this_thread::sleep_for(100ms);
+  }
+
+  viewer->close();
+  std::cout << "closed!" << std::endl;
 }
 
 GLFWwindow *initGUI() {
@@ -52,114 +89,21 @@ GLFWwindow *initGUI() {
   return window;
 }
 
-void novelMethodTesting(Pipeline &pl) {
-  ImGui::LabelText("label", "Value");
-
-  ImGui::Combo("Choose PointCloud 1", &ImGuiState::point_cloud_idx1, ImGuiState::pointclouds,
-               IM_ARRAYSIZE(ImGuiState::pointclouds));
-
-
-  ImGui::Combo("Choose PointCloud 2", &ImGuiState::point_cloud_idx2, ImGuiState::pointclouds,
-               IM_ARRAYSIZE(ImGuiState::pointclouds));
-
-  // NOTE: Need to implement later when changing between datasets
-  // if (ImGuiState::DidDatasetChange()) {
-  //  ImGuiState::dataset_parsed = false;
-  //}
-
-  // ImGui::NewLine();
-
-  // Button to call ParseConfig
-  if (ImGui::Button("Button 1")) {
-    pl.ParseDataset(ImGuiState::dataset_idx);
-    ImGuiState::dataset_parsed = true;
-  }
-
-  ImGui::SameLine();
-  (ImGuiState::IsDatasetParsed())
-      ? ImGui::Text("Success! Parsed Dataset")
-      : ImGui::Text("Click to Parse Dataset Config");
-
-  // Extract object point clouds
-  if (!ImGuiState::IsDatasetParsed()) {
-    ImGui::BeginDisabled();
-  }
-
-  if (ImGui::Button("Button 2")) {
-    pl.ExtractObjectPointClouds();
-    ImGuiState::obj_pc = true;
-  }
-
-  ImGui::SameLine();
-  (ImGuiState::ExtractedObjectPointClouds())
-      ? ImGui::Text("Success! Extracted Object Point Clouds")
-      : ImGui::Text("Click to Extract Object Point Clouds");
-
-  if (!ImGuiState::IsDatasetParsed())
-    ImGui::EndDisabled();
-
-  if (!ImGuiState::ExtractedObjectPointClouds()) {
-    ImGui::BeginDisabled();
-  }
-
-  if (ImGui::Button("Button 3")) {
-    pl.MCAR();
-    ImGuiState::mcar = true;
-  }
-
-  ImGui::SameLine();
-  (ImGuiState::ComputedMCAR()) ? ImGui::Text("Success! MCAR Calculated")
-                               : ImGui::Text("Click to Compute MCAR");
-
-  if (!ImGuiState::ExtractedObjectPointClouds())
-    ImGui::EndDisabled();
-
-  if (!ImGuiState::ComputedMCAR()) {
-    ImGui::BeginDisabled();
-  }
-
-  if (ImGui::Button("Button 4")) {
-    pl.IDW();
-    ImGuiState::idw = true;
-  }
-
-  ImGui::SameLine();
-  (ImGuiState::ComputedIDW()) ? ImGui::Text("Success! IDW Calculated")
-                              : ImGui::Text("Click to Compute IDW");
-
-  if (!ImGuiState::ComputedMCAR())
-    ImGui::EndDisabled();
-
-  if (!ImGuiState::ComputedIDW()) {
-    ImGui::BeginDisabled();
-  }
-
-  if (ImGui::Button("Button 5")) {
-    pl.Eigs();
-    ImGuiState::eigs = true;
-  }
-
-  ImGui::SameLine();
-  (ImGuiState::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues Calculated")
-                               : ImGui::Text("Click to Compute Eigenvalues");
-
-  if (!ImGuiState::ComputedIDW())
-    ImGui::EndDisabled();
-}
-
-void datasetComparisonTesting(Pipeline &pl) {
-
-  // Dropdown selectable box. dataset_idx holds the value for the dataset to
-  // use
-  ImGui::Combo("Choose Dataset", &ImGuiState::dataset_idx, ImGuiState::datasets,
-               IM_ARRAYSIZE(ImGuiState::datasets));
-}
+// void datasetComparisonTesting(Pipeline &pl) {
+//
+//   // Dropdown selectable box. dataset_idx holds the value for the dataset to
+//   // use
+//   ImGui::Combo("Choose Dataset", &ImGuiState::dataset_idx,
+//   ImGuiState::datasets,
+//                IM_ARRAYSIZE(ImGuiState::datasets));
+// }
 
 int main(int argc, char **argv) {
 
   GLFWwindow *window = initGUI();
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+  // Define Pipeline
   Pipeline pl;
 
   // GUI loop
@@ -174,54 +118,182 @@ int main(int argc, char **argv) {
     ImGui::Begin("Pipeline");
     ImGui::SetWindowFontScale(5.0f);
 
-    if (ImGui::TreeNode("Novel Methods Testing")) {
-      novelMethodTesting(pl);
-      ImGui::TreePop();
+    // --------------------------------------------------------------
+    ImGui::Text("Point Clouds");
+
+    ImGui::Combo("Choose PointCloud 1", &ImGuiState::point_cloud_idx1,
+                 ImGuiState::pointclouds,
+                 IM_ARRAYSIZE(ImGuiState::pointclouds));
+
+    ImGui::Combo("Choose PointCloud 2", &ImGuiState::point_cloud_idx2,
+                 ImGuiState::pointclouds,
+                 IM_ARRAYSIZE(ImGuiState::pointclouds));
+
+    if (ImGui::Button("Button 1")) {
+      pl.ParsePointCloudPair(
+          ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx1),
+          ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx2));
+      ImGuiState::point_clouds_read = true;
     }
-    if (ImGui::TreeNode("Dataset Comparison Testing")) {
-      datasetComparisonTesting(pl);
-      ImGui::TreePop();
+
+    ImGui::SameLine();
+    (ImGuiState::PointCloudsRead())
+        ? ImGui::Text("Success! read point clouds")
+        : ImGui::Text("Click to read in point cloud files");
+
+    // Extract object point clouds
+    if (!ImGuiState::PointCloudsRead()) {
+      ImGui::BeginDisabled();
     }
 
-    // ImGui::Text("This is some useful text."); // Display some text (you can
-    //  use a format strings too)
-    // ImGui::Checkbox(
-    //    "Pipeline Window",
-    //    &pipeline_window); // Edit bools storing our window open/close state
-    // ImGui::Checkbox("Another Window", &show_another_window);
+    // --------------------------------------------------------------
+    ImGui::Separator();
+    ImGui::Text("Graph Formulation");
 
-    // ImGui::SliderFloat("float", &f, 0.0f,
-    //                    1.0f); // Edit 1 float using a slider from 0.0f
-    //                    to 1.0f
-    // ImGui::ColorEdit3(
-    //     "clear color",
-    //     (float *)&clear_color); // Edit 3 floats representing a color
+    // TODO: Choose edge heuristic algo
+    ImGui::Combo("Edge Heuristic", &ImGuiState::edge_heuristic_idx,
+                 ImGuiState::edge_heuristics,
+                 IM_ARRAYSIZE(ImGuiState::edge_heuristics));
 
-    // if (ImGui::Button("Button")) // Buttons return true when clicked (most
-    //                              // widgets return true when
-    //                              edited/activated)
-    //   counter++;
-    // ImGui::SameLine();
-    // ImGui::Text("counter = %d", counter);
+    if (ImGui::Button("Button 2")) {
+      // pl.ExtractObjectPointClouds();
+      // pl.EdgeCreation(ImGuiState::edge_heuristic);
+      ImGuiState::edges_created = true;
+    }
 
-    // ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-    //             1000.0f / ImGui::GetIO().Framerate,
-    //             ImGui::GetIO().Framerate);
+    ImGui::SameLine();
+    (ImGuiState::EdgesCreated()) ? ImGui::Text("Success! graph edges created")
+                                 : ImGui::Text("Click to compute graph edges");
+
+    if (!ImGuiState::PointCloudsRead())
+      ImGui::EndDisabled();
+
+    if (!ImGuiState::EdgesCreated()) {
+      ImGui::BeginDisabled();
+    }
+
+    // --------------------------------------------------------------
+    ImGui::Separator();
+    ImGui::Text("Laplacian");
+
+    // TODO: Choose edge heuristic algo
+    ImGui::Combo("Laplacian Algorithm", &ImGuiState::laplacian_idx,
+                 ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
+
+    if (ImGui::Button("Button 3")) {
+      // pl.MCAR();
+      ImGuiState::laplacian_created = true;
+    }
+
+    ImGui::SameLine();
+    (ImGuiState::LaplacianCreated())
+        ? ImGui::Text("Success! Laplacian computed")
+        : ImGui::Text("Click to compute Laplacian");
+
+    if (!ImGuiState::EdgesCreated())
+      ImGui::EndDisabled();
+
+    if (!ImGuiState::LaplacianCreated())
+      ImGui::BeginDisabled();
+
+    // --------------------------------------------------------------
+    ImGui::Separator();
+    ImGui::Text("Eigenvalues");
+
+    ImGui::RadioButton("All Eigenvalues",
+                       &ImGuiState::eigendecomposition_method, 0);
+    ImGui::SameLine();
+    ImGui::RadioButton("Specific # of Eigenvalues",
+                       &ImGuiState::eigendecomposition_method, 1);
+
+    // --- Input Box
+    if (ImGuiState::eigendecomposition_method == 0)
+      ImGui::BeginDisabled();
+
+    ImGui::InputInt("# of Eigenvalues to compute", &ImGuiState::eigs_number);
+
+    if (ImGuiState::eigendecomposition_method == 0)
+      ImGui::EndDisabled();
+    // --- ! Input Box
+
+    if (ImGui::Button("Button 4")) {
+      // pl.IDW();
+      ImGuiState::eigs = true;
+    }
+
+    ImGui::SameLine();
+    (ImGuiState::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues computed")
+                                 : ImGui::Text("Click to compute eigenvalues");
+
+    if (!ImGuiState::LaplacianCreated())
+      ImGui::EndDisabled();
+
+    if (!ImGuiState::ComputedEigs())
+      ImGui::BeginDisabled();
+
+    // --------------------------------------------------------------
+    ImGui::Separator();
+    ImGui::Text("Analysis");
+
+    if (ImGui::Button("Button 5")) {
+      ImGuiState::ad_test = true;
+    }
+
+    ImGui::SameLine();
+    (ImGuiState::ADTestRun()) ? ImGui::Text("Success! AD Test finished")
+                              : ImGui::Text("Click to run AD Test");
+
+    if (ImGui::Button("Button 6")) {
+      ImGuiState::ks_test = true;
+    }
+
+    ImGui::SameLine();
+    (ImGuiState::KSTestRun()) ? ImGui::Text("Success! KS Test finished")
+                              : ImGui::Text("Click to run KS Test");
+
+    if (!ImGuiState::ComputedEigs())
+      ImGui::EndDisabled();
+
+    if (!ImGuiState::PointCloudsRead()) // || TODO viz is already open)
+      ImGui::BeginDisabled();
+
+    // --------------------------------------------------------------
+    ImGui::Separator();
+    ImGui::Text("Visualizer");
+
+    if (ImGui::Button("Button 7")) {
+      ImGuiState::pcl_viz = true;
+      auto pointCloudPair = pl.GetPointCloudPair();
+
+      std::thread t1(RunVizThread, pointCloudPair.first, pointCloudPair.second);
+      t1.detach();
+    }
+
+    // pcl::visualization::PCLVisualizer::Ptr viewer(
+    //     new pcl::visualization::PCLVisualizer("3D Viewer"));
+
+    // viewer->setBackgroundColor(0, 0, 0, 0);
+    // viewer->setBackgroundColor(0, 0, 0, 1);
+    // viewer->addPointCloud<pcl::PointXYZ>(pointCloudPair.first, "Cloud 1",
+    // 0); viewer->addPointCloud<pcl::PointXYZ>(pointCloudPair.second, "Cloud
+    // 2", 1); viewer->setPointCloudRenderingProperties(
+    //     pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Cloud 1", 0);
+    // viewer->setPointCloudRenderingProperties(
+    //     pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Cloud 2", 1);
+    // viewer->addCoordinateSystem(1.0, "Cloud 1", 0);
+    // viewer->addCoordinateSystem(1.0, "Cloud 2", 1);
+    // viewer->initCameraParameters();
+
+    ImGui::SameLine();
+    (ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
+                           : ImGui::Text("Click to run PCL visualizer");
+
+    if (!ImGuiState::PointCloudsRead())
+      ImGui::EndDisabled();
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
     ImGui::End();
-
-    // 3. Show another simple window.
-    // if (show_another_window) {
-    //  ImGui::Begin(
-    //      "Another Window",
-    //      &show_another_window); // Pass a pointer to our bool variable (the
-    //                             // window will have a closing button that
-    //                             will
-    //                             // clear the bool when clicked)
-    //  ImGui::Text("Hello from another window!");
-    //  if (ImGui::Button("Close Me"))
-    //    show_another_window = false;
-    //  ImGui::End();
-    //}
 
     // Rendering
     ImGui::Render();
