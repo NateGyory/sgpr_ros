@@ -23,6 +23,8 @@ inline static int eigendecomposition_method = 0;
 
 // Input box values
 inline static int eigs_number = 100;
+inline static double radius_1 = 0.0f;
+inline static double radius_2 = 0.0f;
 
 // GUI state variables
 inline static bool dataset_parsed = false;
@@ -48,6 +50,7 @@ inline static bool ComputedEigs() { return eigs; }
 inline static bool ADTestRun() { return ad_test; }
 inline static bool KSTestRun() { return ks_test; }
 inline static bool PCLViz() { return pcl_viz; }
+inline static bool ShowRadius() { return edge_heuristic_idx == 1 && edges_created; }
 
 inline static std::string GetPlyFileName(int idx) {
   return &(*pointclouds[idx]);

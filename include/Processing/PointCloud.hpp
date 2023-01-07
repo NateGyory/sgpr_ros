@@ -9,9 +9,36 @@
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/io/ply_io.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/point_cloud.h>
 
 namespace Processing {
 namespace PointCloud {
+
+inline double cloudComputeMCAR(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud) {
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdTree;
+  kdTree.setInputCloud(cloud);
+
+  int size = cloud->size();
+
+  double radius = 0.1f;
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+
+    kdTree.radiusSearch(i, radius, indicies_found,
+                                        squaredDistances, 2);
+    int num_edges = indicies_found.size() - 1;
+
+    if (num_edges == 0) {
+      std::cout << "Increasing radius" << std::endl;
+      i--;
+      radius += 0.1f;
+    }
+  }
+
+  return radius;
+}
 
 inline void computeMCAR(SpectralObject &spectral_object) {
   spectral_object.kdTree.setInputCloud(spectral_object.cloud);

@@ -1,16 +1,32 @@
 #include <Pipeline.h>
 
-//void Pipeline::CloudViz(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud1,
-//                        pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud2) {
+// void Pipeline::CloudViz(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud1,
+//                         pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud2) {
 //
-//  pcl::visualization::CloudViewer viewer1("Cloud Viewer 1");
-//  pcl::visualization::CloudViewer viewer2("Cloud Viewer 2");
-//  viewer1.showCloud(cloud1);
-//  viewer2.showCloud(cloud2);
-//  std::cout << '\n' << "Press Enter";
-//  while (std::cin.get() != '\n') {
-//  }
-//}
+//   pcl::visualization::CloudViewer viewer1("Cloud Viewer 1");
+//   pcl::visualization::CloudViewer viewer2("Cloud Viewer 2");
+//   viewer1.showCloud(cloud1);
+//   viewer2.showCloud(cloud2);
+//   std::cout << '\n' << "Press Enter";
+//   while (std::cin.get() != '\n') {
+//   }
+// }
+
+void Pipeline::ComputeEdges(int edge_heuristic, double &radius1, double &radius2) {
+  switch (edge_heuristic) {
+  case 0:
+    //pl.Knn();
+  case 1:
+    radius1 = Processing::PointCloud::cloudComputeMCAR(mPointCloudPair.first);
+    radius2 = Processing::PointCloud::cloudComputeMCAR(mPointCloudPair.second);
+    break;
+  case 2:
+    //pl.FullyConnected();
+    break;
+  default:
+    break;
+  }
+}
 
 void Pipeline::ParsePointCloudPair(std::string f_ply1, std::string f_ply2) {
   mPointCloudPair = std::make_pair(

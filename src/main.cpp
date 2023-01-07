@@ -116,7 +116,9 @@ int main(int argc, char **argv) {
     ImGui::NewFrame();
 
     ImGui::Begin("Pipeline");
-    ImGui::SetWindowFontScale(5.0f);
+
+    // Only for laptop
+    //ImGui::SetWindowFontScale(5.0f);
 
     // --------------------------------------------------------------
     ImGui::Text("Point Clouds");
@@ -156,14 +158,18 @@ int main(int argc, char **argv) {
                  IM_ARRAYSIZE(ImGuiState::edge_heuristics));
 
     if (ImGui::Button("Button 2")) {
-      // pl.ExtractObjectPointClouds();
-      // pl.EdgeCreation(ImGuiState::edge_heuristic);
+      pl.ComputeEdges(ImGuiState::edge_heuristic_idx, ImGuiState::radius_1, ImGuiState::radius_2);
       ImGuiState::edges_created = true;
     }
 
     ImGui::SameLine();
     (ImGuiState::EdgesCreated()) ? ImGui::Text("Success! graph edges created")
                                  : ImGui::Text("Click to compute graph edges");
+
+    if (ImGuiState::ShowRadius()) {
+      ImGui::Text("Radius for Cloud 1 is: %f", ImGuiState::radius_1);
+      ImGui::Text("Radius for Cloud 2 is: %f", ImGuiState::radius_2);
+    }
 
     if (!ImGuiState::PointCloudsRead())
       ImGui::EndDisabled();

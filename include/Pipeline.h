@@ -38,9 +38,7 @@ public:
 
   // PointCloud Comparison Pipeline
   void ParsePointCloudPair(std::string f_ply1, std::string f_ply2);
-  void CreateViewers();
-  void CloudViz(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud1,
-                pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud2);
+  void ComputeEdges(int edge_heuristic, double &radius1, double &radius2);
 
   PointCloudPair GetPointCloudPair() { return mPointCloudPair; }
 
