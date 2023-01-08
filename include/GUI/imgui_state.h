@@ -16,15 +16,15 @@ inline static int dataset_idx = 0;
 inline static int point_cloud_idx1 = 0;
 inline static int point_cloud_idx2 = 1;
 inline static int edge_heuristic_idx= 1;
-inline static int laplacian_idx= 1;
+inline static int laplacian_idx= 0;
 
 // Radio indexes
-inline static int eigendecomposition_method = 0;
+inline static int eigendecomposition_method = 1;
 
 // Input box values
 inline static int eigs_number = 100;
-inline static double radius_1 = 0.0f;
-inline static double radius_2 = 0.0f;
+//inline static double radius_1 = 0.0f;
+//inline static double radius_2 = 0.0f;
 
 // GUI state variables
 inline static bool dataset_parsed = false;
@@ -38,6 +38,7 @@ inline static bool eigs = false;
 inline static bool ad_test = false;
 inline static bool ks_test = false;
 inline static bool pcl_viz = false;
+inline static bool matplot = false;
 
 inline static bool IsDatasetParsed() { return dataset_parsed; }
 inline static bool PointCloudsRead() { return point_clouds_read; }
@@ -51,6 +52,7 @@ inline static bool ADTestRun() { return ad_test; }
 inline static bool KSTestRun() { return ks_test; }
 inline static bool PCLViz() { return pcl_viz; }
 inline static bool ShowRadius() { return edge_heuristic_idx == 1 && edges_created; }
+inline static bool MatplotViz() { return matplot; }
 
 inline static std::string GetPlyFileName(int idx) {
   return &(*pointclouds[idx]);

@@ -3,8 +3,10 @@
 
 #include <algorithm>
 #include <memory>
+#include <pcl/kdtree/kdtree_flann.h>
 #include <string>
 #include <vector>
+#include <utility>
 
 #include "DataLoaders/DataLoader.h"
 #include "DataLoaders/Matterport3D.h"
@@ -18,8 +20,13 @@
 #include <Processing/Laplacian.hpp>
 #include <Processing/PointCloud.hpp>
 
+#include <Types/GraphLaplacian.h>
+
 using PointCloudPair = std::pair<pcl::PointCloud<pcl::PointXYZ>::Ptr,
                                  pcl::PointCloud<pcl::PointXYZ>::Ptr>;
+
+using GraphLaplacianPair =
+    std::pair<std::shared_ptr<GraphLaplacian>, std::shared_ptr<GraphLaplacian>>;
 
 class Pipeline {
 public:
@@ -38,9 +45,15 @@ public:
 
   // PointCloud Comparison Pipeline
   void ParsePointCloudPair(std::string f_ply1, std::string f_ply2);
-  void ComputeEdges(int edge_heuristic, double &radius1, double &radius2);
+  void FilterCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud);
+  void ComputeEdges(int edge_heuristic);
+  void ComputeLaplcian(int laplacian_type);
+  void ComputeEigs(int eigs_num);
+  void PlotHistograms();
 
   PointCloudPair GetPointCloudPair() { return mPointCloudPair; }
+  double GetRadius1() { return mGraphLaplacianPair.first->radius; }
+  double GetRadius2() { return mGraphLaplacianPair.second->radius; }
 
 private:
   void initDataLoader(int dataset);
@@ -48,7 +61,10 @@ private:
   scene_map_t mSceneMap;
   spDataLoader mDataLoader;
   spKeyFrameDB mKeyFrameDB;
+
+  // NMT pipeline
   PointCloudPair mPointCloudPair;
+  GraphLaplacianPair mGraphLaplacianPair;
 };
 
 #endif // !PIPELINE

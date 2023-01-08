@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
     ImGui::Begin("Pipeline");
 
     // Only for laptop
-    //ImGui::SetWindowFontScale(5.0f);
+    // ImGui::SetWindowFontScale(5.0f);
 
     // --------------------------------------------------------------
     ImGui::Text("Point Clouds");
@@ -152,13 +152,12 @@ int main(int argc, char **argv) {
     ImGui::Separator();
     ImGui::Text("Graph Formulation");
 
-    // TODO: Choose edge heuristic algo
     ImGui::Combo("Edge Heuristic", &ImGuiState::edge_heuristic_idx,
                  ImGuiState::edge_heuristics,
                  IM_ARRAYSIZE(ImGuiState::edge_heuristics));
 
     if (ImGui::Button("Button 2")) {
-      pl.ComputeEdges(ImGuiState::edge_heuristic_idx, ImGuiState::radius_1, ImGuiState::radius_2);
+      pl.ComputeEdges(ImGuiState::edge_heuristic_idx);
       ImGuiState::edges_created = true;
     }
 
@@ -167,8 +166,8 @@ int main(int argc, char **argv) {
                                  : ImGui::Text("Click to compute graph edges");
 
     if (ImGuiState::ShowRadius()) {
-      ImGui::Text("Radius for Cloud 1 is: %f", ImGuiState::radius_1);
-      ImGui::Text("Radius for Cloud 2 is: %f", ImGuiState::radius_2);
+      ImGui::Text("Radius for Cloud 1 is: %f", pl.GetRadius1());
+      ImGui::Text("Radius for Cloud 2 is: %f", pl.GetRadius2());
     }
 
     if (!ImGuiState::PointCloudsRead())
@@ -182,12 +181,11 @@ int main(int argc, char **argv) {
     ImGui::Separator();
     ImGui::Text("Laplacian");
 
-    // TODO: Choose edge heuristic algo
     ImGui::Combo("Laplacian Algorithm", &ImGuiState::laplacian_idx,
                  ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
 
     if (ImGui::Button("Button 3")) {
-      // pl.MCAR();
+      pl.ComputeLaplcian(ImGuiState::laplacian_idx);
       ImGuiState::laplacian_created = true;
     }
 
@@ -223,7 +221,10 @@ int main(int argc, char **argv) {
     // --- ! Input Box
 
     if (ImGui::Button("Button 4")) {
-      // pl.IDW();
+      int eigs_num = (ImGuiState::eigendecomposition_method == 0)
+                         ? -1
+                         : ImGuiState::eigs_number;
+      pl.ComputeEigs(eigs_num);
       ImGuiState::eigs = true;
     }
 
@@ -275,24 +276,25 @@ int main(int argc, char **argv) {
       t1.detach();
     }
 
-    // pcl::visualization::PCLVisualizer::Ptr viewer(
-    //     new pcl::visualization::PCLVisualizer("3D Viewer"));
-
-    // viewer->setBackgroundColor(0, 0, 0, 0);
-    // viewer->setBackgroundColor(0, 0, 0, 1);
-    // viewer->addPointCloud<pcl::PointXYZ>(pointCloudPair.first, "Cloud 1",
-    // 0); viewer->addPointCloud<pcl::PointXYZ>(pointCloudPair.second, "Cloud
-    // 2", 1); viewer->setPointCloudRenderingProperties(
-    //     pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Cloud 1", 0);
-    // viewer->setPointCloudRenderingProperties(
-    //     pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "Cloud 2", 1);
-    // viewer->addCoordinateSystem(1.0, "Cloud 1", 0);
-    // viewer->addCoordinateSystem(1.0, "Cloud 2", 1);
-    // viewer->initCameraParameters();
-
     ImGui::SameLine();
     (ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
                            : ImGui::Text("Click to run PCL visualizer");
+
+    if (!ImGuiState::ComputedEigs()) // || TODO viz is already open)
+      ImGui::BeginDisabled();
+
+    if (ImGui::Button("Button 8")) {
+      ImGuiState::matplot = true;
+      pl.PlotHistograms();
+    }
+
+    ImGui::SameLine();
+    (ImGuiState::MatplotViz())
+        ? ImGui::Text("Success! Matplot++ visualizer is running")
+        : ImGui::Text("Click to run MatPlot++ visualizer");
+
+    if (!ImGuiState::ComputedEigs())
+      ImGui::EndDisabled();
 
     if (!ImGuiState::PointCloudsRead())
       ImGui::EndDisabled();
