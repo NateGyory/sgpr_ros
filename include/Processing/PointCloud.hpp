@@ -5,6 +5,7 @@
 #include <Utils/Visualization.hpp>
 
 #include <boost/smart_ptr/make_shared_array.hpp>
+#include <cmath>
 #include <memory>
 #include <pcl/common/io.h>
 #include <pcl/filters/conditional_removal.h>
@@ -37,7 +38,7 @@ inline void computeMCAR(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud, std::shared_
     if (num_edges == 0) {
       std::cout << "Increasing radius" << std::endl;
       i--;
-      graphLaplacian->radius += 0.1f;
+      graphLaplacian->radius += 0.05f;
     }
   }
 }

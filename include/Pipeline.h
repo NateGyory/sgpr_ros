@@ -44,11 +44,12 @@ public:
   void Eigs();
 
   // PointCloud Comparison Pipeline
-  void ParsePointCloudPair(std::string f_ply1, std::string f_ply2);
-  void FilterCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud);
+  void ParsePointCloudPair(std::string f_ply1, std::string f_ply2, int max_points);
+  void FilterCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud, int max_points);
   void ComputeEdges(int edge_heuristic);
   void ComputeLaplcian(int laplacian_type);
   void ComputeEigs(int eigs_num);
+  void SaveEigenvalues(std::string file_name);
   void PlotHistograms();
 
   PointCloudPair GetPointCloudPair() { return mPointCloudPair; }

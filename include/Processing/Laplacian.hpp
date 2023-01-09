@@ -2,6 +2,9 @@
 
 #include "Scene.h"
 #include "Types/GraphLaplacian.h"
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
 #include <memory>
 
 namespace Processing {
@@ -16,13 +19,45 @@ setSmallestDistance(std::shared_ptr<GraphLaplacian> graphLaplacian) {
     std::vector<float> squaredDistances;
     graphLaplacian->kdTree.nearestKSearch(i, 2, indicies_found,
                                           squaredDistances);
-    min = (squaredDistances[1] < min) ? sqrt(squaredDistances[1]) : min;
+    min = (std::sqrt(squaredDistances[1]) < min) ? sqrt(squaredDistances[1])
+                                                 : min;
   }
 
   graphLaplacian->smallestDistance = min;
 }
 
+// TODO this is not the actual generic laplacian. When we create the normalized
+// IDW laplacian we need to change this back
 inline void genericLaplacian(std::shared_ptr<GraphLaplacian> graphLaplacian) {
+
+  unsigned int max_nn = 1000;
+
+  int size = graphLaplacian->kdTree.getInputCloud()->size();
+  graphLaplacian->laplacian = arma::sp_mat(size, size);
+
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    graphLaplacian->kdTree.radiusSearch(
+        i, graphLaplacian->radius, indicies_found, squaredDistances, max_nn);
+
+    int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
+    graphLaplacian->laplacian(i, i) = num_edges;
+
+    for (int j = 1; j < indicies_found.size(); j++) {
+      graphLaplacian->laplacian(i, indicies_found[j]) = -1;
+      graphLaplacian->laplacian(indicies_found[j], i) = -1;
+    }
+  }
+}
+
+inline void
+normalizedLaplacian(std::shared_ptr<GraphLaplacian> graphLaplacian) {
 
   setSmallestDistance(graphLaplacian);
   double bias = 1.0 - graphLaplacian->smallestDistance;
@@ -39,14 +74,22 @@ inline void genericLaplacian(std::shared_ptr<GraphLaplacian> graphLaplacian) {
         i, graphLaplacian->radius, indicies_found, squaredDistances, max_nn);
 
     int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
     graphLaplacian->laplacian(i, i) = num_edges;
 
+    double norm = 0.0f;
     for (int j = 1; j < indicies_found.size(); j++) {
-      graphLaplacian->laplacian(i, indicies_found[j]) =
-          -1 / (sqrt(squaredDistances[j]) + bias);
-      graphLaplacian->laplacian(indicies_found[j], i) =
-          -1 / (sqrt(squaredDistances[j]) + bias);
+      double val = 1 / (sqrt(squaredDistances[j]) + bias);
+      norm += val;
+      graphLaplacian->laplacian(i, indicies_found[j]) = -1 * val;
+      graphLaplacian->laplacian(indicies_found[j], i) = -1 * val;
     }
+
+    graphLaplacian->laplacian(i,i) /= norm; // Normalize the degree value
   }
 }
 

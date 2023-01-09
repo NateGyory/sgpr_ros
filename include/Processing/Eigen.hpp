@@ -4,11 +4,16 @@
 #include "Types/GraphLaplacian.h"
 #include <memory>
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 namespace Processing {
 namespace Eigen {
 namespace NMT {
 
-inline void computeEigenValues(std::shared_ptr<GraphLaplacian> graphLaplacian, int eigs_num){
+inline void computeEigenValues(std::shared_ptr<GraphLaplacian> graphLaplacian,
+                               int eigs_num) {
 
   arma::mat eigvec;
   int eig_n =
@@ -20,13 +25,26 @@ inline void computeEigenValues(std::shared_ptr<GraphLaplacian> graphLaplacian, i
   }
 
   auto start = std::chrono::steady_clock::now();
-  arma::eigs_sym(graphLaplacian->eigenvalues, eigvec, graphLaplacian->laplacian, eig_n);
+  arma::eigs_sym(graphLaplacian->eigenvalues, eigvec, graphLaplacian->laplacian,
+                 eig_n);
   auto end = std::chrono::steady_clock::now();
   std::cout << "Elapsed time in miliseconds: "
             << std::chrono::duration_cast<std::chrono::milliseconds>(end -
                                                                      start)
                    .count()
             << " ms" << std::endl;
+}
+
+inline void SaveEigenvalues(json &j,
+                            std::shared_ptr<GraphLaplacian> graphLaplacian) {
+
+  std::vector<double> eigs = arma::conv_to<std::vector<double>>::from(
+      graphLaplacian->eigenvalues);
+
+  json eigs_json;
+  eigs_json["eigenvalues"] = eigs;
+
+  j.push_back(eigs_json);
 }
 
 } // namespace NMT

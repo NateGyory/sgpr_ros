@@ -1,5 +1,7 @@
 #include <iostream>
 #include <pcl/common/io.h>
+#include <pcl/impl/point_types.hpp>
+#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 #include <string>
 #include <thread>
@@ -24,6 +26,11 @@ static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+// TODO:
+//    a) Try to actually get the window to close when you tell it to.
+//    b) Determine if we need to use a reference to the point cloud i.e. need to
+//    update the point cloud in the viz frame or we just want to launch a new
+//    window
 void RunVizThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
                   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2) {
 
@@ -36,7 +43,7 @@ void RunVizThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
   viewer->setBackgroundColor(0, 0, 0, v1);
   viewer->addPointCloud<pcl::PointXYZ>(cloud1, "Cloud 1", v1);
 
-  int v2(0);
+  int v2(1);
   viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v2);
   viewer->setBackgroundColor(0.3, 0.3, 0.3, v2);
   viewer->addPointCloud<pcl::PointXYZ>(cloud2, "Cloud 2", v2);
@@ -53,6 +60,89 @@ void RunVizThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
   }
 
   viewer->close();
+  std::cout << "closed!" << std::endl;
+}
+
+void RunVizConnectionThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
+                            pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2,
+                            double r1, double r2) {
+
+  // Viewer 1
+  pcl::visualization::PCLVisualizer::Ptr viewer1(
+      new pcl::visualization::PCLVisualizer("3D Viewer Graph Connections 1"));
+  viewer1->initCameraParameters();
+
+  viewer1->setBackgroundColor(0, 0, 0);
+  viewer1->addPointCloud<pcl::PointXYZ>(cloud1, "Cloud 1");
+
+  viewer1->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 1");
+  viewer1->addCoordinateSystem(1.0);
+
+  // Viewer 2
+  pcl::visualization::PCLVisualizer::Ptr viewer2(
+      new pcl::visualization::PCLVisualizer("3D Viewer Graph Connections 2"));
+  viewer2->initCameraParameters();
+
+  viewer2->setBackgroundColor(0.3, 0.3, 0.3);
+  viewer2->addPointCloud<pcl::PointXYZ>(cloud2, "Cloud 2");
+
+
+  viewer2->setPointCloudRenderingProperties(
+      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 2");
+  viewer2->addCoordinateSystem(1.0);
+
+  unsigned int max_nn = 1000;
+  pcl::KdTreeFLANN<pcl::PointXYZ> kdTree;
+
+  // TODO Maybe separate this so we are not duplicating code
+  kdTree.setInputCloud(cloud1);
+  int size1 = cloud1->size();
+
+  for (int i = 0; i < size1; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    kdTree.radiusSearch(
+        i, r1, indicies_found, squaredDistances, max_nn);
+
+    pcl::PointXYZ pt_r = cloud1->points[i];
+    
+    for (int j = 1; j < indicies_found.size(); j++) {
+      int idx = indicies_found[j];
+      pcl::PointXYZ pt_q = cloud1->points[idx];
+      //viewer->addLine(pt_r, pt_q, "line", 0);
+      std::string string_id = "0" + std::to_string(i) + "-" + std::to_string(j);
+      viewer1->addLine(pt_r, pt_q, string_id, 0);
+    }
+  }
+
+  kdTree.setInputCloud(cloud2);
+  int size2 = cloud2->size();
+
+  for (int i = 0; i < size2; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    kdTree.radiusSearch(
+        i, r2, indicies_found, squaredDistances, max_nn);
+
+    pcl::PointXYZ pt_r = cloud2->points[i];
+    
+    for (int j = 1; j < indicies_found.size(); j++) {
+      int idx = indicies_found[j];
+      pcl::PointXYZ pt_q = cloud2->points[idx];
+      std::string string_id = "1" + std::to_string(i) + "-" + std::to_string(j);
+      viewer2->addLine(pt_r, pt_q, string_id, 0);
+    }
+  }
+
+  while (!viewer1->wasStopped() && !viewer2->wasStopped()) {
+    viewer1->spinOnce(100);
+    viewer2->spinOnce(100);
+    std::this_thread::sleep_for(100ms);
+  }
+
+  viewer1->close();
+  viewer2->close();
   std::cout << "closed!" << std::endl;
 }
 
@@ -131,10 +221,13 @@ int main(int argc, char **argv) {
                  ImGuiState::pointclouds,
                  IM_ARRAYSIZE(ImGuiState::pointclouds));
 
+    //TODO int input box for max_points
+    ImGui::InputInt("Max number of points in point cloud", &ImGuiState::max_pts);
+
     if (ImGui::Button("Button 1")) {
       pl.ParsePointCloudPair(
           ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx1),
-          ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx2));
+          ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx2), ImGuiState::max_pts);
       ImGuiState::point_clouds_read = true;
     }
 
@@ -240,26 +333,50 @@ int main(int argc, char **argv) {
 
     // --------------------------------------------------------------
     ImGui::Separator();
-    ImGui::Text("Analysis");
+    ImGui::Text("Save Eigenvalues");
 
+    ImGui::InputText("file name to save eigenvalues",
+                     ImGuiState::eigenvalue_json_f,
+                     IM_ARRAYSIZE(ImGuiState::eigenvalue_json_f));
     if (ImGui::Button("Button 5")) {
-      ImGuiState::ad_test = true;
+      std::string file_name(ImGuiState::eigenvalue_json_f);
+      pl.SaveEigenvalues(file_name);
+      ImGuiState::saved_eigs = true;
     }
 
     ImGui::SameLine();
-    (ImGuiState::ADTestRun()) ? ImGui::Text("Success! AD Test finished")
-                              : ImGui::Text("Click to run AD Test");
-
-    if (ImGui::Button("Button 6")) {
-      ImGuiState::ks_test = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::KSTestRun()) ? ImGui::Text("Success! KS Test finished")
-                              : ImGui::Text("Click to run KS Test");
+    (ImGuiState::SavedEigs()) ? ImGui::Text("Success! Eigenvalues saved")
+                              : ImGui::Text("Click to save eigenvalues");
 
     if (!ImGuiState::ComputedEigs())
       ImGui::EndDisabled();
+
+    // Currently this functionality is in another GUI
+    // if (!ImGuiState::SavedEigs())
+    //  ImGui::BeginDisabled();
+
+    //// --------------------------------------------------------------
+    // ImGui::Separator();
+    // ImGui::Text("Analysis");
+
+    // if (ImGui::Button("Button 5")) {
+    //   ImGuiState::ad_test = true;
+    // }
+
+    // ImGui::SameLine();
+    //(ImGuiState::ADTestRun()) ? ImGui::Text("Success! AD Test finished")
+    //                           : ImGui::Text("Click to run AD Test");
+
+    // if (ImGui::Button("Button 6")) {
+    //   ImGuiState::ks_test = true;
+    // }
+
+    // ImGui::SameLine();
+    //(ImGuiState::KSTestRun()) ? ImGui::Text("Success! KS Test finished")
+    //                           : ImGui::Text("Click to run KS Test");
+
+    // if (!ImGuiState::ComputedEigs())
+    //   ImGui::EndDisabled();
 
     if (!ImGuiState::PointCloudsRead()) // || TODO viz is already open)
       ImGui::BeginDisabled();
@@ -268,7 +385,7 @@ int main(int argc, char **argv) {
     ImGui::Separator();
     ImGui::Text("Visualizer");
 
-    if (ImGui::Button("Button 7")) {
+    if (ImGui::Button("Button 6")) {
       ImGuiState::pcl_viz = true;
       auto pointCloudPair = pl.GetPointCloudPair();
 
@@ -279,6 +396,26 @@ int main(int argc, char **argv) {
     ImGui::SameLine();
     (ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
                            : ImGui::Text("Click to run PCL visualizer");
+
+    if (!ImGuiState::EdgesCreated())
+      ImGui::BeginDisabled();
+
+    if (ImGui::Button("Button 7")) {
+      ImGuiState::pcl_viz_connection = true;
+      auto pointCloudPair = pl.GetPointCloudPair();
+
+      std::thread t1(RunVizConnectionThread, pointCloudPair.first,
+                     pointCloudPair.second, pl.GetRadius1(), pl.GetRadius2());
+      t1.detach();
+    }
+
+    ImGui::SameLine();
+    (ImGuiState::PCLConnectionViz())
+        ? ImGui::Text("Success! PCL graph connection visualizer is running")
+        : ImGui::Text("Click to run PCL graph connection visualizer");
+
+    if (!ImGuiState::EdgesCreated())
+      ImGui::EndDisabled();
 
     if (!ImGuiState::ComputedEigs()) // || TODO viz is already open)
       ImGui::BeginDisabled();

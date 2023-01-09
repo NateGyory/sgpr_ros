@@ -1,3 +1,5 @@
+#include "Processing/Eigen.hpp"
+#include "Processing/Laplacian.hpp"
 #include <Pipeline.h>
 #include <matplot/matplot.h>
 
@@ -14,6 +16,44 @@ using namespace matplot;
 //   while (std::cin.get() != '\n') {
 //   }
 // }
+
+void Pipeline::SaveEigenvalues(std::string file_name) {
+  std::string file_path =
+      "/home/nate/Development/catkin_ws/src/sgpr_ros/data/" + file_name;
+
+  json j;
+  std::ofstream o(file_path);
+
+  // {
+  //   reference_scans: [
+  //     scan_id:
+  //     ply_color:
+  //     {
+  //       label:
+  //       global_id:
+  //       eigenvalues:
+  //     }
+  //   ],
+  //   query_scans: [
+  //     scan_id:
+  //     reference_scan_id:
+  //     ply_color:
+  //     {
+  //       label:
+  //       global_id:
+  //       eigenvalues:
+  //     }
+  //   ],
+  // }
+
+  j["reference_scans"] = std::vector<json>();
+  j["query_scans"] = std::vector<json>();
+
+  Processing::Eigen::NMT::SaveEigenvalues(j["reference_scans"], mGraphLaplacianPair.first);
+  Processing::Eigen::NMT::SaveEigenvalues(j["query_scans"], mGraphLaplacianPair.second);
+
+  o << std::setw(4) << j << std::endl;
+}
 
 void Pipeline::PlotHistograms() {
   auto f = figure(true);
@@ -63,8 +103,10 @@ void Pipeline::ComputeLaplcian(int laplacian_type) {
   case 0:
     Processing::Laplacian::NMT::genericLaplacian(mGraphLaplacianPair.first);
     Processing::Laplacian::NMT::genericLaplacian(mGraphLaplacianPair.second);
+    break;
   case 1:
-    // TODO Normalized laplacian
+    Processing::Laplacian::NMT::normalizedLaplacian(mGraphLaplacianPair.first);
+    Processing::Laplacian::NMT::normalizedLaplacian(mGraphLaplacianPair.second);
     break;
   default:
     break;
@@ -79,6 +121,7 @@ void Pipeline::ComputeEdges(int edge_heuristic) {
   switch (edge_heuristic) {
   case 0:
     // pl.Knn();
+    break;
   case 1:
     Processing::PointCloud::NMT::computeMCAR(mPointCloudPair.first,
                                              mGraphLaplacianPair.first);
@@ -93,10 +136,11 @@ void Pipeline::ComputeEdges(int edge_heuristic) {
   }
 }
 
-void Pipeline::FilterCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud) {
+void Pipeline::FilterCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud, int max_points) {
   double leafInc = 0.01;
   double leafValue = 0.1;
-  while (cloud->points.size() > 10000) {
+  while (cloud->points.size() > max_points) {
+  //while (cloud->points.size() > 10000) {
     std::cout << "Filtering cloud" << std::endl;
     pcl::PointCloud<pcl::PointXYZ>::Ptr vox_cloud(
         new pcl::PointCloud<pcl::PointXYZ>);
@@ -111,7 +155,7 @@ void Pipeline::FilterCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud) {
   }
 }
 
-void Pipeline::ParsePointCloudPair(std::string f_ply1, std::string f_ply2) {
+void Pipeline::ParsePointCloudPair(std::string f_ply1, std::string f_ply2, int max_points) {
   mPointCloudPair = std::make_pair(
       pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>),
       pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>));
@@ -125,8 +169,8 @@ void Pipeline::ParsePointCloudPair(std::string f_ply1, std::string f_ply2) {
   }
 
   // Filter point clouds
-  FilterCloud(mPointCloudPair.first);
-  FilterCloud(mPointCloudPair.second);
+  FilterCloud(mPointCloudPair.first, max_points);
+  FilterCloud(mPointCloudPair.second, max_points);
 }
 
 void Pipeline::ParseDataset(int dataset) {
