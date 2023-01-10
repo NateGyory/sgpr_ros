@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include <pcl/common/io.h>
 #include <pcl/impl/point_types.hpp>
 #include <pcl/kdtree/kdtree_flann.h>
@@ -10,7 +11,8 @@
 #include <ros/param.h>
 #include <ros/ros.h>
 
-#include <Pipeline.h>
+#include "Pipelines/NovelMethodTestingPipeline.h"
+#include "Pipelines/RScanPipeline.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -28,9 +30,7 @@ static void glfw_error_callback(int error, const char *description) {
 
 // TODO:
 //    a) Try to actually get the window to close when you tell it to.
-//    b) Determine if we need to use a reference to the point cloud i.e. need to
-//    update the point cloud in the viz frame or we just want to launch a new
-//    window
+//    b) Trow all the viz stuff in a separate Processing .hpp file
 void RunVizThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
                   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud2) {
 
@@ -87,7 +87,6 @@ void RunVizConnectionThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
   viewer2->setBackgroundColor(0.3, 0.3, 0.3);
   viewer2->addPointCloud<pcl::PointXYZ>(cloud2, "Cloud 2");
 
-
   viewer2->setPointCloudRenderingProperties(
       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 2");
   viewer2->addCoordinateSystem(1.0);
@@ -102,15 +101,14 @@ void RunVizConnectionThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
   for (int i = 0; i < size1; i++) {
     std::vector<int> indicies_found;
     std::vector<float> squaredDistances;
-    kdTree.radiusSearch(
-        i, r1, indicies_found, squaredDistances, max_nn);
+    kdTree.radiusSearch(i, r1, indicies_found, squaredDistances, max_nn);
 
     pcl::PointXYZ pt_r = cloud1->points[i];
-    
+
     for (int j = 1; j < indicies_found.size(); j++) {
       int idx = indicies_found[j];
       pcl::PointXYZ pt_q = cloud1->points[idx];
-      //viewer->addLine(pt_r, pt_q, "line", 0);
+      // viewer->addLine(pt_r, pt_q, "line", 0);
       std::string string_id = "0" + std::to_string(i) + "-" + std::to_string(j);
       viewer1->addLine(pt_r, pt_q, string_id, 0);
     }
@@ -122,11 +120,10 @@ void RunVizConnectionThread(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud1,
   for (int i = 0; i < size2; i++) {
     std::vector<int> indicies_found;
     std::vector<float> squaredDistances;
-    kdTree.radiusSearch(
-        i, r2, indicies_found, squaredDistances, max_nn);
+    kdTree.radiusSearch(i, r2, indicies_found, squaredDistances, max_nn);
 
     pcl::PointXYZ pt_r = cloud2->points[i];
-    
+
     for (int j = 1; j < indicies_found.size(); j++) {
       int idx = indicies_found[j];
       pcl::PointXYZ pt_q = cloud2->points[idx];
@@ -179,14 +176,425 @@ GLFWwindow *initGUI() {
   return window;
 }
 
-// void datasetComparisonTesting(Pipeline &pl) {
-//
-//   // Dropdown selectable box. dataset_idx holds the value for the dataset to
-//   // use
-//   ImGui::Combo("Choose Dataset", &ImGuiState::dataset_idx,
-//   ImGuiState::datasets,
-//                IM_ARRAYSIZE(ImGuiState::datasets));
-// }
+void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
+
+  ImGui::Begin("Novel Methods Testing");
+
+  // --------------------------------------------------------------
+  ImGui::Text("Point Clouds");
+
+  ImGui::Combo("Choose PointCloud 1", &ImGuiState::point_cloud_idx1,
+               ImGuiState::pointclouds, IM_ARRAYSIZE(ImGuiState::pointclouds));
+
+  ImGui::Combo("Choose PointCloud 2", &ImGuiState::point_cloud_idx2,
+               ImGuiState::pointclouds, IM_ARRAYSIZE(ImGuiState::pointclouds));
+
+  // TODO int input box for max_points
+  ImGui::InputInt("Max number of points in point cloud", &ImGuiState::max_pts);
+
+  if (ImGui::Button("Button 1")) {
+    pl.ParsePointCloudPair(
+        ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx1),
+        ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx2),
+        ImGuiState::max_pts);
+    ImGuiState::point_clouds_read = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::PointCloudsRead())
+      ? ImGui::Text("Success! read point clouds")
+      : ImGui::Text("Click to read in point cloud files");
+
+  // Extract object point clouds
+  if (!ImGuiState::PointCloudsRead()) {
+    ImGui::BeginDisabled();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Graph Formulation");
+
+  ImGui::Combo("Edge Heuristic", &ImGuiState::edge_heuristic_idx,
+               ImGuiState::edge_heuristics,
+               IM_ARRAYSIZE(ImGuiState::edge_heuristics));
+
+  if (ImGui::Button("Button 2")) {
+    pl.ComputeEdges(ImGuiState::edge_heuristic_idx);
+    ImGuiState::edges_created = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::EdgesCreated()) ? ImGui::Text("Success! graph edges created")
+                               : ImGui::Text("Click to compute graph edges");
+
+  if (ImGuiState::ShowRadius()) {
+    ImGui::Text("Radius for Cloud 1 is: %f", pl.GetRadius1());
+    ImGui::Text("Radius for Cloud 2 is: %f", pl.GetRadius2());
+  }
+
+  if (!ImGuiState::PointCloudsRead())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::EdgesCreated()) {
+    ImGui::BeginDisabled();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Laplacian");
+
+  ImGui::Combo("Laplacian Algorithm", &ImGuiState::laplacian_idx,
+               ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
+
+  if (ImGui::Button("Button 3")) {
+    pl.ComputeLaplacian(ImGuiState::laplacian_idx);
+    ImGuiState::laplacian_created = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::LaplacianCreated()) ? ImGui::Text("Success! Laplacian computed")
+                                   : ImGui::Text("Click to compute Laplacian");
+
+  if (!ImGuiState::EdgesCreated())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::LaplacianCreated())
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Eigenvalues");
+
+  ImGui::RadioButton("All Eigenvalues", &ImGuiState::eigendecomposition_method,
+                     0);
+  ImGui::SameLine();
+  ImGui::RadioButton("Specific # of Eigenvalues",
+                     &ImGuiState::eigendecomposition_method, 1);
+
+  // --- Input Box
+  if (ImGuiState::eigendecomposition_method == 0)
+    ImGui::BeginDisabled();
+
+  ImGui::InputInt("# of Eigenvalues to compute", &ImGuiState::eigs_number);
+
+  if (ImGuiState::eigendecomposition_method == 0)
+    ImGui::EndDisabled();
+  // --- ! Input Box
+
+  if (ImGui::Button("Button 4")) {
+    int eigs_num = (ImGuiState::eigendecomposition_method == 0)
+                       ? -1
+                       : ImGuiState::eigs_number;
+    pl.ComputeEigs(eigs_num);
+    ImGuiState::eigs = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues computed")
+                               : ImGui::Text("Click to compute eigenvalues");
+
+  if (!ImGuiState::LaplacianCreated())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::ComputedEigs())
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Save Eigenvalues");
+
+  ImGui::InputText("file name to save eigenvalues",
+                   ImGuiState::eigenvalue_json_f,
+                   IM_ARRAYSIZE(ImGuiState::eigenvalue_json_f));
+  if (ImGui::Button("Button 5")) {
+    std::string file_name(ImGuiState::eigenvalue_json_f);
+    pl.SaveEigenvalues(file_name);
+    ImGuiState::saved_eigs = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::SavedEigs()) ? ImGui::Text("Success! Eigenvalues saved")
+                            : ImGui::Text("Click to save eigenvalues");
+
+  if (!ImGuiState::ComputedEigs())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::PointCloudsRead()) // || TODO viz is already open)
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Visualizer");
+
+  if (ImGui::Button("Button 6")) {
+    ImGuiState::pcl_viz = true;
+    auto pointCloudPair = pl.GetPointCloudPair();
+
+    std::thread t1(RunVizThread, pointCloudPair.first, pointCloudPair.second);
+    t1.detach();
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
+                         : ImGui::Text("Click to run PCL visualizer");
+
+  if (!ImGuiState::EdgesCreated())
+    ImGui::BeginDisabled();
+
+  if (ImGui::Button("Button 7")) {
+    ImGuiState::pcl_viz_connection = true;
+    auto pointCloudPair = pl.GetPointCloudPair();
+
+    std::thread t1(RunVizConnectionThread, pointCloudPair.first,
+                   pointCloudPair.second, pl.GetRadius1(), pl.GetRadius2());
+    t1.detach();
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::PCLConnectionViz())
+      ? ImGui::Text("Success! PCL graph connection visualizer is running")
+      : ImGui::Text("Click to run PCL graph connection visualizer");
+
+  if (!ImGuiState::EdgesCreated())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::ComputedEigs()) // || TODO viz is already open)
+    ImGui::BeginDisabled();
+
+  if (ImGui::Button("Button 8")) {
+    ImGuiState::matplot = true;
+    pl.PlotHistograms();
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::MatplotViz())
+      ? ImGui::Text("Success! Matplot++ visualizer is running")
+      : ImGui::Text("Click to run MatPlot++ visualizer");
+
+  if (!ImGuiState::ComputedEigs())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::PointCloudsRead())
+    ImGui::EndDisabled();
+
+  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+              1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+  ImGui::End();
+}
+
+void datasetTestingPipeline(std::shared_ptr<Pipeline> pl) {
+
+  ImGui::Begin("Dataset Testing");
+
+  // --------------------------------------------------------------
+  ImGui::Text("Dataset");
+
+  ImGui::Combo("Choose Dataset", &ImGuiState::dataset_idx, ImGuiState::datasets,
+               IM_ARRAYSIZE(ImGuiState::datasets));
+
+  if (ImGui::Button("Button 1")) {
+    pl.reset();
+    switch (ImGuiState::dataset_idx) {
+    case 0:
+      pl = std::make_shared<RScanPipeline>();
+      break;
+    case 1:
+      // pl = std::make_shared<MatterPortPipeline>();
+      break;
+    case 2:
+      // pl = std::make_shared<SemanticKittiPipeline>();
+      break;
+    default:
+      break;
+    }
+
+    pl->ParseDataset();
+    pl->ExtractObjectPointClouds();
+    ImGuiState::dataset_parsed = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::IsDatasetParsed()) ? ImGui::Text("Success! Parse datset")
+                                  : ImGui::Text("Click to parse dataset");
+
+  if (!ImGuiState::IsDatasetParsed()) {
+    ImGui::BeginDisabled();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Graph Formulation");
+
+  ImGui::Combo("Edge Heuristic", &ImGuiState::edge_heuristic_idx,
+               ImGuiState::edge_heuristics,
+               IM_ARRAYSIZE(ImGuiState::edge_heuristics));
+
+  if (ImGui::Button("Button 2")) {
+    pl->ComputeEdges(ImGuiState::edge_heuristic_idx);
+    ImGuiState::edges_created = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::EdgesCreated()) ? ImGui::Text("Success! graph edges created")
+                               : ImGui::Text("Click to compute graph edges");
+
+  //if (ImGuiState::ShowRadius()) {
+  //  ImGui::Text("Radius for Cloud 1 is: %f", pl.GetRadius1());
+  //  ImGui::Text("Radius for Cloud 2 is: %f", pl.GetRadius2());
+  //}
+
+  if (!ImGuiState::PointCloudsRead())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::EdgesCreated()) {
+    ImGui::BeginDisabled();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Laplacian");
+
+  ImGui::Combo("Laplacian Algorithm", &ImGuiState::laplacian_idx,
+               ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
+
+  if (ImGui::Button("Button 3")) {
+    pl->ComputeLaplacian(ImGuiState::laplacian_idx);
+    ImGuiState::laplacian_created = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::LaplacianCreated()) ? ImGui::Text("Success! Laplacian computed")
+                                   : ImGui::Text("Click to compute Laplacian");
+
+  if (!ImGuiState::EdgesCreated())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::LaplacianCreated())
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Eigenvalues");
+
+  ImGui::RadioButton("All Eigenvalues", &ImGuiState::eigendecomposition_method,
+                     0);
+  ImGui::SameLine();
+  ImGui::RadioButton("Specific # of Eigenvalues",
+                     &ImGuiState::eigendecomposition_method, 1);
+
+  // --- Input Box
+  if (ImGuiState::eigendecomposition_method == 0)
+    ImGui::BeginDisabled();
+
+  ImGui::InputInt("# of Eigenvalues to compute", &ImGuiState::eigs_number);
+
+  if (ImGuiState::eigendecomposition_method == 0)
+    ImGui::EndDisabled();
+  // --- ! Input Box
+
+  if (ImGui::Button("Button 4")) {
+    int eigs_num = (ImGuiState::eigendecomposition_method == 0)
+                       ? -1
+                       : ImGuiState::eigs_number;
+    pl->ComputeEigs(eigs_num);
+    ImGuiState::eigs = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues computed")
+                               : ImGui::Text("Click to compute eigenvalues");
+
+  if (!ImGuiState::LaplacianCreated())
+    ImGui::EndDisabled();
+
+  if (!ImGuiState::ComputedEigs())
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Save Eigenvalues");
+
+  ImGui::InputText("file name to save eigenvalues",
+                   ImGuiState::eigenvalue_json_f,
+                   IM_ARRAYSIZE(ImGuiState::eigenvalue_json_f));
+  if (ImGui::Button("Button 5")) {
+    std::string file_name(ImGuiState::eigenvalue_json_f);
+    pl->SaveEigenvalues(file_name);
+    ImGuiState::saved_eigs = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::SavedEigs()) ? ImGui::Text("Success! Eigenvalues saved")
+                            : ImGui::Text("Click to save eigenvalues");
+
+  if (!ImGuiState::ComputedEigs())
+    ImGui::EndDisabled();
+
+  //if (!ImGuiState::PointCloudsRead()) // || TODO viz is already open)
+  //  ImGui::BeginDisabled();
+
+  //// --------------------------------------------------------------
+  //ImGui::Separator();
+  //ImGui::Text("Visualizer");
+
+  //if (ImGui::Button("Button 6")) {
+  //  ImGuiState::pcl_viz = true;
+  //  auto pointCloudPair = pl.GetPointCloudPair();
+
+  //  std::thread t1(RunVizThread, pointCloudPair.first, pointCloudPair.second);
+  //  t1.detach();
+  //}
+
+  //ImGui::SameLine();
+  //(ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
+  //                       : ImGui::Text("Click to run PCL visualizer");
+
+  //if (!ImGuiState::EdgesCreated())
+  //  ImGui::BeginDisabled();
+
+  //if (ImGui::Button("Button 7")) {
+  //  ImGuiState::pcl_viz_connection = true;
+  //  auto pointCloudPair = pl.GetPointCloudPair();
+
+  //  std::thread t1(RunVizConnectionThread, pointCloudPair.first,
+  //                 pointCloudPair.second, pl.GetRadius1(), pl.GetRadius2());
+  //  t1.detach();
+  //}
+
+  //ImGui::SameLine();
+  //(ImGuiState::PCLConnectionViz())
+  //    ? ImGui::Text("Success! PCL graph connection visualizer is running")
+  //    : ImGui::Text("Click to run PCL graph connection visualizer");
+
+  //if (!ImGuiState::EdgesCreated())
+  //  ImGui::EndDisabled();
+
+  //if (!ImGuiState::ComputedEigs()) // || TODO viz is already open)
+  //  ImGui::BeginDisabled();
+
+  //if (ImGui::Button("Button 8")) {
+  //  ImGuiState::matplot = true;
+  //  pl->PlotHistograms();
+  //}
+
+  //ImGui::SameLine();
+  //(ImGuiState::MatplotViz())
+  //    ? ImGui::Text("Success! Matplot++ visualizer is running")
+  //    : ImGui::Text("Click to run MatPlot++ visualizer");
+
+  //if (!ImGuiState::ComputedEigs())
+  //  ImGui::EndDisabled();
+
+  //if (!ImGuiState::PointCloudsRead())
+  //  ImGui::EndDisabled();
+
+  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+              1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+  ImGui::End();
+}
+
+// NOTE: Only for laptop. Throw it under Begin block for the window
+// ImGui::SetWindowFontScale(5.0f);
 
 int main(int argc, char **argv) {
 
@@ -194,7 +602,11 @@ int main(int argc, char **argv) {
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   // Define Pipeline
-  Pipeline pl;
+  // Right now we are using type to parse on pipeline underlying behavior
+  // If the datasets end up being super different we may need to create
+  // multiple pipeline types through templating
+  NovelMethodTestingPipeline nmtPipeline;
+  std::shared_ptr<Pipeline> datasetPipeline;
 
   // GUI loop
   while (!glfwWindowShouldClose(window)) {
@@ -205,240 +617,8 @@ int main(int argc, char **argv) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::Begin("Pipeline");
-
-    // Only for laptop
-    // ImGui::SetWindowFontScale(5.0f);
-
-    // --------------------------------------------------------------
-    ImGui::Text("Point Clouds");
-
-    ImGui::Combo("Choose PointCloud 1", &ImGuiState::point_cloud_idx1,
-                 ImGuiState::pointclouds,
-                 IM_ARRAYSIZE(ImGuiState::pointclouds));
-
-    ImGui::Combo("Choose PointCloud 2", &ImGuiState::point_cloud_idx2,
-                 ImGuiState::pointclouds,
-                 IM_ARRAYSIZE(ImGuiState::pointclouds));
-
-    //TODO int input box for max_points
-    ImGui::InputInt("Max number of points in point cloud", &ImGuiState::max_pts);
-
-    if (ImGui::Button("Button 1")) {
-      pl.ParsePointCloudPair(
-          ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx1),
-          ImGuiState::GetPlyFileName(ImGuiState::point_cloud_idx2), ImGuiState::max_pts);
-      ImGuiState::point_clouds_read = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::PointCloudsRead())
-        ? ImGui::Text("Success! read point clouds")
-        : ImGui::Text("Click to read in point cloud files");
-
-    // Extract object point clouds
-    if (!ImGuiState::PointCloudsRead()) {
-      ImGui::BeginDisabled();
-    }
-
-    // --------------------------------------------------------------
-    ImGui::Separator();
-    ImGui::Text("Graph Formulation");
-
-    ImGui::Combo("Edge Heuristic", &ImGuiState::edge_heuristic_idx,
-                 ImGuiState::edge_heuristics,
-                 IM_ARRAYSIZE(ImGuiState::edge_heuristics));
-
-    if (ImGui::Button("Button 2")) {
-      pl.ComputeEdges(ImGuiState::edge_heuristic_idx);
-      ImGuiState::edges_created = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::EdgesCreated()) ? ImGui::Text("Success! graph edges created")
-                                 : ImGui::Text("Click to compute graph edges");
-
-    if (ImGuiState::ShowRadius()) {
-      ImGui::Text("Radius for Cloud 1 is: %f", pl.GetRadius1());
-      ImGui::Text("Radius for Cloud 2 is: %f", pl.GetRadius2());
-    }
-
-    if (!ImGuiState::PointCloudsRead())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::EdgesCreated()) {
-      ImGui::BeginDisabled();
-    }
-
-    // --------------------------------------------------------------
-    ImGui::Separator();
-    ImGui::Text("Laplacian");
-
-    ImGui::Combo("Laplacian Algorithm", &ImGuiState::laplacian_idx,
-                 ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
-
-    if (ImGui::Button("Button 3")) {
-      pl.ComputeLaplcian(ImGuiState::laplacian_idx);
-      ImGuiState::laplacian_created = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::LaplacianCreated())
-        ? ImGui::Text("Success! Laplacian computed")
-        : ImGui::Text("Click to compute Laplacian");
-
-    if (!ImGuiState::EdgesCreated())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::LaplacianCreated())
-      ImGui::BeginDisabled();
-
-    // --------------------------------------------------------------
-    ImGui::Separator();
-    ImGui::Text("Eigenvalues");
-
-    ImGui::RadioButton("All Eigenvalues",
-                       &ImGuiState::eigendecomposition_method, 0);
-    ImGui::SameLine();
-    ImGui::RadioButton("Specific # of Eigenvalues",
-                       &ImGuiState::eigendecomposition_method, 1);
-
-    // --- Input Box
-    if (ImGuiState::eigendecomposition_method == 0)
-      ImGui::BeginDisabled();
-
-    ImGui::InputInt("# of Eigenvalues to compute", &ImGuiState::eigs_number);
-
-    if (ImGuiState::eigendecomposition_method == 0)
-      ImGui::EndDisabled();
-    // --- ! Input Box
-
-    if (ImGui::Button("Button 4")) {
-      int eigs_num = (ImGuiState::eigendecomposition_method == 0)
-                         ? -1
-                         : ImGuiState::eigs_number;
-      pl.ComputeEigs(eigs_num);
-      ImGuiState::eigs = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues computed")
-                                 : ImGui::Text("Click to compute eigenvalues");
-
-    if (!ImGuiState::LaplacianCreated())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::ComputedEigs())
-      ImGui::BeginDisabled();
-
-    // --------------------------------------------------------------
-    ImGui::Separator();
-    ImGui::Text("Save Eigenvalues");
-
-    ImGui::InputText("file name to save eigenvalues",
-                     ImGuiState::eigenvalue_json_f,
-                     IM_ARRAYSIZE(ImGuiState::eigenvalue_json_f));
-    if (ImGui::Button("Button 5")) {
-      std::string file_name(ImGuiState::eigenvalue_json_f);
-      pl.SaveEigenvalues(file_name);
-      ImGuiState::saved_eigs = true;
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::SavedEigs()) ? ImGui::Text("Success! Eigenvalues saved")
-                              : ImGui::Text("Click to save eigenvalues");
-
-    if (!ImGuiState::ComputedEigs())
-      ImGui::EndDisabled();
-
-    // Currently this functionality is in another GUI
-    // if (!ImGuiState::SavedEigs())
-    //  ImGui::BeginDisabled();
-
-    //// --------------------------------------------------------------
-    // ImGui::Separator();
-    // ImGui::Text("Analysis");
-
-    // if (ImGui::Button("Button 5")) {
-    //   ImGuiState::ad_test = true;
-    // }
-
-    // ImGui::SameLine();
-    //(ImGuiState::ADTestRun()) ? ImGui::Text("Success! AD Test finished")
-    //                           : ImGui::Text("Click to run AD Test");
-
-    // if (ImGui::Button("Button 6")) {
-    //   ImGuiState::ks_test = true;
-    // }
-
-    // ImGui::SameLine();
-    //(ImGuiState::KSTestRun()) ? ImGui::Text("Success! KS Test finished")
-    //                           : ImGui::Text("Click to run KS Test");
-
-    // if (!ImGuiState::ComputedEigs())
-    //   ImGui::EndDisabled();
-
-    if (!ImGuiState::PointCloudsRead()) // || TODO viz is already open)
-      ImGui::BeginDisabled();
-
-    // --------------------------------------------------------------
-    ImGui::Separator();
-    ImGui::Text("Visualizer");
-
-    if (ImGui::Button("Button 6")) {
-      ImGuiState::pcl_viz = true;
-      auto pointCloudPair = pl.GetPointCloudPair();
-
-      std::thread t1(RunVizThread, pointCloudPair.first, pointCloudPair.second);
-      t1.detach();
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
-                           : ImGui::Text("Click to run PCL visualizer");
-
-    if (!ImGuiState::EdgesCreated())
-      ImGui::BeginDisabled();
-
-    if (ImGui::Button("Button 7")) {
-      ImGuiState::pcl_viz_connection = true;
-      auto pointCloudPair = pl.GetPointCloudPair();
-
-      std::thread t1(RunVizConnectionThread, pointCloudPair.first,
-                     pointCloudPair.second, pl.GetRadius1(), pl.GetRadius2());
-      t1.detach();
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::PCLConnectionViz())
-        ? ImGui::Text("Success! PCL graph connection visualizer is running")
-        : ImGui::Text("Click to run PCL graph connection visualizer");
-
-    if (!ImGuiState::EdgesCreated())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::ComputedEigs()) // || TODO viz is already open)
-      ImGui::BeginDisabled();
-
-    if (ImGui::Button("Button 8")) {
-      ImGuiState::matplot = true;
-      pl.PlotHistograms();
-    }
-
-    ImGui::SameLine();
-    (ImGuiState::MatplotViz())
-        ? ImGui::Text("Success! Matplot++ visualizer is running")
-        : ImGui::Text("Click to run MatPlot++ visualizer");
-
-    if (!ImGuiState::ComputedEigs())
-      ImGui::EndDisabled();
-
-    if (!ImGuiState::PointCloudsRead())
-      ImGui::EndDisabled();
-
-    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-    ImGui::End();
+    novelMethodsTesting(nmtPipeline);
+    datasetTestingPipeline(datasetPipeline);
 
     // Rendering
     ImGui::Render();

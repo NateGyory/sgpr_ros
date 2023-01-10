@@ -1,7 +1,7 @@
 #ifndef POINT_CLOUD
 #define POINT_CLOUD
 
-#include <Scene.h>
+#include <Types/Scene.h>
 #include <Utils/Visualization.hpp>
 
 #include <boost/smart_ptr/make_shared_array.hpp>
@@ -18,34 +18,26 @@
 
 namespace Processing {
 namespace PointCloud {
-namespace NMT {
 
-//inline void computeMCAR(PointCloudPair &pointCloudPair, GraphLaplacianPair &graphLaplacianPair) {
-inline void computeMCAR(pcl::PointCloud<pcl::PointXYZ>::Ptr &cloud, std::shared_ptr<GraphLaplacian> graphLaplacian) {
-  graphLaplacian->kdTree.setInputCloud(cloud);
+// TODO probably need to template this
+inline void filterPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,
+                             int max_points) {
+  double leafInc = 0.01;
+  double leafValue = 0.1;
+  while (cloud->points.size() > max_points) {
+    std::cout << "Filtering cloud" << std::endl;
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr vox_cloud(
+        new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::VoxelGrid<pcl::PointXYZRGB> sor;
+    sor.setInputCloud(cloud);
+    sor.setLeafSize(leafValue, leafValue, leafValue);
+    sor.filter(*vox_cloud);
 
-  int size = cloud->size();
-
-  graphLaplacian->radius = 0.1f;
-  for (int i = 0; i < size; i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-
-    graphLaplacian->kdTree.radiusSearch(i, graphLaplacian->radius, indicies_found,
-                                        squaredDistances, 2);
-    int num_edges = indicies_found.size() - 1;
-
-    if (num_edges == 0) {
-      std::cout << "Increasing radius" << std::endl;
-      i--;
-      graphLaplacian->radius += 0.05f;
-    }
+    cloud.reset();
+    cloud = vox_cloud;
+    leafValue += leafInc;
   }
 }
-
-}; // namespace NMT
-
-namespace DatasetTesting {
 
 inline void computeMCAR(SpectralObject &spectral_object) {
   spectral_object.kdTree.setInputCloud(spectral_object.cloud);
@@ -64,7 +56,7 @@ inline void computeMCAR(SpectralObject &spectral_object) {
     if (num_edges == 0) {
       std::cout << "Increasing radius" << std::endl;
       i--;
-      radius += 0.1f;
+      radius += 0.05f;
     }
   }
 
@@ -123,8 +115,8 @@ inline void findObjectPointCloud(SpectralObject &spectral_object,
   }
 
   spectral_object.cloud = cloud_filtered;
-  //pcl::copyPointCloud(*cloud_filtered, *spectral_object.cloud);
-  //cloud_filtered.reset();
+  // pcl::copyPointCloud(*cloud_filtered, *spectral_object.cloud);
+  // cloud_filtered.reset();
 }
 
 inline void ExtractObjectPointClouds(Scene &scene) {
@@ -144,7 +136,6 @@ inline void MinimallyConnectedAdaptiveRadius(Scene &scene) {
                 &computeMCAR);
 }
 
-}; // namespace DatasetTesting
 }; // namespace PointCloud
 }; // namespace Processing
 

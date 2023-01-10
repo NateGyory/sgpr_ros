@@ -17,6 +17,7 @@ using namespace matplot;
 //   }
 // }
 
+// TODO place this in the eigs hpp file
 void Pipeline::SaveEigenvalues(std::string file_name) {
   std::string file_path =
       "/home/nate/Development/catkin_ws/src/sgpr_ros/data/" + file_name;
@@ -168,7 +169,7 @@ void Pipeline::ParsePointCloudPair(std::string f_ply1, std::string f_ply2, int m
     PCL_ERROR("Error reading PLY file\n");
   }
 
-  // Filter point clouds
+  // TODO add this to point cloud processing
   FilterCloud(mPointCloudPair.first, max_points);
   FilterCloud(mPointCloudPair.second, max_points);
 }
@@ -182,14 +183,6 @@ void Pipeline::ParseDataset(int dataset) {
 }
 
 void Pipeline::ExtractObjectPointClouds() {
-  std::cout << "ExtractObjectPointClouds" << std::endl;
-  std::for_each(
-      mSceneMap.begin(), mSceneMap.end(),
-      [](std::pair<const std::string, Scene> &pair) {
-        Processing::PointCloud::DatasetTesting::ExtractObjectPointClouds(
-            pair.second);
-      });
-  std::cout << "Finished ExtractObjectPointClouds" << std::endl;
 }
 
 void Pipeline::MCAR() {

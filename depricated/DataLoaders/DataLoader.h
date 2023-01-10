@@ -1,6 +1,4 @@
-#ifndef DATA_LOADER
-#define DATA_LOADER
-
+#pragma once
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -37,5 +35,3 @@ protected:
 
 using spDataLoader = std::shared_ptr<DataLoader>;
 using json = nlohmann::json;
-
-#endif // !DATA_LOADER

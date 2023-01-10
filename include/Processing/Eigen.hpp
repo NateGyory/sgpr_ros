@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene.h"
+#include "Types/Scene.h"
 #include "Types/GraphLaplacian.h"
 #include <memory>
 

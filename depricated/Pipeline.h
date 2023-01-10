@@ -30,7 +30,7 @@ using GraphLaplacianPair =
 
 class Pipeline {
 public:
-  Pipeline() = default;
+  Pipeline(int type) : mType(type) {};
   ~Pipeline() = default;
 
   void PostProcess(int dataset); // NOTE: not using
@@ -58,6 +58,8 @@ public:
 
 private:
   void initDataLoader(int dataset);
+
+  int mType;
 
   scene_map_t mSceneMap;
   spDataLoader mDataLoader;
