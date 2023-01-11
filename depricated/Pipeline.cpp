@@ -189,8 +189,7 @@ void Pipeline::MCAR() {
   std::cout << "MCAR" << std::endl;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
                 [](std::pair<const std::string, Scene> &pair) {
-                  Processing::PointCloud::DatasetTesting::
-                      MinimallyConnectedAdaptiveRadius(pair.second);
+                  Processing::PointCloud::MinimallyConnectedAdaptiveRadius(pair.second);
                 });
   std::cout << "Finished MCAR" << std::endl;
 }
@@ -199,7 +198,7 @@ void Pipeline::IDW() {
   std::cout << "IDW" << std::endl;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
                 [](std::pair<const std::string, Scene> &pair) {
-                  Processing::Laplacian::DatasetTesting::IDWLaplacian(
+                  Processing::Laplacian::IDWLaplacian(
                       pair.second);
                 });
   std::cout << "Finished IDW" << std::endl;
@@ -209,7 +208,7 @@ void Pipeline::Eigs() {
   std::cout << "eigs" << std::endl;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
                 [](std::pair<const std::string, Scene> &pair) {
-                  Processing::Eigen::DatasetTesting::Eigendecomposition(
+                  Processing::Eigen::Eigendecomposition(
                       pair.second, 50);
                 });
   std::cout << "Finished eigs" << std::endl;

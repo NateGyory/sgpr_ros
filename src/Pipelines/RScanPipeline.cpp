@@ -1,5 +1,8 @@
 #include "Pipelines/RScanPipeline.h"
 
+// NOTE: for gdb debugging
+std::string make_string(const char *x) { return x; }
+
 void RScanPipeline::ParseDataset() {
   std::cout << "Parsing Dataset" << std::endl;
   std::string dataset_dir, config_dir, rscan_json, config_json, objects_json;
@@ -99,14 +102,12 @@ void RScanPipeline::ParseDataset() {
   std::cout << "Finished Parsing Dataset" << std::endl;
 }
 
-void RScanPipeline::ExtractObjectPointClouds() {
+void RScanPipeline::ExtractObjectPointClouds(int max_pts) {
   std::cout << "ExtractObjectPointClouds" << std::endl;
-  std::for_each(
-      mSceneMap.begin(), mSceneMap.end(),
-      [](std::pair<const std::string, Scene> &pair) {
-        Processing::PointCloud::DatasetTesting::ExtractObjectPointClouds(
-            pair.second);
-      });
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [max_pts](std::pair<const std::string, Scene> &pair) {
+                  Processing::PointCloud::ExtractObjectPointClouds(pair.second, max_pts);
+                });
   std::cout << "Finished ExtractObjectPointClouds" << std::endl;
 }
 
@@ -119,8 +120,8 @@ void RScanPipeline::ComputeEdges(int edge_heuristic) {
   case 1: // MCAR
     std::for_each(mSceneMap.begin(), mSceneMap.end(),
                   [](std::pair<const std::string, Scene> &pair) {
-                    Processing::PointCloud::DatasetTesting::
-                        MinimallyConnectedAdaptiveRadius(pair.second);
+                    Processing::PointCloud::MinimallyConnectedAdaptiveRadius(
+                        pair.second);
                   });
     break;
   case 2: // Fully Connected
@@ -138,8 +139,7 @@ void RScanPipeline::ComputeLaplacian(int laplacian_type) {
   case 0: // Generic
     std::for_each(mSceneMap.begin(), mSceneMap.end(),
                   [](std::pair<const std::string, Scene> &pair) {
-                    Processing::Laplacian::DatasetTesting::IDWLaplacian(
-                        pair.second);
+                    Processing::Laplacian::IDWLaplacian(pair.second);
                   });
     break;
   case 1: // Normalized
@@ -153,8 +153,7 @@ void RScanPipeline::ComputeEigs(int max_eigs) {
   std::cout << "Computing eigenvalues" << std::endl;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
                 [max_eigs](std::pair<const std::string, Scene> &pair) {
-                  Processing::Eigen::DatasetTesting::Eigendecomposition(
-                      pair.second, max_eigs);
+                  Processing::Eigen::Eigendecomposition(pair.second, max_eigs);
                 });
   std::cout << "Finished computing eigenvalues" << std::endl;
 }
@@ -167,35 +166,59 @@ void RScanPipeline::SaveEigenvalues(std::string file_name) {
   std::ofstream o(file_path);
 
   // {
-  //   reference_scans: [
+  //   reference_scans: [{
   //     scan_id:
-  //     ply_color:
-  //     {
+  //     objects: [{
   //       label:
   //       global_id:
+  //       scene_id
+  //       ply_color:
   //       eigenvalues:
-  //     }
-  //   ],
+  //     }]
+  //   }],
   //   query_scans: [
   //     scan_id:
   //     reference_scan_id:
-  //     ply_color:
-  //     {
+  //     objects: [{
   //       label:
   //       global_id:
+  //       scene_id
+  //       ply_color:
   //       eigenvalues:
-  //     }
-  //   ],
+  //     }]
+  //   }],
   // }
 
-  j["reference_scans"] = std::vector<json>();
-  j["query_scans"] = std::vector<json>();
+  std::vector<json> reference_scans;
+  std::vector<json> query_scans;
+  for (auto &kv : mSceneMap) {
+    json scene;
+    std::vector<json> scene_objects;
 
-  // TODO need to extract the eigenvalue from the SpectralObject
-  //Processing::Eigen::NMT::SaveEigenvalues(j["reference_scans"],
-  //                                        mGraphLaplacianPair.first);
-  //Processing::Eigen::NMT::SaveEigenvalues(j["query_scans"],
-  //                                        mGraphLaplacianPair.second);
+    scene["scan_id"] = kv.first;
+
+    for (auto &so : kv.second.spectral_objects) {
+      json object;
+      object["label"] = so.label;
+      object["global_id"] = so.global_id;
+      object["scene_id"] = so.scene_id;
+      object["ply_color"] = so.ply_color;
+      object["eigenvalues"] = so.eigenvalues;
+      scene_objects.push_back(object);
+    }
+
+    scene["objects"] = scene_objects;
+
+    if (kv.second.is_reference) {
+      reference_scans.push_back(scene);
+    } else {
+      scene["reference_scan_id"] = kv.second.reference_id_match;
+      query_scans.push_back(scene);
+    }
+  }
+
+  j["reference_scans"] = reference_scans;
+  j["query_scans"] = query_scans;
 
   o << std::setw(4) << j << std::endl;
 }

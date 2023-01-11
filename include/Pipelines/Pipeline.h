@@ -25,7 +25,7 @@ public:
   virtual ~Pipeline(){};
 
   virtual void ParseDataset() = 0;
-  virtual void ExtractObjectPointClouds() = 0;
+  virtual void ExtractObjectPointClouds(int max_pts) = 0;
   virtual void ComputeEdges(int edge_heuristic) = 0;
   virtual void ComputeLaplacian(int laplacian_type) = 0;
   virtual void ComputeEigs(int max_eigs) = 0;

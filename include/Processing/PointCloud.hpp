@@ -64,7 +64,7 @@ inline void computeMCAR(SpectralObject &spectral_object) {
 }
 
 inline void findObjectPointCloud(SpectralObject &spectral_object,
-                                 pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud) {
+                                 pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int max_pts) {
   spectral_object.cloud =
       boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered =
@@ -96,30 +96,11 @@ inline void findObjectPointCloud(SpectralObject &spectral_object,
   condrem.setInputCloud(cloud);
   condrem.filter(*cloud_filtered);
 
-  // TODO implement better filtering algorithm
-  double leafInc = 0.01;
-  double leafValue = 0.01;
-  while (cloud_filtered->points.size() > 1000) {
-
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr vox_cloud(
-        new pcl::PointCloud<pcl::PointXYZRGB>);
-
-    pcl::VoxelGrid<pcl::PointXYZRGB> sor;
-
-    sor.setInputCloud(cloud_filtered);
-    sor.setLeafSize(leafValue, leafValue, leafValue);
-    sor.filter(*vox_cloud);
-
-    cloud_filtered = vox_cloud;
-    leafValue += leafInc;
-  }
-
+  filterPointCloud(cloud_filtered, max_pts);
   spectral_object.cloud = cloud_filtered;
-  // pcl::copyPointCloud(*cloud_filtered, *spectral_object.cloud);
-  // cloud_filtered.reset();
 }
 
-inline void ExtractObjectPointClouds(Scene &scene) {
+inline void ExtractObjectPointClouds(Scene &scene, int max_pts) {
   pcl::PCLPointCloud2::Ptr cloud2(new pcl::PCLPointCloud2());
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(
       new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -128,7 +109,7 @@ inline void ExtractObjectPointClouds(Scene &scene) {
   pcl::fromPCLPointCloud2(*cloud2, *cloud);
 
   std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
-                [&](SpectralObject &so) { findObjectPointCloud(so, cloud); });
+                [&, max_pts](SpectralObject &so) { findObjectPointCloud(so, cloud, max_pts); });
 }
 
 inline void MinimallyConnectedAdaptiveRadius(Scene &scene) {

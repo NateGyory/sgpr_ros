@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types/Scene.h"
 #include "Types/GraphLaplacian.h"
+#include "Types/Scene.h"
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
@@ -9,93 +9,6 @@
 
 namespace Processing {
 namespace Laplacian {
-namespace NMT {
-
-inline void
-setSmallestDistance(std::shared_ptr<GraphLaplacian> graphLaplacian) {
-  double min = 1000000.0;
-  for (int i = 0; i < graphLaplacian->kdTree.getInputCloud()->size(); i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-    graphLaplacian->kdTree.nearestKSearch(i, 2, indicies_found,
-                                          squaredDistances);
-    min = (std::sqrt(squaredDistances[1]) < min) ? sqrt(squaredDistances[1])
-                                                 : min;
-  }
-
-  graphLaplacian->smallestDistance = min;
-}
-
-// TODO this is not the actual generic laplacian. When we create the normalized
-// IDW laplacian we need to change this back
-inline void genericLaplacian(std::shared_ptr<GraphLaplacian> graphLaplacian) {
-
-  unsigned int max_nn = 1000;
-
-  int size = graphLaplacian->kdTree.getInputCloud()->size();
-  graphLaplacian->laplacian = arma::sp_mat(size, size);
-
-  for (int i = 0; i < size; i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-    graphLaplacian->kdTree.radiusSearch(
-        i, graphLaplacian->radius, indicies_found, squaredDistances, max_nn);
-
-    int num_edges = indicies_found.size() - 1;
-    if (num_edges == 0) {
-      std::cout << "ERROR, Graph is Disconnected" << std::endl;
-      std::exit(1);
-    }
-
-    graphLaplacian->laplacian(i, i) = num_edges;
-
-    for (int j = 1; j < indicies_found.size(); j++) {
-      graphLaplacian->laplacian(i, indicies_found[j]) = -1;
-      graphLaplacian->laplacian(indicies_found[j], i) = -1;
-    }
-  }
-}
-
-inline void
-normalizedLaplacian(std::shared_ptr<GraphLaplacian> graphLaplacian) {
-
-  setSmallestDistance(graphLaplacian);
-  double bias = 1.0 - graphLaplacian->smallestDistance;
-
-  unsigned int max_nn = 1000;
-
-  int size = graphLaplacian->kdTree.getInputCloud()->size();
-  graphLaplacian->laplacian = arma::sp_mat(size, size);
-
-  for (int i = 0; i < size; i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-    graphLaplacian->kdTree.radiusSearch(
-        i, graphLaplacian->radius, indicies_found, squaredDistances, max_nn);
-
-    int num_edges = indicies_found.size() - 1;
-    if (num_edges == 0) {
-      std::cout << "ERROR, Graph is Disconnected" << std::endl;
-      std::exit(1);
-    }
-
-    graphLaplacian->laplacian(i, i) = num_edges;
-
-    double norm = 0.0f;
-    for (int j = 1; j < indicies_found.size(); j++) {
-      double val = 1 / (sqrt(squaredDistances[j]) + bias);
-      norm += val;
-      graphLaplacian->laplacian(i, indicies_found[j]) = -1 * val;
-      graphLaplacian->laplacian(indicies_found[j], i) = -1 * val;
-    }
-
-    graphLaplacian->laplacian(i,i) /= norm; // Normalize the degree value
-  }
-}
-
-}; // namespace NMT
-
-namespace DatasetTesting {
 
 inline void setSmallestDistance(SpectralObject &spectral_object) {
   double min = 1000000.0;
@@ -104,10 +17,77 @@ inline void setSmallestDistance(SpectralObject &spectral_object) {
     std::vector<float> squaredDistances;
     spectral_object.kdTree.nearestKSearch(i, 2, indicies_found,
                                           squaredDistances);
-    min = (squaredDistances[1] < min) ? sqrt(squaredDistances[1]) : min;
+    min = (std::sqrt(squaredDistances[1]) < min) ? sqrt(squaredDistances[1])
+                                                 : min;
   }
 
   spectral_object.smallest_distance = min;
+}
+
+// TODO this is not the actual generic laplacian. When we create the normalized
+// IDW laplacian we need to change this back
+inline void genericLaplacian(SpectralObject &spectral_object) {
+
+  unsigned int max_nn = 1000;
+
+  int size = spectral_object.cloud->size();
+  spectral_object.laplacian = arma::sp_mat(size, size);
+
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    spectral_object.kdTree.radiusSearch(i, spectral_object.mcar, indicies_found,
+                                        squaredDistances, max_nn);
+
+    int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
+    spectral_object.laplacian(i, i) = num_edges;
+
+    for (int j = 1; j < indicies_found.size(); j++) {
+      spectral_object.laplacian(i, indicies_found[j]) = -1;
+      spectral_object.laplacian(indicies_found[j], i) = -1;
+    }
+  }
+}
+
+inline void normalizedLaplacian(SpectralObject &spectral_object) {
+
+  setSmallestDistance(spectral_object);
+  double bias = 1.0 - spectral_object.smallest_distance;
+
+  unsigned int max_nn = 1000;
+
+  int size = spectral_object.cloud->size();
+  spectral_object.laplacian = arma::sp_mat(size, size);
+
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    spectral_object.kdTree.radiusSearch(i, spectral_object.mcar, indicies_found,
+                                        squaredDistances, max_nn);
+
+    int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
+    spectral_object.laplacian(i, i) = num_edges;
+
+    double norm = 0.0f;
+    for (int j = 1; j < indicies_found.size(); j++) {
+      double val = 1 / (sqrt(squaredDistances[j]) + bias);
+      norm += val;
+      spectral_object.laplacian(i, indicies_found[j]) = -1 * val;
+      spectral_object.laplacian(indicies_found[j], i) = -1 * val;
+    }
+
+    spectral_object.laplacian(i, i) /= norm; // Normalize the degree value
+  }
 }
 
 inline void idwCompute(SpectralObject &spectral_object) {
@@ -143,6 +123,5 @@ inline void IDWLaplacian(Scene &scene) {
                 &idwCompute);
 }
 
-}; // namespace DatasetTesting
 }; // namespace Laplacian
 }; // namespace Processing

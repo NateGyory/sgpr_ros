@@ -1,5 +1,6 @@
 #pragma once
 
+#include <pcl/point_cloud.h>
 #include <string>
 
 #include <matplot/matplot.h>
@@ -29,9 +30,10 @@ public:
   void SaveEigenvalues(std::string file_name);
   void PlotHistograms();
 
-  //double GetRadius1() { return mGraphLaplacianPair.first->radius; }
-  //double GetRadius2() { return mGraphLaplacianPair.second->radius; }
-  //PointCloudPair GetPointCloudPair() { return mPointCloudPair; }
+  double GetRadius1() { return mScenePair.first.spectral_objects[0].mcar; }
+  double GetRadius2() { return mScenePair.second.spectral_objects[0].mcar; }
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr GetCloud1() { return mScenePair.first.spectral_objects[0].cloud; }
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr GetCloud2() { return mScenePair.second.spectral_objects[0].cloud; }
 
 private:
   ScenePair mScenePair;
