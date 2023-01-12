@@ -253,8 +253,9 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::NMT::LaplacianCreated()) ? ImGui::Text("Success! Laplacian computed")
-                                   : ImGui::Text("Click to compute Laplacian");
+  (ImGuiState::NMT::LaplacianCreated())
+      ? ImGui::Text("Success! Laplacian computed")
+      : ImGui::Text("Click to compute Laplacian");
 
   if (!ImGuiState::NMT::EdgesCreated())
     ImGui::EndDisabled();
@@ -266,8 +267,8 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
   ImGui::Separator();
   ImGui::Text("Eigenvalues");
 
-  ImGui::RadioButton("All Eigenvalues", &ImGuiState::NMT::eigendecomposition_method,
-                     0);
+  ImGui::RadioButton("All Eigenvalues",
+                     &ImGuiState::NMT::eigendecomposition_method, 0);
   ImGui::SameLine();
   ImGui::RadioButton("Specific # of Eigenvalues",
                      &ImGuiState::NMT::eigendecomposition_method, 1);
@@ -291,8 +292,9 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::NMT::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues computed")
-                               : ImGui::Text("Click to compute eigenvalues");
+  (ImGuiState::NMT::ComputedEigs())
+      ? ImGui::Text("Success! Eigenvalues computed")
+      : ImGui::Text("Click to compute eigenvalues");
 
   if (!ImGuiState::NMT::LaplacianCreated())
     ImGui::EndDisabled();
@@ -315,7 +317,7 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
 
   ImGui::SameLine();
   (ImGuiState::NMT::SavedEigs()) ? ImGui::Text("Success! Eigenvalues saved")
-                            : ImGui::Text("Click to save eigenvalues");
+                                 : ImGui::Text("Click to save eigenvalues");
 
   if (!ImGuiState::NMT::ComputedEigs())
     ImGui::EndDisabled();
@@ -337,8 +339,9 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::NMT::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
-                         : ImGui::Text("Click to run PCL visualizer");
+  (ImGuiState::NMT::PCLViz())
+      ? ImGui::Text("Success! PCL visualizer is running")
+      : ImGui::Text("Click to run PCL visualizer");
 
   if (!ImGuiState::NMT::EdgesCreated())
     ImGui::BeginDisabled();
@@ -392,8 +395,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   // --------------------------------------------------------------
   ImGui::Text("Dataset");
 
-  ImGui::Combo("Choose Dataset", &ImGuiState::DatasetTesting::dataset_idx, ImGuiState::datasets,
-               IM_ARRAYSIZE(ImGuiState::datasets));
+  ImGui::Combo("Choose Dataset", &ImGuiState::DatasetTesting::dataset_idx,
+               ImGuiState::datasets, IM_ARRAYSIZE(ImGuiState::datasets));
 
   ImGui::InputInt("Max number of points in point cloud",
                   &ImGuiState::DatasetTesting::max_pts);
@@ -420,8 +423,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::DatasetTesting::DatasetParsed()) ? ImGui::Text("Success! Parse datset")
-                                  : ImGui::Text("Click to parse dataset");
+  (ImGuiState::DatasetTesting::DatasetParsed())
+      ? ImGui::Text("Success! Parse datset")
+      : ImGui::Text("Click to parse dataset");
 
   if (!ImGuiState::DatasetTesting::DatasetParsed()) {
     ImGui::BeginDisabled();
@@ -431,9 +435,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::Separator();
   ImGui::Text("Graph Formulation");
 
-  ImGui::Combo("Edge Heuristic", &ImGuiState::DatasetTesting::edge_heuristic_idx,
-               ImGuiState::edge_heuristics,
-               IM_ARRAYSIZE(ImGuiState::edge_heuristics));
+  ImGui::Combo(
+      "Edge Heuristic", &ImGuiState::DatasetTesting::edge_heuristic_idx,
+      ImGuiState::edge_heuristics, IM_ARRAYSIZE(ImGuiState::edge_heuristics));
 
   if (ImGui::Button("Button 2")) {
     pl->ComputeEdges(ImGuiState::DatasetTesting::edge_heuristic_idx);
@@ -441,8 +445,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::DatasetTesting::EdgesCreated()) ? ImGui::Text("Success! graph edges created")
-                               : ImGui::Text("Click to compute graph edges");
+  (ImGuiState::DatasetTesting::EdgesCreated())
+      ? ImGui::Text("Success! graph edges created")
+      : ImGui::Text("Click to compute graph edges");
 
   // if (ImGuiState::ShowRadius()) {
   //   ImGui::Text("Radius for Cloud 1 is: %f", pl.GetRadius1());
@@ -460,7 +465,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::Separator();
   ImGui::Text("Laplacian");
 
-  ImGui::Combo("Laplacian Algorithm", &ImGuiState::DatasetTesting::laplacian_idx,
+  ImGui::Combo("Laplacian Algorithm",
+               &ImGuiState::DatasetTesting::laplacian_idx,
                ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
 
   if (ImGui::Button("Button 3")) {
@@ -469,8 +475,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::DatasetTesting::LaplacianCreated()) ? ImGui::Text("Success! Laplacian computed")
-                                   : ImGui::Text("Click to compute Laplacian");
+  (ImGuiState::DatasetTesting::LaplacianCreated())
+      ? ImGui::Text("Success! Laplacian computed")
+      : ImGui::Text("Click to compute Laplacian");
 
   if (!ImGuiState::DatasetTesting::EdgesCreated())
     ImGui::EndDisabled();
@@ -482,8 +489,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::Separator();
   ImGui::Text("Eigenvalues");
 
-  ImGui::RadioButton("All Eigenvalues", &ImGuiState::DatasetTesting::eigendecomposition_method,
-                     0);
+  ImGui::RadioButton("All Eigenvalues",
+                     &ImGuiState::DatasetTesting::eigendecomposition_method, 0);
   ImGui::SameLine();
   ImGui::RadioButton("Specific # of Eigenvalues",
                      &ImGuiState::DatasetTesting::eigendecomposition_method, 1);
@@ -492,7 +499,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   if (ImGuiState::DatasetTesting::eigendecomposition_method == 0)
     ImGui::BeginDisabled();
 
-  ImGui::InputInt("# of Eigenvalues to compute", &ImGuiState::DatasetTesting::eigs_number);
+  ImGui::InputInt("# of Eigenvalues to compute",
+                  &ImGuiState::DatasetTesting::eigs_number);
 
   if (ImGuiState::DatasetTesting::eigendecomposition_method == 0)
     ImGui::EndDisabled();
@@ -507,8 +515,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::DatasetTesting::ComputedEigs()) ? ImGui::Text("Success! Eigenvalues computed")
-                               : ImGui::Text("Click to compute eigenvalues");
+  (ImGuiState::DatasetTesting::ComputedEigs())
+      ? ImGui::Text("Success! Eigenvalues computed")
+      : ImGui::Text("Click to compute eigenvalues");
 
   if (!ImGuiState::DatasetTesting::LaplacianCreated())
     ImGui::EndDisabled();
@@ -530,8 +539,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   }
 
   ImGui::SameLine();
-  (ImGuiState::DatasetTesting::SavedEigs()) ? ImGui::Text("Success! Eigenvalues saved")
-                            : ImGui::Text("Click to save eigenvalues");
+  (ImGuiState::DatasetTesting::SavedEigs())
+      ? ImGui::Text("Success! Eigenvalues saved")
+      : ImGui::Text("Click to save eigenvalues");
 
   if (!ImGuiState::DatasetTesting::ComputedEigs())
     ImGui::EndDisabled();

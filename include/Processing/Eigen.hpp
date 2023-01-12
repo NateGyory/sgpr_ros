@@ -52,7 +52,7 @@ inline void computeEigenvalues(SpectralObject &spectral_object, int max_eigs) {
   int eig_n =
       (max_eigs == -1) ? spectral_object.laplacian.n_cols - 1 : max_eigs;
 
-  if (max_eigs > spectral_object.cloud->size() - 1) {
+  if (eig_n > spectral_object.laplacian.n_cols - 1) {
     std::cout << "Skipping" << std::endl;
     return;
   }
