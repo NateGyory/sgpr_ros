@@ -62,6 +62,7 @@ namespace DatasetTesting {
 inline static int dataset_idx = 0;
 inline static int edge_heuristic_idx = 1;
 inline static int laplacian_idx = 0;
+inline static int query_scan_idx = 0;
 
 // Input string boxes
 inline static char eigenvalue_json_f[64] = "DT_eigs.json";

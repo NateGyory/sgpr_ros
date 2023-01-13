@@ -23,15 +23,15 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Matplot++ REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-find_package(catkin REQUIRED COMPONENTS
-    roscpp
-)
+#find_package(catkin REQUIRED COMPONENTS
+#    roscpp
+#)
 
-catkin_package(
-   INCLUDE_DIRS include
-   LIBRARIES ${PROJECT_NAME}
-   CATKIN_DEPENDS roscpp rospy
-)
+#catkin_package(
+#   INCLUDE_DIRS include
+#   LIBRARIES ${PROJECT_NAME}
+#   CATKIN_DEPENDS roscpp rospy
+#)
 
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS "src/*.cpp")
 

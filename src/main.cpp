@@ -7,9 +7,9 @@
 #include <string>
 #include <thread>
 
-#include <ros/console.h>
-#include <ros/param.h>
-#include <ros/ros.h>
+//#include <ros/console.h>
+//#include <ros/param.h>
+//#include <ros/ros.h>
 
 #include "Pipelines/NovelMethodTestingPipeline.h"
 #include "Pipelines/RScanPipeline.h"
@@ -450,6 +450,23 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
   // Solution
   // https://eliasdaler.github.io/using-imgui-with-sfml-pt2/
+
+  std::vector<std::string> query_scans = pl->GetQueryScans();
+  if (ImGui::BeginCombo("Query Scans")) {
+      for (int i = 0; i < query_scans.size(); i++) {
+          const bool isSelected = (ImGuiState::DatasetTesting::query_scan_idx == i);
+          if (ImGui::Selectable(query_scans[i], isSelected)) {
+              selectedIndex = i;
+          }
+
+          // Set the initial focus when opening the combo
+          // (scrolling + keyboard navigation focus)
+          if (isSelected) {
+              ImGui::SetItemDefaultFocus();
+          }
+      }
+      ImGui::EndCombo();
+  }
 
   if (!ImGuiState::DatasetTesting::ShouldStep())
     ImGui::EndDisabled();
