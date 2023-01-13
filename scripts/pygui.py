@@ -1,6 +1,8 @@
 import sys
 import json
 
+from colorama import Fore, Back, Style
+
 from scipy.stats import ks_2samp, anderson_ksamp
 #from sklearn.metrics import mean_squared_error
 
@@ -9,41 +11,130 @@ from PyQt5.QtWidgets import QApplication, QGridLayout, QMainWindow, QPushButton,
 global ref_eigenvals, query_eigenvals, ref_eig_map, query_eig_map
 
 ##########################################################
+# Dict Formats
+##########################################################
+
+# JSON format to parse from DT_eigs.json
+#{
+#  reference_scans: [{
+#    scan_id:
+#    objects: [{
+#      label:
+#      global_id:
+#      scene_id
+#      ply_color:
+#      eigenvalues:
+#    }]
+#  }],
+#  query_scans: [
+#    scan_id:
+#    reference_scan_id:
+#    objects: [{
+#      label:
+#      global_id:
+#      scene_id
+#      ply_color:
+#      eigenvalues:
+#    }]
+#  }],
+#}
+
+# score_card = {
+#   query_scan_id: string
+#   reference_scan_id_match: string
+#   total_objs: int
+#   ref_scan_scores : {
+#       <scan_id>: <total_matches>
+#       ...
+#   }
+#}
+
+##########################################################
 # Dataset Testing analysis functions here
 ##########################################################
-def dtRunADTest():
+def compareObjects(ref_obj_map, query_obj_map, type):
+    # For all objs in the query obj map try and find a global id match in ref map
+    total_matches = 0
+    for k, v in query_obj_map.items():
+        # search for key in the ref_obj_map
+        if (k not in ref_obj_map):
+            continue
+
+        ref_obj = ref_obj_map[k]
+        if (len(ref_obj["eigenvalues"]) == 0 or len(v["eigenvalues"]) == 0):
+            continue
+
+        if type == 0: # KSTest
+            result = ks_2samp(ref_obj["eigenvalues"], v["eigenvalues"])
+
+            if result.pvalue > 0.05:
+                #print("Match for Label: {} Global ID: {}".format(k, v["label"]))     
+                total_matches+=1
+
+        elif type == 1: # ADTest
+            result = anderson_ksamp([ref_obj["eigenvalues"], v["eigenvalues"]])
+
+            if result[2] > 0.05:
+                #print("Match for Label: {} Global ID: {}".format(k, v["label"]))     
+                total_matches+=1
+
+    return total_matches
+
+def dtRunTest(type):
     global ref_eig_map, query_eig_map
 
-def dtRunKSTest():
-    global ref_eig_map, query_eig_map
+    total_scenes = 0
+    total_correct = 0
 
+    for q_k, q_v in query_eig_map.items():
+        query_scan_id = q_k
+        reference_scan_id = q_v[0]
+
+        score_card = dict()
+        score_card["query_scan_id"] = query_scan_id
+        score_card["reference_scan_id_match"] = reference_scan_id
+        score_card["total_objs"] = len(q_v[0])
+        score_card["ref_scan_scores"] = dict()
+        
+        print("######################################")
+        print("Query scan ID: " + query_scan_id)
+        print("Correct Reference Scan ID: " + reference_scan_id)
+
+        # For the query scan test against every reference scan
+        for r_k, r_v in ref_eig_map.items():
+            #print("-------------------------------------")
+            #print("Testing Reference Scan:\n{}".format(r_k))
+            total_matches = compareObjects(r_v, q_v[1], type)
+            score_card["ref_scan_scores"][r_k] = total_matches
+            #print("-------------------------------------")
+
+        # for each each ref_scan_scores print the one with the highest
+        ref_winner = str()
+        total_matches = -1
+        for k, v in score_card["ref_scan_scores"].items():
+            if v > total_matches:
+                total_matches = v
+                ref_winner = k
+        
+        total_scenes+=1
+        print("\nWinner:{}\nTotal Matches: {}/{}".format(ref_winner, total_matches, len(q_v[1])))
+
+        if reference_scan_id == ref_winner:
+            total_correct+=1
+            print(Fore.GREEN + "CORRECT!!!")
+            print(Style.RESET_ALL)
+        else:
+            print(Fore.RED + "WRONG!!!")
+            print(Style.RESET_ALL)
+
+    print("\n######################################")
+    print("Final Results")
+    print("Accuracy: {}/{}".format(total_correct, total_scenes))
+
+# TODO Need to change the global_id key to not overwrite other objects that have the same global_id in the scene
 def dtParseJSON(file_path):
     global ref_eig_map, query_eig_map
 
-    # JSON format to parse
-    #{
-    #  reference_scans: [{
-    #    scan_id:
-    #    objects: [{
-    #      label:
-    #      global_id:
-    #      scene_id
-    #      ply_color:
-    #      eigenvalues:
-    #    }]
-    #  }],
-    #  query_scans: [
-    #    scan_id:
-    #    reference_scan_id:
-    #    objects: [{
-    #      label:
-    #      global_id:
-    #      scene_id
-    #      ply_color:
-    #      eigenvalues:
-    #    }]
-    #  }],
-    #}
     
     file_path = "/home/nate/Development/catkin_ws/src/sgpr_ros/data/DT_eigs.json"
     f = open(file_path)
@@ -144,10 +235,10 @@ class MainWindow(QMainWindow):
             dtParseJSON(self.eigs_path + self.dt_eigs_f)
 
         def dt_ad_clicked():
-            dtRunADTest()
+            dtRunTest(1)
 
         def dt_ks_clicked():
-            dtRunKSTest()
+            dtRunTest(0)
 
         def nmt_read_json_file():
             self.dt_eigs_f = self.nmt_textbox.text()

@@ -68,6 +68,7 @@ inline static char eigenvalue_json_f[64] = "DT_eigs.json";
 
 // Radio indexes
 inline static int eigendecomposition_method = 1;
+inline static int should_step = 0;
 
 // Input box values
 inline static int eigs_number = 100;
@@ -84,6 +85,7 @@ inline static bool saved_eigs = false;
 //inline static bool matplot = false;
 
 inline static bool DatasetParsed() { return dataset_parsed; }
+inline static bool ShouldStep() { return should_step == 1; }
 inline static bool EdgesCreated() { return edges_created; }
 inline static bool LaplacianCreated() { return laplacian_created; }
 inline static bool ComputedEigs() { return eigs; }

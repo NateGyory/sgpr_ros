@@ -433,6 +433,29 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
   // --------------------------------------------------------------
   ImGui::Separator();
+  ImGui::Text("To Step Or Not To Step");
+
+  ImGui::RadioButton("Step",
+                     &ImGuiState::DatasetTesting::should_step, 0);
+  ImGui::SameLine();
+  ImGui::RadioButton("Don't Step",
+                     &ImGuiState::DatasetTesting::should_step, 1);
+
+  if (!ImGuiState::DatasetTesting::ShouldStep())
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Choose Scans");
+
+  // Solution
+  // https://eliasdaler.github.io/using-imgui-with-sfml-pt2/
+
+  if (!ImGuiState::DatasetTesting::ShouldStep())
+    ImGui::EndDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
   ImGui::Text("Graph Formulation");
 
   ImGui::Combo(
