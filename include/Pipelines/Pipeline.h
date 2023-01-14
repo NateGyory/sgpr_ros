@@ -15,11 +15,6 @@
 #include <Processing/Laplacian.hpp>
 #include <Processing/PointCloud.hpp>
 
-#include <Types/GraphLaplacian.h>
-
-using GraphLaplacianPair =
-    std::pair<std::shared_ptr<GraphLaplacian>, std::shared_ptr<GraphLaplacian>>;
-
 class Pipeline {
 public:
   virtual ~Pipeline(){};
@@ -30,8 +25,14 @@ public:
   virtual void ComputeLaplacian(int laplacian_type) = 0;
   virtual void ComputeEigs(int max_eigs) = 0;
   virtual void SaveEigenvalues(std::string file_name) = 0;
+  virtual void GetQueryScans(std::vector<std::string> &query_scans) = 0;
+  virtual void GetRefScans(std::vector<std::string> &ref_scans) = 0;
+  virtual const char* GetMappedRefScan(std::vector<std::string> &query_scans, int query_scan_idx) = 0;
 
 protected:
   scene_map_t mSceneMap;
   spKeyFrameDB mKeyFrameDB;
+
+  std::pair<std::string, std::string> mQRScanPair;
+  std::pair<int, int> mQRObjIdx;
 };

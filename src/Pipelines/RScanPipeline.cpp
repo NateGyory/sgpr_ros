@@ -106,7 +106,8 @@ void RScanPipeline::ExtractObjectPointClouds(int max_pts) {
   std::cout << "ExtractObjectPointClouds" << std::endl;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
                 [max_pts](std::pair<const std::string, Scene> &pair) {
-                  Processing::PointCloud::ExtractObjectPointClouds(pair.second, max_pts);
+                  Processing::PointCloud::ExtractObjectPointClouds(pair.second,
+                                                                   max_pts);
                 });
   std::cout << "Finished ExtractObjectPointClouds" << std::endl;
 }
@@ -221,4 +222,28 @@ void RScanPipeline::SaveEigenvalues(std::string file_name) {
   j["query_scans"] = query_scans;
 
   o << std::setw(4) << j << std::endl;
+}
+
+void RScanPipeline::GetQueryScans(std::vector<std::string> &query_scans) {
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [&query_scans](std::pair<const std::string, Scene> &pair) {
+                  if (!pair.second.is_reference)
+                    query_scans.push_back(pair.first);
+                });
+}
+
+void RScanPipeline::GetRefScans(std::vector<std::string> &ref_scans) {
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [&ref_scans](std::pair<const std::string, Scene> &pair) {
+                  if (pair.second.is_reference)
+                    ref_scans.push_back(pair.first);
+                });
+}
+
+const char *
+RScanPipeline::GetMappedRefScan(std::vector<std::string> &query_scans,
+                                int query_scan_idx) {
+  return (query_scans.size() == 0) ? ""
+                                   : mSceneMap[query_scans[query_scan_idx]]
+                                         .reference_id_match.c_str();
 }

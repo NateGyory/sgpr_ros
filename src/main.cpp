@@ -2,14 +2,15 @@
 #include <memory>
 #include <pcl/common/io.h>
 #include <pcl/impl/point_types.hpp>
+#include <pcl/io/ply_io.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 #include <string>
 #include <thread>
 
-//#include <ros/console.h>
-//#include <ros/param.h>
-//#include <ros/ros.h>
+// #include <ros/console.h>
+// #include <ros/param.h>
+// #include <ros/ros.h>
 
 #include "Pipelines/NovelMethodTestingPipeline.h"
 #include "Pipelines/RScanPipeline.h"
@@ -28,38 +29,46 @@ static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-// TODO:
-//    a) Try to actually get the window to close when you tell it to.
-//    b) Trow all the viz stuff in a separate Processing .hpp file
 void RunVizThread(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1,
                   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2) {
 
-  pcl::visualization::PCLVisualizer::Ptr viewer(
-      new pcl::visualization::PCLVisualizer("3D Viewer"));
-  viewer->initCameraParameters();
+  pcl::visualization::PCLVisualizer::Ptr viewer1(
+      new pcl::visualization::PCLVisualizer("3D Viewer 1"));
+  pcl::visualization::PCLVisualizer::Ptr viewer2(
+      new pcl::visualization::PCLVisualizer("3D Viewer 2"));
 
-  int v1(0);
-  viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v1);
-  viewer->setBackgroundColor(0, 0, 0, v1);
-  viewer->addPointCloud<pcl::PointXYZRGB>(cloud1, "Cloud 1", v1);
+  viewer1->initCameraParameters();
+  viewer2->initCameraParameters();
 
-  int v2(1);
-  viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v2);
-  viewer->setBackgroundColor(0.3, 0.3, 0.3, v2);
-  viewer->addPointCloud<pcl::PointXYZRGB>(cloud2, "Cloud 2", v2);
+  // int v1(0);
+  // viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v1);
+  viewer1->setBackgroundColor(0, 0, 0);
+  viewer1->addPointCloud<pcl::PointXYZRGB>(cloud1, "Cloud 1");
 
-  viewer->setPointCloudRenderingProperties(
+  // int v2(1);
+  // viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v2);
+  viewer2->setBackgroundColor(0.3, 0.3, 0.3);
+  viewer2->addPointCloud<pcl::PointXYZRGB>(cloud2, "Cloud 2");
+
+  viewer1->setPointCloudRenderingProperties(
       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 1");
-  viewer->setPointCloudRenderingProperties(
+  viewer2->setPointCloudRenderingProperties(
       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 2");
-  viewer->addCoordinateSystem(1.0);
 
-  while (!viewer->wasStopped()) {
-    viewer->spinOnce(100);
-    std::this_thread::sleep_for(100ms);
-  }
+  viewer1->addCoordinateSystem(1.0);
+  viewer2->addCoordinateSystem(1.0);
 
-  viewer->close();
+  // while (!viewer->wasStopped()) {
+  //   viewer->spinOnce(100);
+  //   std::this_thread::sleep_for(100ms);
+  // }
+
+  viewer1->spin();
+  viewer2->spin();
+
+  // viewer1.reset();
+  // viewer2.reset();
+
   std::cout << "closed!" << std::endl;
 }
 
@@ -435,41 +444,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::Separator();
   ImGui::Text("To Step Or Not To Step");
 
-  ImGui::RadioButton("Step",
-                     &ImGuiState::DatasetTesting::should_step, 0);
+  ImGui::RadioButton("Step", &ImGuiState::DatasetTesting::should_step, 0);
   ImGui::SameLine();
-  ImGui::RadioButton("Don't Step",
-                     &ImGuiState::DatasetTesting::should_step, 1);
-
-  if (!ImGuiState::DatasetTesting::ShouldStep())
-    ImGui::BeginDisabled();
-
-  // --------------------------------------------------------------
-  ImGui::Separator();
-  ImGui::Text("Choose Scans");
-
-  // Solution
-  // https://eliasdaler.github.io/using-imgui-with-sfml-pt2/
-
-  std::vector<std::string> query_scans = pl->GetQueryScans();
-  if (ImGui::BeginCombo("Query Scans")) {
-      for (int i = 0; i < query_scans.size(); i++) {
-          const bool isSelected = (ImGuiState::DatasetTesting::query_scan_idx == i);
-          if (ImGui::Selectable(query_scans[i], isSelected)) {
-              selectedIndex = i;
-          }
-
-          // Set the initial focus when opening the combo
-          // (scrolling + keyboard navigation focus)
-          if (isSelected) {
-              ImGui::SetItemDefaultFocus();
-          }
-      }
-      ImGui::EndCombo();
-  }
-
-  if (!ImGuiState::DatasetTesting::ShouldStep())
-    ImGui::EndDisabled();
+  ImGui::RadioButton("Don't Step", &ImGuiState::DatasetTesting::should_step, 1);
 
   // --------------------------------------------------------------
   ImGui::Separator();
@@ -583,6 +560,115 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       ? ImGui::Text("Success! Eigenvalues saved")
       : ImGui::Text("Click to save eigenvalues");
 
+  if (!ImGuiState::DatasetTesting::ShouldStep())
+    ImGui::BeginDisabled();
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Choose Scans");
+
+  if (ImGuiState::DatasetTesting::GetQueryScans()) {
+    pl->GetQueryScans(ImGuiState::DatasetTesting::query_scans);
+  }
+
+  const char *selected_query_scan =
+      ImGuiState::DatasetTesting::GetSelectedQueryScan();
+
+  if (ImGui::BeginCombo("Choose A Query Scan", selected_query_scan)) {
+    for (int i = 0; i < ImGuiState::DatasetTesting::query_scans.size(); i++) {
+      const bool isSelected = (ImGuiState::DatasetTesting::query_scan_idx == i);
+      if (ImGui::Selectable(ImGuiState::DatasetTesting::query_scans[i].c_str(),
+                            isSelected)) {
+        ImGuiState::DatasetTesting::query_scan_idx = i;
+      }
+
+      if (isSelected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  const char *selected_ref_scan =
+      (ImGuiState::DatasetTesting::query_scans.size() > 0)
+          ? pl->GetMappedRefScan(ImGuiState::DatasetTesting::query_scans,
+                                 ImGuiState::DatasetTesting::query_scan_idx)
+          : "";
+
+  if (ImGuiState::DatasetTesting::GetRefScans())
+    pl->GetRefScans(ImGuiState::DatasetTesting::ref_scans);
+
+  if (ImGuiState::DatasetTesting::UpdateRefScanSelected()) {
+    ImGuiState::DatasetTesting::last_query_scan_idx =
+        ImGuiState::DatasetTesting::query_scan_idx;
+    std::string ref = std::string(selected_ref_scan);
+    auto it = std::find(ImGuiState::DatasetTesting::ref_scans.begin(),
+                        ImGuiState::DatasetTesting::ref_scans.end(), ref);
+
+    if (it != ImGuiState::DatasetTesting::ref_scans.end()) {
+      ImGuiState::DatasetTesting::ref_scan_idx =
+          it - ImGuiState::DatasetTesting::ref_scans.begin();
+    } else {
+      std::cout << "ERROR reference scan not in list" << std::endl;
+      std::exit(1);
+    }
+  }
+
+  if (ImGui::BeginCombo("Choose A Reference Scan", selected_ref_scan)) {
+    for (int i = 0; i < ImGuiState::DatasetTesting::ref_scans.size(); i++) {
+      const bool isSelected = (ImGuiState::DatasetTesting::ref_scan_idx == i);
+      if (ImGui::Selectable(ImGuiState::DatasetTesting::ref_scans[i].c_str(),
+                            isSelected)) {
+        ImGuiState::DatasetTesting::ref_scan_idx = i;
+      }
+
+      if (isSelected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Choose Objects");
+
+  ImGui::RadioButton("Compare All Matching Objects",
+                     &ImGuiState::DatasetTesting::obj_compare_method, 0);
+  ImGui::SameLine();
+  ImGui::RadioButton("Select Objects",
+                     &ImGuiState::DatasetTesting::obj_compare_method, 1);
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Visualizers Per Step");
+
+  ImGui::Checkbox("Visualize Point Clouds",
+                  &ImGuiState::DatasetTesting::c_visualize_point_clouds);
+  ImGui::Checkbox("Visualize Graph Connections",
+                  &ImGuiState::DatasetTesting::c_visualize_graph_connections);
+  ImGui::Checkbox("Visualize Spectra",
+                  &ImGuiState::DatasetTesting::c_visualize_spectra);
+  ImGui::Checkbox("Anderson-Darling Test",
+                  &ImGuiState::DatasetTesting::c_anderson_darling_test);
+  ImGui::Checkbox("KS Test", &ImGuiState::DatasetTesting::c_ks_test);
+
+  if (ImGui::Button("Button ?")) {
+  }
+  // TODO
+  // First try and figure out why the viz thread is not closing
+  // options:
+  //  a) do get viz thread to close
+  //  b) keep doing what we are doing
+  //  c) (Probably the cleanest but most work) throw it in ros and create a
+  //  service msg which will do all the viz stuff in different processes
+  //}
+  ImGui::SameLine();
+  ImGui::Text("Step over each matching object between the scenes");
+
+  if (!ImGuiState::DatasetTesting::ShouldStep())
+    ImGui::EndDisabled();
+
   if (!ImGuiState::DatasetTesting::ComputedEigs())
     ImGui::EndDisabled();
 
@@ -653,14 +739,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 // ImGui::SetWindowFontScale(5.0f);
 
 int main(int argc, char **argv) {
-
   GLFWwindow *window = initGUI();
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-  // Define Pipeline
-  // Right now we are using type to parse on pipeline underlying behavior
-  // If the datasets end up being super different we may need to create
-  // multiple pipeline types through templating
   NovelMethodTestingPipeline nmtPipeline;
   std::shared_ptr<Pipeline> datasetPipeline;
 
