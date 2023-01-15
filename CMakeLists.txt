@@ -23,16 +23,31 @@ find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Matplot++ REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
-#find_package(catkin REQUIRED COMPONENTS
-#    roscpp
-#)
+find_package(catkin REQUIRED COMPONENTS
+    roscpp message_generation
+)
 
-#catkin_package(
-#   INCLUDE_DIRS include
-#   LIBRARIES ${PROJECT_NAME}
-#   CATKIN_DEPENDS roscpp rospy
-#)
+add_service_files(
+  FILES Eigenvalues.srv
+)
 
+generate_messages(
+  #DEPENDENCIES actionlib_msgs std_msgs
+)
+
+catkin_package(
+   INCLUDE_DIRS include
+   LIBRARIES ${PROJECT_NAME}
+   CATKIN_DEPENDS roscpp rospy
+)
+
+catkin_install_python(PROGRAMS
+  scripts/ks_test_service.py
+  scripts/ad_test_service.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+# Main node files and executable
 file(GLOB_RECURSE SRCS CONFIGURE_DEPENDS "src/*.cpp")
 
 add_executable(sgpr_ros ${SRCS})

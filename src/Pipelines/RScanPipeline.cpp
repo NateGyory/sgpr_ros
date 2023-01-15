@@ -1,4 +1,5 @@
 #include "Pipelines/RScanPipeline.h"
+#include <pcl/common/io.h>
 
 // NOTE: for gdb debugging
 std::string make_string(const char *x) { return x; }
@@ -246,4 +247,80 @@ RScanPipeline::GetMappedRefScan(std::vector<std::string> &query_scans,
   return (query_scans.size() == 0) ? ""
                                    : mSceneMap[query_scans[query_scan_idx]]
                                          .reference_id_match.c_str();
+}
+
+void RScanPipeline::GetQuerySpectralObjIds(
+    std::vector<int> &query_obj_scene_ids, std::string query_scan) {
+  for (auto spectral_obj : mSceneMap[query_scan].spectral_objects) {
+    query_obj_scene_ids.push_back(spectral_obj.scene_id);
+  }
+}
+
+bool RScanPipeline::RefObjExists(std::string query_scan, int query_obj_idx,
+                                 int &ref_obj_idx) {
+  int scene_id = mSceneMap[query_scan].spectral_objects[query_obj_idx].scene_id;
+  std::string reference_scan = mSceneMap[query_scan].reference_id_match;
+
+  auto begin_it = mSceneMap[reference_scan].spectral_objects.begin();
+  auto end_it = mSceneMap[reference_scan].spectral_objects.end();
+
+  auto it =
+      std::find_if(begin_it, end_it, [scene_id](const SpectralObject &so) {
+        return so.scene_id == scene_id;
+      });
+
+  ref_obj_idx = it - begin_it;
+
+  return it != end_it;
+}
+
+void RScanPipeline::GetQueryRefCloudObjPair(
+    std::string query_scan, std::string ref_scan, int q_idx, int r_idx,
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2) {
+  pcl::copyPointCloud(*cloud1,
+                      *mSceneMap[query_scan].spectral_objects[q_idx].cloud);
+  pcl::copyPointCloud(*cloud2,
+                      *mSceneMap[ref_scan].spectral_objects[r_idx].cloud);
+}
+
+double RScanPipeline::GetRadius(std::string scan, int obj_idx) {
+  return mSceneMap[scan].spectral_objects[obj_idx].mcar;
+}
+
+void RScanPipeline::PlotHistograms(std::string ref_scan, std::string query_scan,
+                                   int query_obj_idx, int ref_obj_idx) {
+  auto f = figure(true);
+  f->width(f->width() * 3);
+  f->height(f->height() * 2.5);
+  f->x_position(10);
+  f->y_position(10);
+
+  std::vector<double> ref = arma::conv_to<std::vector<double>>::from(
+      mSceneMap[ref_scan].spectral_objects[ref_obj_idx].eigenvalues);
+  std::vector<double> query = arma::conv_to<std::vector<double>>::from(
+      mSceneMap[query_scan].spectral_objects[query_obj_idx].eigenvalues);
+
+  double min_ref = *std::min_element(ref.begin(), ref.end());
+  double max_ref = *std::max_element(ref.begin(), ref.end());
+  double min_query = *std::min_element(query.begin(), query.end());
+  double max_query = *std::max_element(query.begin(), query.end());
+
+  double min = std::min(min_ref, min_query);
+  double max = std::max(max_ref, max_query);
+
+  double bin_width = (max - min) / 25;
+
+  auto h1 = hist(ref);
+  h1->face_color("r");
+  h1->edge_color("r");
+  h1->bin_width(bin_width);
+  hold(on);
+  auto h2 = hist(query);
+  h2->face_color("b");
+  h2->edge_color("b");
+  h2->bin_width(bin_width);
+  title("Eigenvalue Spectras");
+  f->draw();
+  show();
 }

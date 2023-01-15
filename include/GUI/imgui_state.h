@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imgui.h"
+#include <pcl/point_cloud.h>
 #include <string>
 #include <vector>
 #include <pcl/visualization/pcl_visualizer.h>
@@ -60,8 +61,13 @@ inline static bool ShowRadius() {
 
 namespace DatasetTesting {
 
+inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
+inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
+
+
 inline static std::vector<std::string> query_scans;
 inline static std::vector<std::string> ref_scans;
+inline static std::vector<int> query_obj_scene_ids;
 
 // Indexes for drop down arrays
 inline static int dataset_idx = 0;
@@ -96,9 +102,14 @@ inline static bool edges_created = false;
 inline static bool laplacian_created = false;
 inline static bool eigs = false;
 inline static bool saved_eigs = false;
+inline static bool ref_obj_exists = true;
 // inline static bool pcl_viz = false; Not yet implemented
 // inline static bool pcl_viz_connection = false;
 // inline static bool matplot = false;
+
+// query and ref obj idx for current obj comparing in the scene
+inline static int query_obj_idx = 0;
+inline static int ref_obj_idx = 0;
 
 inline static bool DatasetParsed() { return dataset_parsed; }
 inline static bool ShouldStep() { return should_step == 0; }
@@ -114,6 +125,9 @@ inline static bool UpdateRefScanSelected() {
 inline static const char *GetSelectedQueryScan() {
   return (query_scans.size() > 0) ? query_scans[query_scan_idx].c_str() : "";
 }
+
+inline static bool ReadyToStep() { return query_obj_scene_ids.size() > 0 && query_obj_idx < query_obj_scene_ids.size(); }
+inline static bool RefObjExists() { return ref_obj_exists; }
 inline static bool EdgesCreated() { return edges_created; }
 inline static bool LaplacianCreated() { return laplacian_created; }
 inline static bool ComputedEigs() { return eigs; }

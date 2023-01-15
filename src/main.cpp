@@ -8,9 +8,11 @@
 #include <string>
 #include <thread>
 
-// #include <ros/console.h>
-// #include <ros/param.h>
-// #include <ros/ros.h>
+#include <ros/console.h>
+#include <ros/param.h>
+#include <ros/ros.h>
+
+#include <sgpr_ros/Eigenvalues.h>
 
 #include "Pipelines/NovelMethodTestingPipeline.h"
 #include "Pipelines/RScanPipeline.h"
@@ -19,11 +21,15 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_state.h"
+#include "ros/duration.h"
 #include <stdio.h>
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 using namespace std::chrono_literals;
+
+ros::ServiceClient ks_service_client;
+ros::ServiceClient ad_service_client;
 
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
@@ -653,8 +659,82 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                   &ImGuiState::DatasetTesting::c_anderson_darling_test);
   ImGui::Checkbox("KS Test", &ImGuiState::DatasetTesting::c_ks_test);
 
-  if (ImGui::Button("Button ?")) {
+  if (ImGui::Button("Init Objects")) {
+    std::cout << "INIT Pressed" << std::endl;
+    ImGuiState::DatasetTesting::query_obj_scene_ids.clear();
+    ImGuiState::DatasetTesting::query_obj_idx = 0;
+    pl->GetQuerySpectralObjIds(ImGuiState::DatasetTesting::query_obj_scene_ids,
+                               std::string(selected_query_scan));
   }
+
+  if (ImGui::Button("Vizualize Object Pairs")) {
+    std::cout << "Step Pressed" << std::endl;
+
+    if (pl->RefObjExists(std::string(selected_query_scan),
+                         ImGuiState::DatasetTesting::query_obj_idx,
+                         ImGuiState::DatasetTesting::ref_obj_idx)) {
+      ImGuiState::DatasetTesting::ref_obj_exists = true;
+      // Get Point Clouds
+      pl->GetQueryRefCloudObjPair(std::string(selected_query_scan),
+                                  std::string(selected_ref_scan),
+                                  ImGuiState::DatasetTesting::query_obj_idx,
+                                  ImGuiState::DatasetTesting::ref_obj_idx,
+                                  ImGuiState::DatasetTesting::cloud1,
+                                  ImGuiState::DatasetTesting::cloud2);
+
+      // Call viz thread
+      std::thread t1(RunVizThread, ImGuiState::DatasetTesting::cloud1,
+                     ImGuiState::DatasetTesting::cloud2);
+      t1.detach();
+
+      // call point cloud connetion viz thread
+      double r1 = pl->GetRadius(std::string(selected_query_scan),
+                                ImGuiState::DatasetTesting::query_obj_idx);
+      double r2 = pl->GetRadius(std::string(selected_ref_scan),
+                                ImGuiState::DatasetTesting::ref_obj_idx);
+      std::thread t2(RunVizConnectionThread, ImGuiState::DatasetTesting::cloud1,
+                     ImGuiState::DatasetTesting::cloud2, r1, r2);
+      t2.detach();
+
+      // Call matplot lib histogram func
+      pl->PlotHistograms(std::string(selected_ref_scan),
+                         std::string(selected_query_scan),
+                         ImGuiState::DatasetTesting::query_obj_idx,
+                         ImGuiState::DatasetTesting::ref_obj_idx);
+
+      // Call rosservice for ad and ks test
+      sgpr_ros::Eigenvalues srv;
+      srv.request.a = 1;
+      srv.request.b = 2;
+      if (ks_service_client.call(srv)) {
+        ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+      } else {
+        ROS_ERROR("Failed to call service add_two_ints");
+      }
+
+      if (ad_service_client.call(srv)) {
+        ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+      } else {
+        ROS_ERROR("Failed to call service add_two_ints");
+      }
+
+      ImGuiState::DatasetTesting::cloud1.reset();
+      ImGuiState::DatasetTesting::cloud2.reset();
+
+    } else {
+      ImGuiState::DatasetTesting::ref_obj_exists = false;
+    }
+
+    ImGuiState::DatasetTesting::query_obj_idx++;
+  }
+
+  // TODO need a scene is done function
+  if (!ImGuiState::DatasetTesting::ReadyToStep())
+    ImGui::BeginDisabled();
+
+  if (!ImGuiState::DatasetTesting::RefObjExists())
+    ImGui::Text("Ref Object Does Not Exist");
+
   // TODO
   // First try and figure out why the viz thread is not closing
   // options:
@@ -663,8 +743,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   //  c) (Probably the cleanest but most work) throw it in ros and create a
   //  service msg which will do all the viz stuff in different processes
   //}
-  ImGui::SameLine();
-  ImGui::Text("Step over each matching object between the scenes");
+
+  if (!ImGuiState::DatasetTesting::ReadyToStep())
+    ImGui::EndDisabled();
 
   if (!ImGuiState::DatasetTesting::ShouldStep())
     ImGui::EndDisabled();
@@ -739,6 +820,28 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 // ImGui::SetWindowFontScale(5.0f);
 
 int main(int argc, char **argv) {
+  ros::init(argc, argv, "sgpr_ros_node");
+  ros::NodeHandle n;
+
+  ks_service_client = n.serviceClient<sgpr_ros::Eigenvalues>("ks_test_service");
+  ad_service_client = n.serviceClient<sgpr_ros::Eigenvalues>("ad_test_service");
+
+  ks_service_client.waitForExistence(ros::Duration(10));
+  ad_service_client.waitForExistence(ros::Duration(10));
+
+  // sgpr_ros::Eigenvalues srv;
+  // srv.request.a = 1;
+  // srv.request.b = 2;
+  // if (ks_service_client.call(srv)) {
+  //   ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+  // } else {
+  //   ROS_ERROR("Failed to call service add_two_ints");
+  //   return 1;
+  // }
+
+  // Todo need to use the param server at somepoint
+  // ros::param::get("dataset", dataset);
+
   GLFWwindow *window = initGUI();
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
@@ -777,12 +880,6 @@ int main(int argc, char **argv) {
 
   glfwDestroyWindow(window);
   glfwTerminate();
-
-  // ros::init(argc, argv, "sgpr_ros_node");
-  // ros::NodeHandle n;
-
-  // int dataset;
-  // ros::param::get("dataset", dataset);
 
   // switch (dataset) {
   // case 0:
