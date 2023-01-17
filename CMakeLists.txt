@@ -24,15 +24,17 @@ find_package(Matplot++ REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
-    roscpp message_generation
+    roscpp message_generation std_msgs sensor_msgs
 )
 
 add_service_files(
-  FILES Eigenvalues.srv
+  FILES
+  Eigenvalues.srv
+  PointClouds.srv
 )
 
 generate_messages(
-  #DEPENDENCIES actionlib_msgs std_msgs
+  DEPENDENCIES std_msgs sensor_msgs
 )
 
 catkin_package(
@@ -42,8 +44,9 @@ catkin_package(
 )
 
 catkin_install_python(PROGRAMS
-  scripts/ks_test_service.py
-  scripts/ad_test_service.py
+  scripts/evaluation_service.py
+  scripts/point_cloud_viz_service.py
+  scripts/histogram_viz_service.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

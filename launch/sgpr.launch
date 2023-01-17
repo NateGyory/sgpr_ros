@@ -2,15 +2,22 @@
 
 <node
   pkg="sgpr_ros"
-  type="ks_test_service.py"
-  name="ks_test_service_node"
+  type="evaluation_service.py"
+  name="evaluation_service_node"
   output="screen"
 />
 
 <node
   pkg="sgpr_ros"
-  type="ad_test_service.py"
-  name="ad_test_service_node"
+  type="histogram_viz_service.py"
+  name="histogram_viz_service_node"
+  output="screen"
+/>
+
+<node
+  pkg="sgpr_ros"
+  type="point_cloud_viz_service.py"
+  name="point_cloud_viz_service_node"
   output="screen"
 />
 

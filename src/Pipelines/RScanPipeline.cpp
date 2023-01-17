@@ -278,10 +278,10 @@ void RScanPipeline::GetQueryRefCloudObjPair(
     std::string query_scan, std::string ref_scan, int q_idx, int r_idx,
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2) {
-  pcl::copyPointCloud(*cloud1,
-                      *mSceneMap[query_scan].spectral_objects[q_idx].cloud);
-  pcl::copyPointCloud(*cloud2,
-                      *mSceneMap[ref_scan].spectral_objects[r_idx].cloud);
+  pcl::copyPointCloud(*mSceneMap[query_scan].spectral_objects[q_idx].cloud,
+                      *cloud1);
+  pcl::copyPointCloud(*mSceneMap[ref_scan].spectral_objects[r_idx].cloud,
+                      *cloud2);
 }
 
 double RScanPipeline::GetRadius(std::string scan, int obj_idx) {
@@ -323,4 +323,13 @@ void RScanPipeline::PlotHistograms(std::string ref_scan, std::string query_scan,
   title("Eigenvalue Spectras");
   f->draw();
   show();
+}
+
+void RScanPipeline::GetEigs(sgpr_ros::Eigenvalues &eig_srv,
+                            std::string query_scan, int query_obj_idx,
+                            std::string ref_scan, int ref_obj_idx) {
+  eig_srv.request.q_eigs = arma::conv_to<std::vector<double>>::from(
+      mSceneMap[query_scan].spectral_objects[query_obj_idx].eigenvalues);
+  eig_srv.request.r_eigs = arma::conv_to<std::vector<double>>::from(
+      mSceneMap[ref_scan].spectral_objects[ref_obj_idx].eigenvalues);
 }

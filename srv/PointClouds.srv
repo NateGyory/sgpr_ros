@@ -1,0 +1,6 @@
+sensor_msgs/PointCloud2 cloud1
+sensor_msgs/PointCloud2 cloud2
+float64 radius1
+float64 radius2
+---
+bool done

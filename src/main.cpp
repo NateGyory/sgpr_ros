@@ -1,18 +1,22 @@
+#include <boost/smart_ptr/make_shared_object.hpp>
 #include <iostream>
 #include <memory>
+#include <string>
+#include <thread>
+
 #include <pcl/common/io.h>
 #include <pcl/impl/point_types.hpp>
 #include <pcl/io/ply_io.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
-#include <string>
-#include <thread>
+#include <pcl_conversions/pcl_conversions.h>
 
 #include <ros/console.h>
 #include <ros/param.h>
 #include <ros/ros.h>
 
 #include <sgpr_ros/Eigenvalues.h>
+#include <sgpr_ros/PointClouds.h>
 
 #include "Pipelines/NovelMethodTestingPipeline.h"
 #include "Pipelines/RScanPipeline.h"
@@ -28,8 +32,9 @@
 
 using namespace std::chrono_literals;
 
-ros::ServiceClient ks_service_client;
-ros::ServiceClient ad_service_client;
+ros::ServiceClient evaluation_service_client;
+ros::ServiceClient point_cloud_service_client;
+ros::ServiceClient histogram_service_client;
 
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
@@ -147,11 +152,14 @@ void RunVizConnectionThread(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1,
     }
   }
 
-  while (!viewer1->wasStopped() && !viewer2->wasStopped()) {
-    viewer1->spinOnce(100);
-    viewer2->spinOnce(100);
-    std::this_thread::sleep_for(100ms);
-  }
+  // while (!viewer1->wasStopped() && !viewer2->wasStopped()) {
+  //   viewer1->spinOnce(100);
+  //   viewer2->spinOnce(100);
+  //   std::this_thread::sleep_for(100ms);
+  // }
+
+  viewer1->spin();
+  viewer2->spin();
 
   viewer1->close();
   viewer2->close();
@@ -673,6 +681,15 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     if (pl->RefObjExists(std::string(selected_query_scan),
                          ImGuiState::DatasetTesting::query_obj_idx,
                          ImGuiState::DatasetTesting::ref_obj_idx)) {
+
+      ImGuiState::DatasetTesting::cloud1.reset();
+      ImGuiState::DatasetTesting::cloud2.reset();
+
+      ImGuiState::DatasetTesting::cloud1 =
+          boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+      ImGuiState::DatasetTesting::cloud2 =
+          boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+
       ImGuiState::DatasetTesting::ref_obj_exists = true;
       // Get Point Clouds
       pl->GetQueryRefCloudObjPair(std::string(selected_query_scan),
@@ -682,41 +699,93 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                                   ImGuiState::DatasetTesting::cloud1,
                                   ImGuiState::DatasetTesting::cloud2);
 
+      //----------------------------------------------------------------------
+      // DELETEME
       // Call viz thread
-      std::thread t1(RunVizThread, ImGuiState::DatasetTesting::cloud1,
-                     ImGuiState::DatasetTesting::cloud2);
-      t1.detach();
+      // std::thread t1(RunVizThread, ImGuiState::DatasetTesting::cloud1,
+      //               ImGuiState::DatasetTesting::cloud2);
+      // t1.detach();
+      //----------------------------------------------------------------------
 
-      // call point cloud connetion viz thread
+      // Todo convert pcl point cloud to pointcloud 2 and send them
       double r1 = pl->GetRadius(std::string(selected_query_scan),
                                 ImGuiState::DatasetTesting::query_obj_idx);
       double r2 = pl->GetRadius(std::string(selected_ref_scan),
                                 ImGuiState::DatasetTesting::ref_obj_idx);
-      std::thread t2(RunVizConnectionThread, ImGuiState::DatasetTesting::cloud1,
-                     ImGuiState::DatasetTesting::cloud2, r1, r2);
-      t2.detach();
 
-      // Call matplot lib histogram func
-      pl->PlotHistograms(std::string(selected_ref_scan),
-                         std::string(selected_query_scan),
-                         ImGuiState::DatasetTesting::query_obj_idx,
-                         ImGuiState::DatasetTesting::ref_obj_idx);
+      sensor_msgs::PointCloud2 ros_cloud1, ros_cloud2;
+      pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud1, ros_cloud1);
+      pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud2, ros_cloud2);
+
+      sgpr_ros::PointClouds pc_srv;
+      pc_srv.request.cloud1 = ros_cloud1;
+      pc_srv.request.cloud2 = ros_cloud2;
+      pc_srv.request.radius1 = r1;
+      pc_srv.request.radius2 = r2;
+      if (point_cloud_service_client.call(pc_srv)) {
+        ROS_INFO("Point cloud service success!!! %d", pc_srv.response.done);
+      } else {
+        ROS_ERROR("Point cloud service failed");
+      }
+
+      // call point cloud connetion viz thread
+
+      std::cout << "r1: " << r1 << std::endl;
+      std::cout << "r2: " << r2 << std::endl;
+
+      //----------------------------------------------------------------------
+      // DELETEME
+      // std::thread t2(RunVizConnectionThread,
+      // ImGuiState::DatasetTesting::cloud1,
+      //              ImGuiState::DatasetTesting::cloud2, r1, r2);
+      // t2.detach();
+      //----------------------------------------------------------------------
+
+      sgpr_ros::Eigenvalues eig_srv;
+      pl->GetEigs(eig_srv, std::string(selected_query_scan),
+                  ImGuiState::DatasetTesting::query_obj_idx,
+                  std::string(selected_ref_scan),
+                  ImGuiState::DatasetTesting::ref_obj_idx);
+      if (histogram_service_client.call(eig_srv)) {
+        ROS_INFO("histogram service success!!! %f",
+                 eig_srv.response.results[0]);
+      } else {
+        ROS_ERROR("histogram service failed");
+      }
+
+      // Eval service
+      if (evaluation_service_client.call(eig_srv)) {
+        ROS_INFO("eval service success!!! %f",
+                 eig_srv.response.results[0]);
+      } else {
+        ROS_ERROR("eval service failed");
+      }
+
+      //----------------------------------------------------------------------
+      // DELETEME
+      /// Call matplot lib histogram func
+      //pl->PlotHistograms(std::string(selected_ref_scan),
+      //                   std::string(selected_query_scan),
+      //                   ImGuiState::DatasetTesting::query_obj_idx,
+      //                   ImGuiState::DatasetTesting::ref_obj_idx);
+
+      //----------------------------------------------------------------------
 
       // Call rosservice for ad and ks test
-      sgpr_ros::Eigenvalues srv;
-      srv.request.a = 1;
-      srv.request.b = 2;
-      if (ks_service_client.call(srv)) {
-        ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-      } else {
-        ROS_ERROR("Failed to call service add_two_ints");
-      }
+      // sgpr_ros::Eigenvalues srv;
+      // srv.request.a = 1;
+      // srv.request.b = 2;
+      // if (ks_service_client.call(srv)) {
+      //  ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+      //} else {
+      //  ROS_ERROR("Failed to call service add_two_ints");
+      //}
 
-      if (ad_service_client.call(srv)) {
-        ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-      } else {
-        ROS_ERROR("Failed to call service add_two_ints");
-      }
+      // if (ad_service_client.call(srv)) {
+      //   ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+      // } else {
+      //   ROS_ERROR("Failed to call service add_two_ints");
+      // }
 
       ImGuiState::DatasetTesting::cloud1.reset();
       ImGuiState::DatasetTesting::cloud2.reset();
@@ -823,11 +892,16 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "sgpr_ros_node");
   ros::NodeHandle n;
 
-  ks_service_client = n.serviceClient<sgpr_ros::Eigenvalues>("ks_test_service");
-  ad_service_client = n.serviceClient<sgpr_ros::Eigenvalues>("ad_test_service");
+  evaluation_service_client =
+      n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
+  histogram_service_client =
+      n.serviceClient<sgpr_ros::Eigenvalues>("histogram_viz_service");
+  point_cloud_service_client =
+      n.serviceClient<sgpr_ros::PointClouds>("point_cloud_viz_service");
 
-  ks_service_client.waitForExistence(ros::Duration(10));
-  ad_service_client.waitForExistence(ros::Duration(10));
+  evaluation_service_client.waitForExistence(ros::Duration(10));
+  histogram_service_client.waitForExistence(ros::Duration(10));
+  point_cloud_service_client.waitForExistence(ros::Duration(10));
 
   // sgpr_ros::Eigenvalues srv;
   // srv.request.a = 1;

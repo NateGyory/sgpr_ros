@@ -16,6 +16,8 @@
 #include <Processing/Laplacian.hpp>
 #include <Processing/PointCloud.hpp>
 
+#include <sgpr_ros/Eigenvalues.h>
+
 #include <matplot/matplot.h>
 
 using namespace matplot;
@@ -47,6 +49,9 @@ public:
 
   virtual void PlotHistograms(std::string ref_scan, std::string query_scan,
                               int query_obj_idx, int ref_obj_idx) = 0;
+  virtual void GetEigs(sgpr_ros::Eigenvalues &eig_srv, std::string query_scan,
+                       int query_obj_idx, std::string ref_scan,
+                       int ref_obj_idx) = 0;
 
 protected:
   scene_map_t mSceneMap;
