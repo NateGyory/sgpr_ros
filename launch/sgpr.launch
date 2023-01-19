@@ -14,12 +14,12 @@
   output="screen"
 />
 
-<node
+<!-- <node
   pkg="sgpr_ros"
   type="point_cloud_viz_service.py"
   name="point_cloud_viz_service_node"
   output="screen"
-/>
+/> -->
 
 <node
   pkg="sgpr_ros"

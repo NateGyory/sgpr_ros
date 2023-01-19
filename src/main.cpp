@@ -755,8 +755,7 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
       // Eval service
       if (evaluation_service_client.call(eig_srv)) {
-        ROS_INFO("eval service success!!! %f",
-                 eig_srv.response.results[0]);
+        ROS_INFO("eval service success!!! %f", eig_srv.response.results[0]);
       } else {
         ROS_ERROR("eval service failed");
       }
@@ -764,10 +763,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       //----------------------------------------------------------------------
       // DELETEME
       /// Call matplot lib histogram func
-      //pl->PlotHistograms(std::string(selected_ref_scan),
-      //                   std::string(selected_query_scan),
-      //                   ImGuiState::DatasetTesting::query_obj_idx,
-      //                   ImGuiState::DatasetTesting::ref_obj_idx);
+      // pl->PlotHistograms(std::string(selected_ref_scan),
+      //                    std::string(selected_query_scan),
+      //                    ImGuiState::DatasetTesting::query_obj_idx,
+      //                    ImGuiState::DatasetTesting::ref_obj_idx);
 
       //----------------------------------------------------------------------
 
@@ -892,16 +891,16 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "sgpr_ros_node");
   ros::NodeHandle n;
 
-  evaluation_service_client =
-      n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
-  histogram_service_client =
-      n.serviceClient<sgpr_ros::Eigenvalues>("histogram_viz_service");
-  point_cloud_service_client =
-      n.serviceClient<sgpr_ros::PointClouds>("point_cloud_viz_service");
+  // evaluation_service_client =
+  //     n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
+  // histogram_service_client =
+  //     n.serviceClient<sgpr_ros::Eigenvalues>("histogram_viz_service");
+  // point_cloud_service_client =
+  //     n.serviceClient<sgpr_ros::PointClouds>("point_cloud_viz_service");
 
-  evaluation_service_client.waitForExistence(ros::Duration(10));
-  histogram_service_client.waitForExistence(ros::Duration(10));
-  point_cloud_service_client.waitForExistence(ros::Duration(10));
+  // evaluation_service_client.waitForExistence(ros::Duration(10));
+  // histogram_service_client.waitForExistence(ros::Duration(10));
+  // point_cloud_service_client.waitForExistence(ros::Duration(10));
 
   // sgpr_ros::Eigenvalues srv;
   // srv.request.a = 1;
@@ -917,6 +916,13 @@ int main(int argc, char **argv) {
   // ros::param::get("dataset", dataset);
 
   GLFWwindow *window = initGUI();
+
+  GLFWwindow *window2 = glfwCreateWindow(640, 480, "World Hello", NULL, NULL);
+  if (!window2) {
+    glfwTerminate();
+    return -1;
+  }
+
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   NovelMethodTestingPipeline nmtPipeline;
@@ -938,11 +944,38 @@ int main(int argc, char **argv) {
     ImGui::Render();
     int display_w, display_h;
     glfwGetFramebufferSize(window, &display_w, &display_h);
+    // glViewport(0, 0, display_w, display_h / 2);
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
                  clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    // glBegin(GL_TRIANGLES);
+    // glColor3f(1.f, 0.f, 0.f);
+    // glVertex3f(-0.6f, -0.4f, 0.f);
+    // glColor3f(0.f, 1.f, 0.f);
+    // glVertex3f(0.6f, -0.4f, 0.f);
+    // glColor3f(0.f, 0.f, 1.f);
+    // glVertex3f(0.f, 0.6f, 0.f);
+    // glEnd();
+
+    glfwMakeContextCurrent(window2);
+    /* Render here */
+    glBegin(GL_TRIANGLES);
+    glColor3f(1.f, 0.f, 0.f);
+    glVertex3f(-0.6f, -0.4f, 0.f);
+    glColor3f(0.f, 1.f, 0.f);
+    glVertex3f(0.6f, -0.4f, 0.f);
+    glColor3f(0.f, 0.f, 1.f);
+    glVertex3f(0.f, 0.6f, 0.f);
+    glEnd();
+
+    glClear(GL_COLOR_BUFFER_BIT);
+    /* Swap front and back buffers */
+    glfwSwapBuffers(window2);
+
 
     glfwSwapBuffers(window);
   }
