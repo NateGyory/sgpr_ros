@@ -44,7 +44,7 @@ inline void computeMCAR(SpectralObject &spectral_object) {
 
   int size = spectral_object.cloud->size();
 
-  double radius = 0.1f;
+  double radius = 0.01f;
   for (int i = 0; i < size; i++) {
     std::vector<int> indicies_found;
     std::vector<float> squaredDistances;
@@ -56,7 +56,7 @@ inline void computeMCAR(SpectralObject &spectral_object) {
     if (num_edges == 0) {
       std::cout << "Increasing radius" << std::endl;
       i--;
-      radius += 0.05f;
+      radius += 0.01f;
     }
   }
 

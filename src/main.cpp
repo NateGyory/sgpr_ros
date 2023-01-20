@@ -1,6 +1,8 @@
 #include <boost/smart_ptr/make_shared_object.hpp>
 #include <iostream>
+#include <matplot/freestanding/axes_functions.h>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -27,142 +29,225 @@
 #include "imgui_state.h"
 #include "ros/duration.h"
 #include <stdio.h>
+#include <vtkIOStream.h>
 #define GL_SILENCE_DEPRECATION
 #include <GLFW/glfw3.h> // Will drag system OpenGL headers
 
 using namespace std::chrono_literals;
+using namespace matplot;
 
 ros::ServiceClient evaluation_service_client;
 ros::ServiceClient point_cloud_service_client;
 ros::ServiceClient histogram_service_client;
 
+pcl::visualization::PCLVisualizer::Ptr viewer;
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud1;
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud2;
+bool update_cloud = true;
+bool show_radius = false;
+bool radius_toggled = false;
+double thread_r1;
+double thread_r2;
+std::mutex mtx;
+
+matplot::figure_handle f = matplot::figure(true);
+
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void RunVizThread(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1,
-                  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2) {
+void PlotSpectra(sgpr_ros::Eigenvalues &eigs) {
+  f->width(f->width() * 3);
+  f->height(f->height() * 2.5);
+  f->x_position(10);
+  f->y_position(10);
 
-  pcl::visualization::PCLVisualizer::Ptr viewer1(
-      new pcl::visualization::PCLVisualizer("3D Viewer 1"));
-  pcl::visualization::PCLVisualizer::Ptr viewer2(
-      new pcl::visualization::PCLVisualizer("3D Viewer 2"));
+  std::vector<double> ref = eigs.request.r_eigs;
+  std::vector<double> query = eigs.request.q_eigs;
 
-  viewer1->initCameraParameters();
-  viewer2->initCameraParameters();
+  double min_ref = *std::min_element(ref.begin(), ref.end());
+  double max_ref = *std::max_element(ref.begin(), ref.end());
+  double min_query = *std::min_element(query.begin(), query.end());
+  double max_query = *std::max_element(query.begin(), query.end());
 
-  // int v1(0);
-  // viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v1);
-  viewer1->setBackgroundColor(0, 0, 0);
-  viewer1->addPointCloud<pcl::PointXYZRGB>(cloud1, "Cloud 1");
+  double min = std::min(min_ref, min_query);
+  double max = std::max(max_ref, max_query);
 
-  // int v2(1);
-  // viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v2);
-  viewer2->setBackgroundColor(0.3, 0.3, 0.3);
-  viewer2->addPointCloud<pcl::PointXYZRGB>(cloud2, "Cloud 2");
+  double bin_width = (max - min) / 25;
 
-  viewer1->setPointCloudRenderingProperties(
-      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 1");
-  viewer2->setPointCloudRenderingProperties(
-      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 2");
-
-  viewer1->addCoordinateSystem(1.0);
-  viewer2->addCoordinateSystem(1.0);
-
-  // while (!viewer->wasStopped()) {
-  //   viewer->spinOnce(100);
-  //   std::this_thread::sleep_for(100ms);
-  // }
-
-  viewer1->spin();
-  viewer2->spin();
-
-  // viewer1.reset();
-  // viewer2.reset();
-
-  std::cout << "closed!" << std::endl;
+  auto h1 = hist(ref);
+  h1->face_color("r");
+  h1->edge_color("r");
+  h1->bin_width(bin_width);
+  hold(on);
+  auto h2 = hist(query);
+  h2->face_color("b");
+  h2->edge_color("b");
+  h2->bin_width(bin_width);
+  title("Eigenvalue Spectras");
+  f->draw();
+  cla();
 }
 
-void RunVizConnectionThread(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1,
-                            pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2,
-                            double r1, double r2) {
+void keyboardEventOccurred(const pcl::visualization::KeyboardEvent &event,
+                           void *viewer_void) {
+  if (event.getKeySym() == "r" && event.keyDown()) {
+    std::cout << "r was pressed => removing all text" << std::endl;
+    mtx.lock();
+    show_radius = !show_radius;
+    radius_toggled = true;
+    mtx.unlock();
+  }
+}
 
-  // Viewer 1
-  pcl::visualization::PCLVisualizer::Ptr viewer1(
-      new pcl::visualization::PCLVisualizer("3D Viewer Graph Connections 1"));
-  viewer1->initCameraParameters();
+void BackgroundVizThread() {
 
-  viewer1->setBackgroundColor(0, 0, 0);
-  viewer1->addPointCloud<pcl::PointXYZRGB>(cloud1, "Cloud 1");
+  int v0(0);
+  int v1(1);
 
-  viewer1->setPointCloudRenderingProperties(
-      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 1");
-  viewer1->addCoordinateSystem(1.0);
+  // TODO I can probably delete this
+  if (viewer.use_count() == 0) {
 
-  // Viewer 2
-  pcl::visualization::PCLVisualizer::Ptr viewer2(
-      new pcl::visualization::PCLVisualizer("3D Viewer Graph Connections 2"));
-  viewer2->initCameraParameters();
+    viewer = boost::make_shared<pcl::visualization::PCLVisualizer>();
+    viewer->registerKeyboardCallback(keyboardEventOccurred, nullptr);
 
-  viewer2->setBackgroundColor(0.3, 0.3, 0.3);
-  viewer2->addPointCloud<pcl::PointXYZRGB>(cloud2, "Cloud 2");
+    viewer->initCameraParameters();
+    viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v0);
+    viewer->setBackgroundColor(0, 0, 0, v0);
+    viewer->addCoordinateSystem(1.0, "coord1", v0);
 
-  viewer2->setPointCloudRenderingProperties(
-      pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "Cloud 2");
-  viewer2->addCoordinateSystem(1.0);
-
-  unsigned int max_nn = 1000;
-  pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
-
-  // TODO Maybe separate this so we are not duplicating code
-  kdTree.setInputCloud(cloud1);
-  int size1 = cloud1->size();
-
-  for (int i = 0; i < size1; i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-    kdTree.radiusSearch(i, r1, indicies_found, squaredDistances, max_nn);
-
-    pcl::PointXYZRGB pt_r = cloud1->points[i];
-
-    for (int j = 1; j < indicies_found.size(); j++) {
-      int idx = indicies_found[j];
-      pcl::PointXYZRGB pt_q = cloud1->points[idx];
-      // viewer->addLine(pt_r, pt_q, "line", 0);
-      std::string string_id = "0" + std::to_string(i) + "-" + std::to_string(j);
-      viewer1->addLine(pt_r, pt_q, string_id, 0);
-    }
+    viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v1);
+    viewer->setBackgroundColor(0.3, 0.3, 0.3, v1);
+    viewer->addCoordinateSystem(1.0, "coord2", v1);
   }
 
-  kdTree.setInputCloud(cloud2);
-  int size2 = cloud2->size();
+  while (!viewer->wasStopped()) {
+    mtx.lock();
+    if (radius_toggled) {
+      if (show_radius) {
 
-  for (int i = 0; i < size2; i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-    kdTree.radiusSearch(i, r2, indicies_found, squaredDistances, max_nn);
+        auto start = std::chrono::steady_clock::now();
+        unsigned int max_nn = 1000;
+        pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
 
-    pcl::PointXYZRGB pt_r = cloud2->points[i];
+        // TODO Maybe separate this so we are not duplicating code
+        kdTree.setInputCloud(thread_cloud1);
+        int size1 = thread_cloud1->size();
 
-    for (int j = 1; j < indicies_found.size(); j++) {
-      int idx = indicies_found[j];
-      pcl::PointXYZRGB pt_q = cloud2->points[idx];
-      std::string string_id = "1" + std::to_string(i) + "-" + std::to_string(j);
-      viewer2->addLine(pt_r, pt_q, string_id, 0);
+        for (int i = 0; i < size1; i++) {
+          std::vector<int> indicies_found;
+          std::vector<float> squaredDistances;
+          kdTree.radiusSearch(i, thread_r1, indicies_found, squaredDistances,
+                              max_nn);
+
+          pcl::PointXYZRGB pt_r = thread_cloud1->points[i];
+
+          for (int j = 1; j < indicies_found.size(); j++) {
+            int idx = indicies_found[j];
+            pcl::PointXYZRGB pt_q = thread_cloud1->points[idx];
+            // viewer->addLine(pt_r, pt_q, "line", 0);
+            std::string string_id =
+                "0" + std::to_string(i) + "-" + std::to_string(j);
+            viewer->addLine(pt_r, pt_q, string_id, v0);
+          }
+        }
+
+        kdTree.setInputCloud(thread_cloud2);
+        int size2 = thread_cloud2->size();
+
+        for (int i = 0; i < size2; i++) {
+          std::vector<int> indicies_found;
+          std::vector<float> squaredDistances;
+          kdTree.radiusSearch(i, thread_r2, indicies_found, squaredDistances,
+                              max_nn);
+
+          pcl::PointXYZRGB pt_r = thread_cloud2->points[i];
+
+          for (int j = 1; j < indicies_found.size(); j++) {
+            int idx = indicies_found[j];
+            pcl::PointXYZRGB pt_q = thread_cloud2->points[idx];
+            std::string string_id =
+                "1" + std::to_string(i) + "-" + std::to_string(j);
+            viewer->addLine(pt_r, pt_q, string_id, v1);
+          }
+        }
+      } else {
+        viewer->removeAllShapes(v0);
+        viewer->removeAllShapes(v1);
+      }
+      radius_toggled = false;
     }
+
+    if (update_cloud) {
+      // TODO try and replace this with updateCloud instead if everything works
+      viewer->removeAllPointClouds(v0);
+      viewer->removeAllPointClouds(v1);
+      viewer->removeAllShapes(v0);
+      viewer->removeAllShapes(v1);
+
+      viewer->addPointCloud(thread_cloud1, "cloud1", v0);
+      viewer->addPointCloud(thread_cloud2, "cloud2", v1);
+
+      viewer->setPointCloudRenderingProperties(
+          pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud1", v0);
+      viewer->setPointCloudRenderingProperties(
+          pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud2", v1);
+
+      if (show_radius) {
+        unsigned int max_nn = 1000;
+        pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
+
+        // TODO Maybe separate this so we are not duplicating code
+        kdTree.setInputCloud(thread_cloud1);
+        int size1 = thread_cloud1->size();
+
+        for (int i = 0; i < size1; i++) {
+          std::vector<int> indicies_found;
+          std::vector<float> squaredDistances;
+          kdTree.radiusSearch(i, thread_r1, indicies_found, squaredDistances,
+                              max_nn);
+
+          pcl::PointXYZRGB pt_r = thread_cloud1->points[i];
+
+          for (int j = 1; j < indicies_found.size(); j++) {
+            int idx = indicies_found[j];
+            pcl::PointXYZRGB pt_q = thread_cloud1->points[idx];
+            // viewer->addLine(pt_r, pt_q, "line", 0);
+            std::string string_id =
+                "0" + std::to_string(i) + "-" + std::to_string(j);
+            viewer->addLine(pt_r, pt_q, string_id, v0);
+          }
+        }
+
+        kdTree.setInputCloud(thread_cloud2);
+        int size2 = thread_cloud2->size();
+
+        for (int i = 0; i < size2; i++) {
+          std::vector<int> indicies_found;
+          std::vector<float> squaredDistances;
+          kdTree.radiusSearch(i, thread_r2, indicies_found, squaredDistances,
+                              max_nn);
+
+          pcl::PointXYZRGB pt_r = thread_cloud2->points[i];
+
+          for (int j = 1; j < indicies_found.size(); j++) {
+            int idx = indicies_found[j];
+            pcl::PointXYZRGB pt_q = thread_cloud2->points[idx];
+            std::string string_id =
+                "1" + std::to_string(i) + "-" + std::to_string(j);
+            viewer->addLine(pt_r, pt_q, string_id, v1);
+          }
+        }
+      }
+
+      update_cloud = false;
+    }
+    mtx.unlock();
+    viewer->spinOnce(1);
+    // std::this_thread::sleep_for(100ms);
   }
 
-  // while (!viewer1->wasStopped() && !viewer2->wasStopped()) {
-  //   viewer1->spinOnce(100);
-  //   viewer2->spinOnce(100);
-  //   std::this_thread::sleep_for(100ms);
-  // }
-
-  viewer1->spin();
-  viewer2->spin();
-
-  viewer1->close();
-  viewer2->close();
+  viewer->close();
   std::cout << "closed!" << std::endl;
 }
 
@@ -205,6 +290,17 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
 
   // --------------------------------------------------------------
   ImGui::Text("Point Clouds");
+
+  if (ImGui::Button("DELETE ME")) {
+    // Lock here
+    mtx.lock();
+    thread_cloud1.reset();
+    thread_cloud1 = pl.GetCloud2();
+    thread_cloud2.reset();
+    thread_cloud2 = pl.GetCloud2();
+    update_cloud = true;
+    mtx.unlock();
+  }
 
   ImGui::Combo("Choose PointCloud 1", &ImGuiState::NMT::point_cloud_idx1,
                ImGuiState::pointclouds, IM_ARRAYSIZE(ImGuiState::pointclouds));
@@ -357,8 +453,8 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1 = pl.GetCloud1();
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2 = pl.GetCloud2();
 
-    std::thread t1(RunVizThread, cloud1, cloud2);
-    t1.detach();
+    // std::thread t1(RunVizThread, cloud1, cloud2);
+    // t1.detach();
   }
 
   ImGui::SameLine();
@@ -374,9 +470,9 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1 = pl.GetCloud1();
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2 = pl.GetCloud2();
 
-    std::thread t1(RunVizConnectionThread, cloud1, cloud2, pl.GetRadius1(),
-                   pl.GetRadius2());
-    t1.detach();
+    // std::thread t1(RunVizConnectionThread, cloud1, cloud2, pl.GetRadius1(),
+    //                pl.GetRadius2());
+    // t1.detach();
   }
 
   ImGui::SameLine();
@@ -699,6 +795,14 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                                   ImGuiState::DatasetTesting::cloud1,
                                   ImGuiState::DatasetTesting::cloud2);
 
+      mtx.lock();
+      thread_cloud1.reset();
+      thread_cloud1 = ImGuiState::DatasetTesting::cloud1;
+      thread_cloud2.reset();
+      thread_cloud2 = ImGuiState::DatasetTesting::cloud2;
+      update_cloud = true;
+      mtx.unlock();
+
       //----------------------------------------------------------------------
       // DELETEME
       // Call viz thread
@@ -708,30 +812,36 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       //----------------------------------------------------------------------
 
       // Todo convert pcl point cloud to pointcloud 2 and send them
-      double r1 = pl->GetRadius(std::string(selected_query_scan),
+      thread_r1 = pl->GetRadius(std::string(selected_query_scan),
                                 ImGuiState::DatasetTesting::query_obj_idx);
-      double r2 = pl->GetRadius(std::string(selected_ref_scan),
+      thread_r2 = pl->GetRadius(std::string(selected_ref_scan),
                                 ImGuiState::DatasetTesting::ref_obj_idx);
 
-      sensor_msgs::PointCloud2 ros_cloud1, ros_cloud2;
-      pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud1, ros_cloud1);
-      pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud2, ros_cloud2);
+      std::cout << "Cloud1 size: " << thread_cloud1->size() << std::endl;
+      std::cout << "Cloud2 size: " << thread_cloud2->size() << std::endl;
 
-      sgpr_ros::PointClouds pc_srv;
-      pc_srv.request.cloud1 = ros_cloud1;
-      pc_srv.request.cloud2 = ros_cloud2;
-      pc_srv.request.radius1 = r1;
-      pc_srv.request.radius2 = r2;
-      if (point_cloud_service_client.call(pc_srv)) {
-        ROS_INFO("Point cloud service success!!! %d", pc_srv.response.done);
-      } else {
-        ROS_ERROR("Point cloud service failed");
-      }
+      std::cout << "r1 size:" << thread_r1 << std::endl;
+      std::cout << "r2 size:" << thread_r2 << std::endl;
+
+      // sensor_msgs::PointCloud2 ros_cloud1, ros_cloud2;
+      // pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud1, ros_cloud1);
+      // pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud2, ros_cloud2);
+
+      // sgpr_ros::PointClouds pc_srv;
+      // pc_srv.request.cloud1 = ros_cloud1;
+      // pc_srv.request.cloud2 = ros_cloud2;
+      // pc_srv.request.radius1 = r1;
+      // pc_srv.request.radius2 = r2;
+      // if (point_cloud_service_client.call(pc_srv)) {
+      //   ROS_INFO("Point cloud service success!!! %d", pc_srv.response.done);
+      // } else {
+      //   ROS_ERROR("Point cloud service failed");
+      // }
 
       // call point cloud connetion viz thread
 
-      std::cout << "r1: " << r1 << std::endl;
-      std::cout << "r2: " << r2 << std::endl;
+      // std::cout << "r1: " << r1 << std::endl;
+      // std::cout << "r2: " << r2 << std::endl;
 
       //----------------------------------------------------------------------
       // DELETEME
@@ -746,19 +856,22 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                   ImGuiState::DatasetTesting::query_obj_idx,
                   std::string(selected_ref_scan),
                   ImGuiState::DatasetTesting::ref_obj_idx);
-      if (histogram_service_client.call(eig_srv)) {
-        ROS_INFO("histogram service success!!! %f",
-                 eig_srv.response.results[0]);
-      } else {
-        ROS_ERROR("histogram service failed");
-      }
 
-      // Eval service
-      if (evaluation_service_client.call(eig_srv)) {
-        ROS_INFO("eval service success!!! %f", eig_srv.response.results[0]);
-      } else {
-        ROS_ERROR("eval service failed");
-      }
+      PlotSpectra(eig_srv);
+
+      // if (histogram_service_client.call(eig_srv)) {
+      //   ROS_INFO("histogram service success!!! %f",
+      //            eig_srv.response.results[0]);
+      // } else {
+      //   ROS_ERROR("histogram service failed");
+      // }
+
+      //// Eval service
+      // if (evaluation_service_client.call(eig_srv)) {
+      //   ROS_INFO("eval service success!!! %f", eig_srv.response.results[0]);
+      // } else {
+      //   ROS_ERROR("eval service failed");
+      // }
 
       //----------------------------------------------------------------------
       // DELETEME
@@ -915,18 +1028,20 @@ int main(int argc, char **argv) {
   // Todo need to use the param server at somepoint
   // ros::param::get("dataset", dataset);
 
-  GLFWwindow *window = initGUI();
-
-  GLFWwindow *window2 = glfwCreateWindow(640, 480, "World Hello", NULL, NULL);
-  if (!window2) {
-    glfwTerminate();
-    return -1;
-  }
-
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
   NovelMethodTestingPipeline nmtPipeline;
   std::shared_ptr<Pipeline> datasetPipeline;
+
+  nmtPipeline.ParsePointCloudPair("/home/nate/Datasets/teddyPly/b1.ply",
+                                  "/home/nate/Datasets/teddyPly/b7.ply", 300);
+  thread_cloud1 = nmtPipeline.GetCloud1();
+  thread_cloud2 = nmtPipeline.GetCloud1();
+
+  std::thread viz_t(BackgroundVizThread);
+  viz_t.detach();
+
+  GLFWwindow *window = initGUI();
 
   // GUI loop
   while (!glfwWindowShouldClose(window)) {
@@ -944,39 +1059,12 @@ int main(int argc, char **argv) {
     ImGui::Render();
     int display_w, display_h;
     glfwGetFramebufferSize(window, &display_w, &display_h);
-    // glViewport(0, 0, display_w, display_h / 2);
     glViewport(0, 0, display_w, display_h);
     glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
                  clear_color.z * clear_color.w, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-    // glBegin(GL_TRIANGLES);
-    // glColor3f(1.f, 0.f, 0.f);
-    // glVertex3f(-0.6f, -0.4f, 0.f);
-    // glColor3f(0.f, 1.f, 0.f);
-    // glVertex3f(0.6f, -0.4f, 0.f);
-    // glColor3f(0.f, 0.f, 1.f);
-    // glVertex3f(0.f, 0.6f, 0.f);
-    // glEnd();
-
-    glfwMakeContextCurrent(window2);
-    /* Render here */
-    glBegin(GL_TRIANGLES);
-    glColor3f(1.f, 0.f, 0.f);
-    glVertex3f(-0.6f, -0.4f, 0.f);
-    glColor3f(0.f, 1.f, 0.f);
-    glVertex3f(0.6f, -0.4f, 0.f);
-    glColor3f(0.f, 0.f, 1.f);
-    glVertex3f(0.f, 0.6f, 0.f);
-    glEnd();
-
-    glClear(GL_COLOR_BUFFER_BIT);
-    /* Swap front and back buffers */
-    glfwSwapBuffers(window2);
-
-
     glfwSwapBuffers(window);
   }
 
