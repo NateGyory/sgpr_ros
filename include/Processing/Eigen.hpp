@@ -53,8 +53,9 @@ inline void computeEigenvalues(SpectralObject &spectral_object, int max_eigs) {
       (max_eigs == -1) ? spectral_object.laplacian.n_cols - 1 : max_eigs;
 
   if (eig_n > spectral_object.laplacian.n_cols - 1) {
-    std::cout << "Skipping" << std::endl;
-    return;
+    eig_n = spectral_object.laplacian.n_cols - 1;
+    //std::cout << "Skipping" << std::endl;
+    //return;
   }
 
   auto start = std::chrono::steady_clock::now();

@@ -9,20 +9,6 @@
 
 <node
   pkg="sgpr_ros"
-  type="histogram_viz_service.py"
-  name="histogram_viz_service_node"
-  output="screen"
-/>
-
-<!-- <node
-  pkg="sgpr_ros"
-  type="point_cloud_viz_service.py"
-  name="point_cloud_viz_service_node"
-  output="screen"
-/> -->
-
-<node
-  pkg="sgpr_ros"
   type="sgpr_ros"
   name="sgpr_ros_node"
   output="screen"

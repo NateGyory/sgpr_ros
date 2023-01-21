@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sgpr_ros/Eigenvalues.h"
 #include "imgui.h"
 #include <pcl/point_cloud.h>
 #include <string>
@@ -63,6 +64,7 @@ namespace DatasetTesting {
 
 inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
 inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
+inline static sgpr_ros::Eigenvalues eig_srv;
 
 
 inline static std::vector<std::string> query_scans;

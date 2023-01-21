@@ -18,7 +18,6 @@
 #include <ros/ros.h>
 
 #include <sgpr_ros/Eigenvalues.h>
-#include <sgpr_ros/PointClouds.h>
 
 #include "Pipelines/NovelMethodTestingPipeline.h"
 #include "Pipelines/RScanPipeline.h"
@@ -37,56 +36,67 @@ using namespace std::chrono_literals;
 using namespace matplot;
 
 ros::ServiceClient evaluation_service_client;
-ros::ServiceClient point_cloud_service_client;
-ros::ServiceClient histogram_service_client;
 
 pcl::visualization::PCLVisualizer::Ptr viewer;
+matplot::figure_handle f;
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud1;
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud2;
 bool update_cloud = true;
+bool update_hist = false;
 bool show_radius = false;
 bool radius_toggled = false;
 double thread_r1;
 double thread_r2;
-std::mutex mtx;
-
-matplot::figure_handle f = matplot::figure(true);
+std::mutex mtx, eigs_mtx;
 
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void PlotSpectra(sgpr_ros::Eigenvalues &eigs) {
-  f->width(f->width() * 3);
-  f->height(f->height() * 2.5);
-  f->x_position(10);
-  f->y_position(10);
+void PlotSpectra() {
+  if (f.use_count() == 0) {
+    f = matplot::figure(true);
+    f->width(f->width() * 3);
+    f->height(f->height() * 2.5);
+    f->x_position(72);
+    f->y_position(760);
+    f->size(960, 380);
+  }
 
-  std::vector<double> ref = eigs.request.r_eigs;
-  std::vector<double> query = eigs.request.q_eigs;
+  while (1) {
+    if (update_hist) {
+      eigs_mtx.lock();
+      cla();
+      std::vector<double> ref =
+          ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
+      std::vector<double> query =
+          ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
 
-  double min_ref = *std::min_element(ref.begin(), ref.end());
-  double max_ref = *std::max_element(ref.begin(), ref.end());
-  double min_query = *std::min_element(query.begin(), query.end());
-  double max_query = *std::max_element(query.begin(), query.end());
+      double min_ref = *std::min_element(ref.begin(), ref.end());
+      double max_ref = *std::max_element(ref.begin(), ref.end());
+      double min_query = *std::min_element(query.begin(), query.end());
+      double max_query = *std::max_element(query.begin(), query.end());
 
-  double min = std::min(min_ref, min_query);
-  double max = std::max(max_ref, max_query);
+      double min = std::min(min_ref, min_query);
+      double max = std::max(max_ref, max_query);
 
-  double bin_width = (max - min) / 25;
+      double bin_width = (max - min) / 25;
 
-  auto h1 = hist(ref);
-  h1->face_color("r");
-  h1->edge_color("r");
-  h1->bin_width(bin_width);
-  hold(on);
-  auto h2 = hist(query);
-  h2->face_color("b");
-  h2->edge_color("b");
-  h2->bin_width(bin_width);
-  title("Eigenvalue Spectras");
-  f->draw();
-  cla();
+      auto h1 = hist(ref);
+      h1->face_color("r");
+      h1->edge_color("r");
+      h1->bin_width(bin_width);
+      hold(on);
+      auto h2 = hist(query);
+      h2->face_color("b");
+      h2->edge_color("b");
+      h2->bin_width(bin_width);
+      title("Eigenvalue Spectras");
+      f->draw();
+      update_hist = false;
+      eigs_mtx.unlock();
+    }
+  }
 }
 
 void keyboardEventOccurred(const pcl::visualization::KeyboardEvent &event,
@@ -109,6 +119,8 @@ void BackgroundVizThread() {
   if (viewer.use_count() == 0) {
 
     viewer = boost::make_shared<pcl::visualization::PCLVisualizer>();
+    viewer->setPosition(72, 0);
+    viewer->setSize(600, 200);
     viewer->registerKeyboardCallback(keyboardEventOccurred, nullptr);
 
     viewer->initCameraParameters();
@@ -263,9 +275,10 @@ GLFWwindow *initGUI() {
 
   // Create window with graphics context
   GLFWwindow *window =
-      glfwCreateWindow(1280, 720, "SGPR Data Explorer", NULL, NULL);
+      glfwCreateWindow(500, 650, "SGPR Data Explorer", NULL, NULL);
   if (window == NULL)
     exit(1);
+  glfwSetWindowPos(window, 1032, 0);
   glfwMakeContextCurrent(window);
   glfwSwapInterval(1); // Enable vsync
 
@@ -751,17 +764,7 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
   // --------------------------------------------------------------
   ImGui::Separator();
-  ImGui::Text("Visualizers Per Step");
-
-  ImGui::Checkbox("Visualize Point Clouds",
-                  &ImGuiState::DatasetTesting::c_visualize_point_clouds);
-  ImGui::Checkbox("Visualize Graph Connections",
-                  &ImGuiState::DatasetTesting::c_visualize_graph_connections);
-  ImGui::Checkbox("Visualize Spectra",
-                  &ImGuiState::DatasetTesting::c_visualize_spectra);
-  ImGui::Checkbox("Anderson-Darling Test",
-                  &ImGuiState::DatasetTesting::c_anderson_darling_test);
-  ImGui::Checkbox("KS Test", &ImGuiState::DatasetTesting::c_ks_test);
+  ImGui::Text("Visualizer");
 
   if (ImGui::Button("Init Objects")) {
     std::cout << "INIT Pressed" << std::endl;
@@ -851,13 +854,14 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       // t2.detach();
       //----------------------------------------------------------------------
 
-      sgpr_ros::Eigenvalues eig_srv;
-      pl->GetEigs(eig_srv, std::string(selected_query_scan),
+      eigs_mtx.lock();
+      pl->GetEigs(ImGuiState::DatasetTesting::eig_srv,
+                  std::string(selected_query_scan),
                   ImGuiState::DatasetTesting::query_obj_idx,
                   std::string(selected_ref_scan),
                   ImGuiState::DatasetTesting::ref_obj_idx);
-
-      PlotSpectra(eig_srv);
+      update_hist = true;
+      eigs_mtx.unlock();
 
       // if (histogram_service_client.call(eig_srv)) {
       //   ROS_INFO("histogram service success!!! %f",
@@ -867,11 +871,12 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       // }
 
       //// Eval service
-      // if (evaluation_service_client.call(eig_srv)) {
-      //   ROS_INFO("eval service success!!! %f", eig_srv.response.results[0]);
-      // } else {
-      //   ROS_ERROR("eval service failed");
-      // }
+      if (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv)) {
+        ROS_INFO("eval service success!!! %f",
+                 ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+      } else {
+        ROS_ERROR("eval service failed");
+      }
 
       //----------------------------------------------------------------------
       // DELETEME
@@ -1004,26 +1009,10 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "sgpr_ros_node");
   ros::NodeHandle n;
 
-  // evaluation_service_client =
-  //     n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
-  // histogram_service_client =
-  //     n.serviceClient<sgpr_ros::Eigenvalues>("histogram_viz_service");
-  // point_cloud_service_client =
-  //     n.serviceClient<sgpr_ros::PointClouds>("point_cloud_viz_service");
+  evaluation_service_client =
+      n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
 
-  // evaluation_service_client.waitForExistence(ros::Duration(10));
-  // histogram_service_client.waitForExistence(ros::Duration(10));
-  // point_cloud_service_client.waitForExistence(ros::Duration(10));
-
-  // sgpr_ros::Eigenvalues srv;
-  // srv.request.a = 1;
-  // srv.request.b = 2;
-  // if (ks_service_client.call(srv)) {
-  //   ROS_INFO("Sum: %ld", (long int)srv.response.sum);
-  // } else {
-  //   ROS_ERROR("Failed to call service add_two_ints");
-  //   return 1;
-  // }
+  evaluation_service_client.waitForExistence(ros::Duration(10));
 
   // Todo need to use the param server at somepoint
   // ros::param::get("dataset", dataset);
@@ -1038,8 +1027,12 @@ int main(int argc, char **argv) {
   thread_cloud1 = nmtPipeline.GetCloud1();
   thread_cloud2 = nmtPipeline.GetCloud1();
 
+  // Background threads running
   std::thread viz_t(BackgroundVizThread);
   viz_t.detach();
+
+  std::thread spectra_t(PlotSpectra);
+  spectra_t.detach();
 
   GLFWwindow *window = initGUI();
 
