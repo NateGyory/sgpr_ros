@@ -112,6 +112,13 @@ void RScanPipeline::ExtractObjectPointClouds(int max_pts) {
                                                                    max_pts);
                 });
   std::cout << "Finished ExtractObjectPointClouds" << std::endl;
+  std::cout << "Calculating GFA Features" << std::endl;
+  // TODO calculate GFA
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [](std::pair<const std::string, Scene> &pair) {
+                  Processing::PointCloud::CalculateGFAFeatures(pair.second);
+                });
+  std::cout << "Finished Calculating GFA Features" << std::endl;
 }
 
 void RScanPipeline::ComputeEdges(int edge_heuristic) {
