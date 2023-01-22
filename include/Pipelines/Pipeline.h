@@ -44,7 +44,8 @@ public:
   GetQueryRefCloudObjPair(std::string query_scan, std::string ref_scan,
                           int q_idx, int r_idx,
                           pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
-                          pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2) = 0;
+                          pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2,
+                          std::string &cloud_id1, std::string &cloud_id2) = 0;
   virtual double GetRadius(std::string scan, int obj_idx) = 0;
 
   virtual void PlotHistograms(std::string ref_scan, std::string query_scan,

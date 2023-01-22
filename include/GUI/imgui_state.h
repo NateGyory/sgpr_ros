@@ -65,6 +65,8 @@ namespace DatasetTesting {
 inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
 inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
 inline static sgpr_ros::Eigenvalues eig_srv;
+inline static std::string cloud_id1;
+inline static std::string cloud_id2;
 
 
 inline static std::vector<std::string> query_scans;

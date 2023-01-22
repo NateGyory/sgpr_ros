@@ -90,37 +90,43 @@ inline void normalizedLaplacian(SpectralObject &spectral_object) {
   }
 }
 
-inline void idwCompute(SpectralObject &spectral_object) {
+// inline void idwCompute(SpectralObject &spectral_object) {
+//
+//   setSmallestDistance(spectral_object);
+//   double bias = 1.0 - spectral_object.smallest_distance;
+//
+//   unsigned int max_nn = 1000;
+//
+//   int size = spectral_object.cloud->size();
+//   spectral_object.laplacian = arma::sp_mat(size, size);
+//
+//   for (int i = 0; i < size; i++) {
+//     std::vector<int> indicies_found;
+//     std::vector<float> squaredDistances;
+//     spectral_object.kdTree.radiusSearch(i, spectral_object.mcar,
+//     indicies_found,
+//                                         squaredDistances, max_nn);
+//
+//     int num_edges = indicies_found.size() - 1;
+//     spectral_object.laplacian(i, i) = num_edges;
+//
+//     for (int j = 1; j < indicies_found.size(); j++) {
+//       spectral_object.laplacian(i, indicies_found[j]) =
+//           -1 / (sqrt(squaredDistances[j]) + bias);
+//       spectral_object.laplacian(indicies_found[j], i) =
+//           -1 / (sqrt(squaredDistances[j]) + bias);
+//     }
+//   }
+// }
 
-  setSmallestDistance(spectral_object);
-  double bias = 1.0 - spectral_object.smallest_distance;
-
-  unsigned int max_nn = 1000;
-
-  int size = spectral_object.cloud->size();
-  spectral_object.laplacian = arma::sp_mat(size, size);
-
-  for (int i = 0; i < size; i++) {
-    std::vector<int> indicies_found;
-    std::vector<float> squaredDistances;
-    spectral_object.kdTree.radiusSearch(i, spectral_object.mcar, indicies_found,
-                                        squaredDistances, max_nn);
-
-    int num_edges = indicies_found.size() - 1;
-    spectral_object.laplacian(i, i) = num_edges;
-
-    for (int j = 1; j < indicies_found.size(); j++) {
-      spectral_object.laplacian(i, indicies_found[j]) =
-          -1 / (sqrt(squaredDistances[j]) + bias);
-      spectral_object.laplacian(indicies_found[j], i) =
-          -1 / (sqrt(squaredDistances[j]) + bias);
-    }
-  }
+inline void genLaplacian(Scene &scene) {
+  std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
+                &genericLaplacian);
 }
 
-inline void IDWLaplacian(Scene &scene) {
+inline void normLaplacian(Scene &scene) {
   std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
-                &idwCompute);
+                &normalizedLaplacian);
 }
 
 }; // namespace Laplacian

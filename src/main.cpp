@@ -205,6 +205,20 @@ void BackgroundVizThread() {
       viewer->setPointCloudRenderingProperties(
           pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud2", v1);
 
+      // Add Label and ID
+      viewer->addText(ImGuiState::DatasetTesting::cloud_id1, 0, 0, 25, 1, 1, 1, "text1", v0);
+      viewer->addText(ImGuiState::DatasetTesting::cloud_id2, 0, 0, 25, 1, 1, 1, "text2", v1);
+      // Add radii
+      std::string rsize1 = "Radius Size: " + std::to_string(thread_r1);
+      std::string rsize2 = "Radius Size: " + std::to_string(thread_r2);
+      viewer->addText(rsize1, 0, 25, 25, 1, 1, 1, "text3", v0);
+      viewer->addText(rsize2, 0, 25, 25, 1, 1, 1, "text4", v1);
+      // Add cloud size
+      std::string csize1 = "Cloud Size: " + std::to_string(thread_cloud1->size());
+      std::string csize2 = "Cloud Size: " + std::to_string(thread_cloud2->size());
+      viewer->addText(csize1, 0, 50, 25, 1, 1, 1, "text5", v0);
+      viewer->addText(csize2, 0, 50, 25, 1, 1, 1, "text6", v1);
+
       if (show_radius) {
         unsigned int max_nn = 1000;
         pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
@@ -303,17 +317,6 @@ void novelMethodsTesting(NovelMethodTestingPipeline &pl) {
 
   // --------------------------------------------------------------
   ImGui::Text("Point Clouds");
-
-  if (ImGui::Button("DELETE ME")) {
-    // Lock here
-    mtx.lock();
-    thread_cloud1.reset();
-    thread_cloud1 = pl.GetCloud2();
-    thread_cloud2.reset();
-    thread_cloud2 = pl.GetCloud2();
-    update_cloud = true;
-    mtx.unlock();
-  }
 
   ImGui::Combo("Choose PointCloud 1", &ImGuiState::NMT::point_cloud_idx1,
                ImGuiState::pointclouds, IM_ARRAYSIZE(ImGuiState::pointclouds));
@@ -796,7 +799,14 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                                   ImGuiState::DatasetTesting::query_obj_idx,
                                   ImGuiState::DatasetTesting::ref_obj_idx,
                                   ImGuiState::DatasetTesting::cloud1,
-                                  ImGuiState::DatasetTesting::cloud2);
+                                  ImGuiState::DatasetTesting::cloud2,
+                                  ImGuiState::DatasetTesting::cloud_id1,
+                                  ImGuiState::DatasetTesting::cloud_id2);
+
+      thread_r1 = pl->GetRadius(std::string(selected_query_scan),
+                                ImGuiState::DatasetTesting::query_obj_idx);
+      thread_r2 = pl->GetRadius(std::string(selected_ref_scan),
+                                ImGuiState::DatasetTesting::ref_obj_idx);
 
       mtx.lock();
       thread_cloud1.reset();
@@ -815,16 +825,12 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       //----------------------------------------------------------------------
 
       // Todo convert pcl point cloud to pointcloud 2 and send them
-      thread_r1 = pl->GetRadius(std::string(selected_query_scan),
-                                ImGuiState::DatasetTesting::query_obj_idx);
-      thread_r2 = pl->GetRadius(std::string(selected_ref_scan),
-                                ImGuiState::DatasetTesting::ref_obj_idx);
 
-      std::cout << "Cloud1 size: " << thread_cloud1->size() << std::endl;
-      std::cout << "Cloud2 size: " << thread_cloud2->size() << std::endl;
+      //std::cout << "Cloud1 size: " << thread_cloud1->size() << std::endl;
+      //std::cout << "Cloud2 size: " << thread_cloud2->size() << std::endl;
 
-      std::cout << "r1 size:" << thread_r1 << std::endl;
-      std::cout << "r2 size:" << thread_r2 << std::endl;
+      //std::cout << "r1 size:" << thread_r1 << std::endl;
+      //std::cout << "r2 size:" << thread_r2 << std::endl;
 
       // sensor_msgs::PointCloud2 ros_cloud1, ros_cloud2;
       // pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud1, ros_cloud1);

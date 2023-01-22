@@ -24,10 +24,12 @@ public:
                               std::string query_scan) override;
   bool RefObjExists(std::string query_scan, int query_obj_idx,
                     int &ref_obj_idx) override;
-  void GetQueryRefCloudObjPair(
-      std::string query_scan, std::string ref_scan, int q_idx, int r_idx,
-      pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
-      pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2) override;
+  void GetQueryRefCloudObjPair(std::string query_scan, std::string ref_scan,
+                               int q_idx, int r_idx,
+                               pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
+                               pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2,
+                               std::string &cloud_id1,
+                               std::string &cloud_id2) override;
   double GetRadius(std::string scan, int obj_idx) override;
   void PlotHistograms(std::string ref_scan, std::string query_scan,
                       int query_obj_idx, int ref_obj_idx) override;

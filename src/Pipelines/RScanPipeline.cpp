@@ -1,5 +1,6 @@
 #include "Pipelines/RScanPipeline.h"
 #include <pcl/common/io.h>
+#include <string>
 
 // NOTE: for gdb debugging
 std::string make_string(const char *x) { return x; }
@@ -141,10 +142,14 @@ void RScanPipeline::ComputeLaplacian(int laplacian_type) {
   case 0: // Generic
     std::for_each(mSceneMap.begin(), mSceneMap.end(),
                   [](std::pair<const std::string, Scene> &pair) {
-                    Processing::Laplacian::IDWLaplacian(pair.second);
+                    Processing::Laplacian::genLaplacian(pair.second);
                   });
     break;
   case 1: // Normalized
+    std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                  [](std::pair<const std::string, Scene> &pair) {
+                    Processing::Laplacian::normLaplacian(pair.second);
+                  });
     break;
   default:
     break;
@@ -277,11 +282,18 @@ bool RScanPipeline::RefObjExists(std::string query_scan, int query_obj_idx,
 void RScanPipeline::GetQueryRefCloudObjPair(
     std::string query_scan, std::string ref_scan, int q_idx, int r_idx,
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2) {
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2, std::string &cloud_id1,
+    std::string &cloud_id2) {
   pcl::copyPointCloud(*mSceneMap[query_scan].spectral_objects[q_idx].cloud,
                       *cloud1);
   pcl::copyPointCloud(*mSceneMap[ref_scan].spectral_objects[r_idx].cloud,
                       *cloud2);
+  cloud_id1 =
+      mSceneMap[query_scan].spectral_objects[q_idx].label + " : " +
+      std::to_string(mSceneMap[query_scan].spectral_objects[q_idx].global_id);
+  cloud_id2 =
+      mSceneMap[ref_scan].spectral_objects[r_idx].label + " : " +
+      std::to_string(mSceneMap[ref_scan].spectral_objects[r_idx].global_id);
 }
 
 double RScanPipeline::GetRadius(std::string scan, int obj_idx) {
