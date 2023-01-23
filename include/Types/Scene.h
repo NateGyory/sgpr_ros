@@ -21,6 +21,7 @@ struct SpectralObject {
   double smallest_distance;
   arma::sp_mat laplacian;
   arma::vec eigenvalues;
+  std::vector<double> gfaFeatures;
 };
 
 /*! \struct Scene

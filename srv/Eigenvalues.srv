@@ -1,4 +1,6 @@
 float64[] r_eigs
 float64[] q_eigs
+float64[] r_gfa
+float64[] q_gfa
 ---
 float64[] results

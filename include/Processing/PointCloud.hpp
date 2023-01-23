@@ -15,6 +15,7 @@
 #include <pcl/point_cloud.h>
 
 #include "Types/GraphLaplacian.h"
+#include "Processing/GFA.hpp"
 
 namespace Processing {
 namespace PointCloud {
@@ -64,7 +65,8 @@ inline void computeMCAR(SpectralObject &spectral_object) {
 }
 
 inline void findObjectPointCloud(SpectralObject &spectral_object,
-                                 pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int max_pts) {
+                                 pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,
+                                 int max_pts) {
   spectral_object.cloud =
       boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered =
@@ -109,12 +111,19 @@ inline void ExtractObjectPointClouds(Scene &scene, int max_pts) {
   pcl::fromPCLPointCloud2(*cloud2, *cloud);
 
   std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
-                [&, max_pts](SpectralObject &so) { findObjectPointCloud(so, cloud, max_pts); });
+                [&, max_pts](SpectralObject &so) {
+                  findObjectPointCloud(so, cloud, max_pts);
+                });
 }
 
 inline void MinimallyConnectedAdaptiveRadius(Scene &scene) {
   std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
                 &computeMCAR);
+}
+
+inline void CalculateGFAFeatures(Scene &scene) {
+  std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
+                Processing::GFA::calculateGFA);
 }
 
 }; // namespace PointCloud

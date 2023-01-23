@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <boost/smart_ptr/make_shared_object.hpp>
 #include <iostream>
 #include <matplot/freestanding/axes_functions.h>
@@ -39,6 +40,7 @@ ros::ServiceClient evaluation_service_client;
 
 pcl::visualization::PCLVisualizer::Ptr viewer;
 matplot::figure_handle f;
+matplot::figure_handle f_gfa;
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud1;
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud2;
 bool update_cloud = true;
@@ -51,6 +53,103 @@ std::mutex mtx, eigs_mtx;
 
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
+}
+
+void PlotGFA() {
+  if (f_gfa.use_count() == 0) {
+    f_gfa = matplot::figure(false);
+    f_gfa->width(f_gfa->width() * 3);
+    f_gfa->height(f_gfa->height() * 2.5);
+    f_gfa->x_position(0);
+    f_gfa->y_position(0);
+    f_gfa->size(1500, 1200);
+  }
+
+  while (1) {
+    if (update_hist) {
+      eigs_mtx.lock();
+      cla();
+
+      std::cout << "GFA for query is: " << std::endl;
+      for (auto const &val : ImGuiState::DatasetTesting::eig_srv.request.q_gfa)
+          std::cout << val << std::endl;
+
+      std::cout << "GFA for ref is: " << std::endl;
+      for (auto const &val : ImGuiState::DatasetTesting::eig_srv.request.r_gfa)
+          std::cout << val << std::endl;
+
+      std::vector<std::vector<double>> ref;
+      std::vector<std::vector<double>> query;
+
+      for (int i = 0;
+           i < ImGuiState::DatasetTesting::eig_srv.request.r_gfa.size(); i++) {
+
+        double multiplier = ImGuiState::DatasetTesting::eig_srv.request.r_gfa[i];
+        std::vector<double> spectra =
+            ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
+        std::transform(spectra.begin(), spectra.end(), spectra.begin(),
+                       [multiplier](double &val) { return val * multiplier; });
+
+        ref.push_back(spectra);
+      }
+
+      for (int i = 0;
+           i < ImGuiState::DatasetTesting::eig_srv.request.q_gfa.size(); i++) {
+
+        double multiplier = ImGuiState::DatasetTesting::eig_srv.request.q_gfa[i];
+        std::vector<double> spectra =
+            ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
+        std::transform(spectra.begin(), spectra.end(), spectra.begin(),
+                       [multiplier](double &val) { return val * multiplier; });
+
+        query.push_back(spectra);
+      }
+
+      // Now that the 7 spectras have been created we need to plot them
+      for (int i = 0; i < 7; i++) {
+        double min_ref = *std::min_element(ref[i].begin(), ref[i].end());
+        double max_ref = *std::max_element(ref[i].begin(), ref[i].end());
+        double min_query = *std::min_element(query[i].begin(), query[i].end());
+        double max_query = *std::max_element(query[i].begin(), query[i].end());
+
+        double min = std::min(min_ref, min_query);
+        double max = std::max(max_ref, max_query);
+
+        double bin_width = (max - min) / 25;
+
+        std::string label = "GFA: " + std::to_string(i + 1);
+        subplot(7, 1, i, true);
+        auto h1 = hist(ref[i]);
+        h1->face_color("r");
+        h1->edge_color("r");
+        h1->bin_width(bin_width);
+        hold(on);
+        auto h2 = hist(query[i]);
+        h2->face_color("b");
+        h2->edge_color("b");
+        h2->bin_width(bin_width);
+        title(label);
+        f_gfa->draw();
+        //f_gfa->show();
+        //cla();
+      }
+
+      // std::vector<double> ref =
+      //     ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
+      // std::vector<double> query =
+      //     ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
+
+      // double min_ref = *std::min_element(ref.begin(), ref.end());
+      // double max_ref = *std::max_element(ref.begin(), ref.end());
+      // double min_query = *std::min_element(query.begin(), query.end());
+      // double max_query = *std::max_element(query.begin(), query.end());
+
+      // TODO do the multiplication of the scaler here foreach gfa value
+
+      update_hist = false;
+      eigs_mtx.unlock();
+    }
+  }
 }
 
 void PlotSpectra() {
@@ -191,7 +290,8 @@ void BackgroundVizThread() {
     }
 
     if (update_cloud) {
-      // TODO try and replace this with updateCloud instead if everything works
+      // TODO try and replace this with updateCloud instead if everything
+      // works
       viewer->removeAllPointClouds(v0);
       viewer->removeAllPointClouds(v1);
       viewer->removeAllShapes(v0);
@@ -206,16 +306,20 @@ void BackgroundVizThread() {
           pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud2", v1);
 
       // Add Label and ID
-      viewer->addText(ImGuiState::DatasetTesting::cloud_id1, 0, 0, 25, 1, 1, 1, "text1", v0);
-      viewer->addText(ImGuiState::DatasetTesting::cloud_id2, 0, 0, 25, 1, 1, 1, "text2", v1);
+      viewer->addText(ImGuiState::DatasetTesting::cloud_id1, 0, 0, 25, 1, 1, 1,
+                      "text1", v0);
+      viewer->addText(ImGuiState::DatasetTesting::cloud_id2, 0, 0, 25, 1, 1, 1,
+                      "text2", v1);
       // Add radii
       std::string rsize1 = "Radius Size: " + std::to_string(thread_r1);
       std::string rsize2 = "Radius Size: " + std::to_string(thread_r2);
       viewer->addText(rsize1, 0, 25, 25, 1, 1, 1, "text3", v0);
       viewer->addText(rsize2, 0, 25, 25, 1, 1, 1, "text4", v1);
       // Add cloud size
-      std::string csize1 = "Cloud Size: " + std::to_string(thread_cloud1->size());
-      std::string csize2 = "Cloud Size: " + std::to_string(thread_cloud2->size());
+      std::string csize1 =
+          "Cloud Size: " + std::to_string(thread_cloud1->size());
+      std::string csize2 =
+          "Cloud Size: " + std::to_string(thread_cloud2->size());
       viewer->addText(csize1, 0, 50, 25, 1, 1, 1, "text5", v0);
       viewer->addText(csize2, 0, 50, 25, 1, 1, 1, "text6", v1);
 
@@ -826,11 +930,11 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
       // Todo convert pcl point cloud to pointcloud 2 and send them
 
-      //std::cout << "Cloud1 size: " << thread_cloud1->size() << std::endl;
-      //std::cout << "Cloud2 size: " << thread_cloud2->size() << std::endl;
+      // std::cout << "Cloud1 size: " << thread_cloud1->size() << std::endl;
+      // std::cout << "Cloud2 size: " << thread_cloud2->size() << std::endl;
 
-      //std::cout << "r1 size:" << thread_r1 << std::endl;
-      //std::cout << "r2 size:" << thread_r2 << std::endl;
+      // std::cout << "r1 size:" << thread_r1 << std::endl;
+      // std::cout << "r2 size:" << thread_r2 << std::endl;
 
       // sensor_msgs::PointCloud2 ros_cloud1, ros_cloud2;
       // pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud1, ros_cloud1);
@@ -842,7 +946,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       // pc_srv.request.radius1 = r1;
       // pc_srv.request.radius2 = r2;
       // if (point_cloud_service_client.call(pc_srv)) {
-      //   ROS_INFO("Point cloud service success!!! %d", pc_srv.response.done);
+      //   ROS_INFO("Point cloud service success!!! %d",
+      //   pc_srv.response.done);
       // } else {
       //   ROS_ERROR("Point cloud service failed");
       // }
@@ -956,8 +1061,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   //   ImGuiState::pcl_viz = true;
   //   auto pointCloudPair = pl.GetPointCloudPair();
 
-  //  std::thread t1(RunVizThread, pointCloudPair.first, pointCloudPair.second);
-  //  t1.detach();
+  //  std::thread t1(RunVizThread, pointCloudPair.first,
+  //  pointCloudPair.second); t1.detach();
   //}
 
   // ImGui::SameLine();
@@ -1039,6 +1144,9 @@ int main(int argc, char **argv) {
 
   std::thread spectra_t(PlotSpectra);
   spectra_t.detach();
+
+  //std::thread gfa_t(PlotGFA);
+  //gfa_t.detach();
 
   GLFWwindow *window = initGUI();
 
