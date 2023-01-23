@@ -15,6 +15,7 @@
 #include <pcl/point_cloud.h>
 
 #include "Types/GraphLaplacian.h"
+#include "Processing/GFA.hpp"
 
 namespace Processing {
 namespace PointCloud {
@@ -122,7 +123,7 @@ inline void MinimallyConnectedAdaptiveRadius(Scene &scene) {
 
 inline void CalculateGFAFeatures(Scene &scene) {
   std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
-                &Processing::GFA::calculateGFA);
+                Processing::GFA::calculateGFA);
 }
 
 }; // namespace PointCloud

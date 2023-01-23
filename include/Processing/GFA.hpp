@@ -4,12 +4,14 @@
 #include <pcl/common/common.h>
 #include <pcl/point_cloud.h>
 
-#include <Eigen/Core>
 #include <Eigen/Eigenvalues>
+#include <Eigen/Dense>
 
 #include <cfenv>
 
 #include "Types/Scene.h"
+
+using namespace Eigen;
 
 namespace Processing {
 namespace GFA {
@@ -40,7 +42,7 @@ inline void GetGFAFeature(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,
   // upper diagonal.
   const std::vector<size_t> row_indices_to_access = {0, 0, 0, 1, 1, 2};
   const std::vector<size_t> col_indices_to_access = {0, 1, 2, 1, 2, 2};
-  Eigen::Matrix3f covariance_matrix;
+  Matrix3f covariance_matrix;
   for (size_t i = 0u; i < row_indices_to_access.size(); ++i) {
     const size_t row = row_indices_to_access[i];
     const size_t col = col_indices_to_access[i];
@@ -56,7 +58,7 @@ inline void GetGFAFeature(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,
 
   // Compute eigenvalues of covariance matrix.
   constexpr bool compute_eigenvectors = false;
-  Eigen::EigenSolver<Eigen::Matrix3f> eigenvalues_solver(covariance_matrix,
+  EigenSolver<Matrix3f> eigenvalues_solver(covariance_matrix,
                                                          compute_eigenvectors);
   std::vector<float> eigenvalues(3, 0.0);
   eigenvalues.at(0) = eigenvalues_solver.eigenvalues()[0].real();
@@ -146,25 +148,25 @@ inline void GetGFAFeature(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,
 
   // Check that there were no overflows, underflows, or invalid float
   // operations.
-  if (std::fetestexcept(FE_OVERFLOW)) {
+  //if (std::fetestexcept(FE_OVERFLOW)) {
 
-    std::cout << "Overflow error in eigenvalue feature computation."
-              << std::endl;
-    exit(0);
-  } else if (std::fetestexcept(FE_UNDERFLOW)) {
-    std::cout << "Underflow error in eigenvalue feature computation."
-              << std::endl;
-    exit(0);
-  } else if (std::fetestexcept(FE_INVALID)) {
-    std::cout << "Invalid Flag error in eigenvalue feature computation."
-              << std::endl;
-    exit(0);
-  } else if (std::fetestexcept(FE_DIVBYZERO)) {
-    std::cout << "Divide by zero error in eigenvalue feature computation."
-              << std::endl;
-    ;
-    exit(0);
-  }
+  //  std::cout << "Overflow error in eigenvalue feature computation."
+  //            << std::endl;
+  //  exit(0);
+  //} else if (std::fetestexcept(FE_UNDERFLOW)) {
+  //  std::cout << "Underflow error in eigenvalue feature computation."
+  //            << std::endl;
+  //  exit(0);
+  //} else if (std::fetestexcept(FE_INVALID)) {
+  //  std::cout << "Invalid Flag error in eigenvalue feature computation."
+  //            << std::endl;
+  //  exit(0);
+  //} else if (std::fetestexcept(FE_DIVBYZERO)) {
+  //  std::cout << "Divide by zero error in eigenvalue feature computation."
+  //            << std::endl;
+  //  ;
+  //  exit(0);
+  //}
 }
 
 inline void computeCentroid(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,

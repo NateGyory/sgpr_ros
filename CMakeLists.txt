@@ -17,6 +17,7 @@ project(sgpr_ros)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
 
+find_package(Eigen3 REQUIRED)
 find_package(PCL REQUIRED)
 find_package(Armadillo REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
@@ -59,6 +60,7 @@ target_link_libraries(sgpr_ros PRIVATE
     nlohmann_json::nlohmann_json
     Matplot++::matplot
     glfw
+    Eigen3::Eigen
     ${PCL_LIBRARIES}
     ${ARMADILLO_LIBRARIES}
     ${OPENGL_LIBRARIES}

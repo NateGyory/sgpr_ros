@@ -351,4 +351,8 @@ void RScanPipeline::GetEigs(sgpr_ros::Eigenvalues &eig_srv,
       mSceneMap[query_scan].spectral_objects[query_obj_idx].eigenvalues);
   eig_srv.request.r_eigs = arma::conv_to<std::vector<double>>::from(
       mSceneMap[ref_scan].spectral_objects[ref_obj_idx].eigenvalues);
+  eig_srv.request.q_gfa =
+      mSceneMap[query_scan].spectral_objects[query_obj_idx].gfaFeatures;
+  eig_srv.request.r_gfa =
+      mSceneMap[ref_scan].spectral_objects[ref_obj_idx].gfaFeatures;
 }
