@@ -163,6 +163,7 @@ void RScanPipeline::ComputeLaplacian(int laplacian_type) {
   }
   std::cout << "Finished computing Laplacian" << std::endl;
 }
+
 void RScanPipeline::ComputeEigs(int max_eigs) {
   std::cout << "Computing eigenvalues" << std::endl;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),

@@ -24,7 +24,39 @@ inline void setSmallestDistance(SpectralObject &spectral_object) {
   spectral_object.smallest_distance = min;
 }
 
-// TODO this is not the actual generic laplacian. When we create the normalized
+// NOTE: This is a utility function that allows us to check that the laplacians
+// rows and cols add to 0. It is super slow so only use it as a one off check
+inline void checkLaplacian(SpectralObject &spectral_object) {
+  // Check laplacin Rows
+  for (int i = 0; i < spectral_object.laplacian.n_rows; i++) {
+    int sum = 0;
+    for (int j = 0; j < spectral_object.laplacian.n_cols; j++) {
+      sum += spectral_object.laplacian(i, j);
+    }
+
+    if (sum != 0) {
+      std::cout << "ERROR, rows laplacian sum is not 0" << std::endl;
+      exit(1);
+    }
+  }
+
+  // Check laplacin Cols
+  for (int i = 0; i < spectral_object.laplacian.n_cols; i++) {
+    int sum = 0;
+
+    for (int j = 0; j < spectral_object.laplacian.n_rows; j++) {
+      sum += spectral_object.laplacian(j, i);
+    }
+
+    if (sum != 0) {
+      std::cout << "ERROR, cols laplacian sum is not 0" << std::endl;
+      exit(1);
+    }
+  }
+}
+
+// TODO this is not the actual generic laplacian. When we create the
+// normalized
 // IDW laplacian we need to change this back
 inline void genericLaplacian(SpectralObject &spectral_object) {
 
@@ -47,11 +79,15 @@ inline void genericLaplacian(SpectralObject &spectral_object) {
 
     spectral_object.laplacian(i, i) = num_edges;
 
-    for (int j = 1; j < indicies_found.size(); j++) {
+    for (int j = 0; j < indicies_found.size(); j++) {
+      if (indicies_found[j] == i)
+        continue;
       spectral_object.laplacian(i, indicies_found[j]) = -1;
       spectral_object.laplacian(indicies_found[j], i) = -1;
     }
   }
+
+  // Call checkLaplacian(spectral_object) to verify the laplacian is correct
 }
 
 inline void normalizedLaplacian(SpectralObject &spectral_object) {

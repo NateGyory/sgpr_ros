@@ -3,10 +3,7 @@
   "ply_filename": "labels.instances.annotated.v2.ply",
   "reference_scans": [
     {
-      "scan_id": "41385847-a238-2435-838b-61864922c518"
-    },
-    {
-      "scan_id": "0958224e-e2c2-2de1-943b-38e36345e2e7"
+      "scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d"
     }
   ]
 }
