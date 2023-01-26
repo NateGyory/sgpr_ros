@@ -18,7 +18,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_BUILD_TYPE Debug)
 
 find_package(Eigen3 REQUIRED)
-find_package(PCL REQUIRED)
+find_package(PCL 1.13.0 REQUIRED)
 find_package(Armadillo REQUIRED)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 find_package(Matplot++ REQUIRED)

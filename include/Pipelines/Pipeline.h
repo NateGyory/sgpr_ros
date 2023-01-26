@@ -40,12 +40,10 @@ public:
                                       std::string query_scan) = 0;
   virtual bool RefObjExists(std::string query_scan, int query_obj_idx,
                             int &ref_obj_idx) = 0;
-  virtual void
-  GetQueryRefCloudObjPair(std::string query_scan, std::string ref_scan,
-                          int q_idx, int r_idx,
-                          pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
-                          pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2,
-                          std::string &cloud_id1, std::string &cloud_id2) = 0;
+  virtual void GetQueryRefCloudObjPair(std::string query_scan,
+                                       std::string ref_scan, int q_idx,
+                                       int r_idx, SpectralObject &q_so,
+                                       SpectralObject &r_so) = 0;
   virtual double GetRadius(std::string scan, int obj_idx) = 0;
 
   virtual void PlotHistograms(std::string ref_scan, std::string query_scan,

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Types/Scene.h"
 #include "sgpr_ros/Eigenvalues.h"
 #include "imgui.h"
 #include <pcl/point_cloud.h>
@@ -62,11 +63,19 @@ inline static bool ShowRadius() {
 
 namespace DatasetTesting {
 
-inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
-inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
+//inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
+//inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
+//inline static std::string cloud_id1;
+//inline static std::string cloud_id2;
+
 inline static sgpr_ros::Eigenvalues eig_srv;
-inline static std::string cloud_id1;
-inline static std::string cloud_id2;
+inline static SpectralObject q_so;
+inline static SpectralObject r_so;
+inline static bool update_cloud = false;
+inline static bool update_hist = false;
+inline static bool show_radius = false;
+inline static bool radius_toggled = false;
+inline static std::mutex mtx, eigs_mtx;
 
 
 inline static std::vector<std::string> query_scans;

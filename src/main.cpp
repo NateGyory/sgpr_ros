@@ -23,6 +23,9 @@
 #include "Pipelines/NovelMethodTestingPipeline.h"
 #include "Pipelines/RScanPipeline.h"
 
+#include "Processing/Eigen.hpp"
+#include "Processing/Laplacian.hpp"
+#include "Processing/PointCloud.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -37,120 +40,120 @@ using namespace std::chrono_literals;
 using namespace matplot;
 
 ros::ServiceClient evaluation_service_client;
-
 pcl::visualization::PCLVisualizer::Ptr viewer;
 matplot::figure_handle f;
-matplot::figure_handle f_gfa;
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud1;
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr thread_cloud2;
-bool update_cloud = true;
-bool update_hist = false;
-bool show_radius = false;
-bool radius_toggled = false;
-double thread_r1;
-double thread_r2;
-std::mutex mtx, eigs_mtx;
+
+// matplot::figure_handle f_gfa;
 
 static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
-void PlotGFA() {
-  if (f_gfa.use_count() == 0) {
-    f_gfa = matplot::figure(false);
-    f_gfa->width(f_gfa->width() * 3);
-    f_gfa->height(f_gfa->height() * 2.5);
-    f_gfa->x_position(0);
-    f_gfa->y_position(0);
-    f_gfa->size(1500, 1200);
-  }
-
-  while (1) {
-    if (update_hist) {
-      eigs_mtx.lock();
-      cla();
-
-      std::cout << "GFA for query is: " << std::endl;
-      for (auto const &val : ImGuiState::DatasetTesting::eig_srv.request.q_gfa)
-          std::cout << val << std::endl;
-
-      std::cout << "GFA for ref is: " << std::endl;
-      for (auto const &val : ImGuiState::DatasetTesting::eig_srv.request.r_gfa)
-          std::cout << val << std::endl;
-
-      std::vector<std::vector<double>> ref;
-      std::vector<std::vector<double>> query;
-
-      for (int i = 0;
-           i < ImGuiState::DatasetTesting::eig_srv.request.r_gfa.size(); i++) {
-
-        double multiplier = ImGuiState::DatasetTesting::eig_srv.request.r_gfa[i];
-        std::vector<double> spectra =
-            ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
-        std::transform(spectra.begin(), spectra.end(), spectra.begin(),
-                       [multiplier](double &val) { return val * multiplier; });
-
-        ref.push_back(spectra);
-      }
-
-      for (int i = 0;
-           i < ImGuiState::DatasetTesting::eig_srv.request.q_gfa.size(); i++) {
-
-        double multiplier = ImGuiState::DatasetTesting::eig_srv.request.q_gfa[i];
-        std::vector<double> spectra =
-            ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
-        std::transform(spectra.begin(), spectra.end(), spectra.begin(),
-                       [multiplier](double &val) { return val * multiplier; });
-
-        query.push_back(spectra);
-      }
-
-      // Now that the 7 spectras have been created we need to plot them
-      for (int i = 0; i < 7; i++) {
-        double min_ref = *std::min_element(ref[i].begin(), ref[i].end());
-        double max_ref = *std::max_element(ref[i].begin(), ref[i].end());
-        double min_query = *std::min_element(query[i].begin(), query[i].end());
-        double max_query = *std::max_element(query[i].begin(), query[i].end());
-
-        double min = std::min(min_ref, min_query);
-        double max = std::max(max_ref, max_query);
-
-        double bin_width = (max - min) / 25;
-
-        std::string label = "GFA: " + std::to_string(i + 1);
-        subplot(7, 1, i, true);
-        auto h1 = hist(ref[i]);
-        h1->face_color("r");
-        h1->edge_color("r");
-        h1->bin_width(bin_width);
-        hold(on);
-        auto h2 = hist(query[i]);
-        h2->face_color("b");
-        h2->edge_color("b");
-        h2->bin_width(bin_width);
-        title(label);
-        f_gfa->draw();
-        //f_gfa->show();
-        //cla();
-      }
-
-      // std::vector<double> ref =
-      //     ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
-      // std::vector<double> query =
-      //     ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
-
-      // double min_ref = *std::min_element(ref.begin(), ref.end());
-      // double max_ref = *std::max_element(ref.begin(), ref.end());
-      // double min_query = *std::min_element(query.begin(), query.end());
-      // double max_query = *std::max_element(query.begin(), query.end());
-
-      // TODO do the multiplication of the scaler here foreach gfa value
-
-      update_hist = false;
-      eigs_mtx.unlock();
-    }
-  }
-}
+// void PlotGFA() {
+//   if (f_gfa.use_count() == 0) {
+//     f_gfa = matplot::figure(false);
+//     f_gfa->width(f_gfa->width() * 3);
+//     f_gfa->height(f_gfa->height() * 2.5);
+//     f_gfa->x_position(0);
+//     f_gfa->y_position(0);
+//     f_gfa->size(1500, 1200);
+//   }
+//
+//   while (1) {
+//     if (update_hist) {
+//       eigs_mtx.lock();
+//       cla();
+//
+//       std::cout << "GFA for query is: " << std::endl;
+//       for (auto const &val :
+//       ImGuiState::DatasetTesting::eig_srv.request.q_gfa)
+//         std::cout << val << std::endl;
+//
+//       std::cout << "GFA for ref is: " << std::endl;
+//       for (auto const &val :
+//       ImGuiState::DatasetTesting::eig_srv.request.r_gfa)
+//         std::cout << val << std::endl;
+//
+//       std::vector<std::vector<double>> ref;
+//       std::vector<std::vector<double>> query;
+//
+//       for (int i = 0;
+//            i < ImGuiState::DatasetTesting::eig_srv.request.r_gfa.size(); i++)
+//            {
+//
+//         double multiplier =
+//             ImGuiState::DatasetTesting::eig_srv.request.r_gfa[i];
+//         std::vector<double> spectra =
+//             ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
+//         std::transform(spectra.begin(), spectra.end(), spectra.begin(),
+//                        [multiplier](double &val) { return val * multiplier;
+//                        });
+//
+//         ref.push_back(spectra);
+//       }
+//
+//       for (int i = 0;
+//            i < ImGuiState::DatasetTesting::eig_srv.request.q_gfa.size(); i++)
+//            {
+//
+//         double multiplier =
+//             ImGuiState::DatasetTesting::eig_srv.request.q_gfa[i];
+//         std::vector<double> spectra =
+//             ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
+//         std::transform(spectra.begin(), spectra.end(), spectra.begin(),
+//                        [multiplier](double &val) { return val * multiplier;
+//                        });
+//
+//         query.push_back(spectra);
+//       }
+//
+//       // Now that the 7 spectras have been created we need to plot them
+//       for (int i = 0; i < 7; i++) {
+//         double min_ref = *std::min_element(ref[i].begin(), ref[i].end());
+//         double max_ref = *std::max_element(ref[i].begin(), ref[i].end());
+//         double min_query = *std::min_element(query[i].begin(),
+//         query[i].end()); double max_query =
+//         *std::max_element(query[i].begin(), query[i].end());
+//
+//         double min = std::min(min_ref, min_query);
+//         double max = std::max(max_ref, max_query);
+//
+//         double bin_width = (max - min) / 25;
+//
+//         std::string label = "GFA: " + std::to_string(i + 1);
+//         subplot(7, 1, i, true);
+//         auto h1 = hist(ref[i]);
+//         h1->face_color("r");
+//         h1->edge_color("r");
+//         h1->bin_width(bin_width);
+//         hold(on);
+//         auto h2 = hist(query[i]);
+//         h2->face_color("b");
+//         h2->edge_color("b");
+//         h2->bin_width(bin_width);
+//         title(label);
+//         f_gfa->draw();
+//         // f_gfa->show();
+//         // cla();
+//       }
+//
+//       // std::vector<double> ref =
+//       //     ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
+//       // std::vector<double> query =
+//       //     ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
+//
+//       // double min_ref = *std::min_element(ref.begin(), ref.end());
+//       // double max_ref = *std::max_element(ref.begin(), ref.end());
+//       // double min_query = *std::min_element(query.begin(), query.end());
+//       // double max_query = *std::max_element(query.begin(), query.end());
+//
+//       // TODO do the multiplication of the scaler here foreach gfa value
+//
+//       update_hist = false;
+//       eigs_mtx.unlock();
+//     }
+//   }
+// }
 
 void PlotSpectra() {
   if (f.use_count() == 0) {
@@ -163,8 +166,8 @@ void PlotSpectra() {
   }
 
   while (1) {
-    if (update_hist) {
-      eigs_mtx.lock();
+    if (ImGuiState::DatasetTesting::update_hist) {
+      ImGuiState::DatasetTesting::eigs_mtx.lock();
       cla();
       std::vector<double> ref =
           ImGuiState::DatasetTesting::eig_srv.request.r_eigs;
@@ -192,8 +195,8 @@ void PlotSpectra() {
       h2->bin_width(bin_width);
       title("Eigenvalue Spectras");
       f->draw();
-      update_hist = false;
-      eigs_mtx.unlock();
+      ImGuiState::DatasetTesting::update_hist = false;
+      ImGuiState::DatasetTesting::eigs_mtx.unlock();
     }
   }
 }
@@ -202,10 +205,11 @@ void keyboardEventOccurred(const pcl::visualization::KeyboardEvent &event,
                            void *viewer_void) {
   if (event.getKeySym() == "r" && event.keyDown()) {
     std::cout << "r was pressed => removing all text" << std::endl;
-    mtx.lock();
-    show_radius = !show_radius;
-    radius_toggled = true;
-    mtx.unlock();
+    ImGuiState::DatasetTesting::mtx.lock();
+    ImGuiState::DatasetTesting::show_radius =
+        !ImGuiState::DatasetTesting::show_radius;
+    ImGuiState::DatasetTesting::radius_toggled = true;
+    ImGuiState::DatasetTesting::mtx.unlock();
   }
 }
 
@@ -217,7 +221,7 @@ void BackgroundVizThread() {
   // TODO I can probably delete this
   if (viewer.use_count() == 0) {
 
-    viewer = boost::make_shared<pcl::visualization::PCLVisualizer>();
+    viewer = std::make_shared<pcl::visualization::PCLVisualizer>();
     viewer->setPosition(72, 0);
     viewer->setSize(600, 200);
     viewer->registerKeyboardCallback(keyboardEventOccurred, nullptr);
@@ -225,37 +229,39 @@ void BackgroundVizThread() {
     viewer->initCameraParameters();
     viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v0);
     viewer->setBackgroundColor(0, 0, 0, v0);
-    viewer->addCoordinateSystem(1.0, "coord1", v0);
+    //viewer->addCoordinateSystem(1.0, "coord1", v0);
 
     viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v1);
     viewer->setBackgroundColor(0.3, 0.3, 0.3, v1);
-    viewer->addCoordinateSystem(1.0, "coord2", v1);
+    //viewer->addCoordinateSystem(1.0, "coord2", v1);
   }
 
   while (!viewer->wasStopped()) {
-    mtx.lock();
-    if (radius_toggled) {
-      if (show_radius) {
+    ImGuiState::DatasetTesting::mtx.lock();
+    if (ImGuiState::DatasetTesting::radius_toggled) {
+      if (ImGuiState::DatasetTesting::show_radius) {
 
         auto start = std::chrono::steady_clock::now();
         unsigned int max_nn = 1000;
         pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
 
         // TODO Maybe separate this so we are not duplicating code
-        kdTree.setInputCloud(thread_cloud1);
-        int size1 = thread_cloud1->size();
+        kdTree.setInputCloud(ImGuiState::DatasetTesting::q_so.cloud);
+        int size1 = ImGuiState::DatasetTesting::q_so.cloud->size();
 
         for (int i = 0; i < size1; i++) {
           std::vector<int> indicies_found;
           std::vector<float> squaredDistances;
-          kdTree.radiusSearch(i, thread_r1, indicies_found, squaredDistances,
-                              max_nn);
+          kdTree.radiusSearch(i, ImGuiState::DatasetTesting::q_so.mcar,
+                              indicies_found, squaredDistances, max_nn);
 
-          pcl::PointXYZRGB pt_r = thread_cloud1->points[i];
+          pcl::PointXYZRGB pt_r =
+              ImGuiState::DatasetTesting::q_so.cloud->points[i];
 
           for (int j = 1; j < indicies_found.size(); j++) {
             int idx = indicies_found[j];
-            pcl::PointXYZRGB pt_q = thread_cloud1->points[idx];
+            pcl::PointXYZRGB pt_q =
+                ImGuiState::DatasetTesting::q_so.cloud->points[idx];
             // viewer->addLine(pt_r, pt_q, "line", 0);
             std::string string_id =
                 "0" + std::to_string(i) + "-" + std::to_string(j);
@@ -263,20 +269,22 @@ void BackgroundVizThread() {
           }
         }
 
-        kdTree.setInputCloud(thread_cloud2);
-        int size2 = thread_cloud2->size();
+        kdTree.setInputCloud(ImGuiState::DatasetTesting::r_so.cloud);
+        int size2 = ImGuiState::DatasetTesting::r_so.cloud->size();
 
         for (int i = 0; i < size2; i++) {
           std::vector<int> indicies_found;
           std::vector<float> squaredDistances;
-          kdTree.radiusSearch(i, thread_r2, indicies_found, squaredDistances,
-                              max_nn);
+          kdTree.radiusSearch(i, ImGuiState::DatasetTesting::r_so.mcar,
+                              indicies_found, squaredDistances, max_nn);
 
-          pcl::PointXYZRGB pt_r = thread_cloud2->points[i];
+          pcl::PointXYZRGB pt_r =
+              ImGuiState::DatasetTesting::r_so.cloud->points[i];
 
           for (int j = 1; j < indicies_found.size(); j++) {
             int idx = indicies_found[j];
-            pcl::PointXYZRGB pt_q = thread_cloud2->points[idx];
+            pcl::PointXYZRGB pt_q =
+                ImGuiState::DatasetTesting::r_so.cloud->points[idx];
             std::string string_id =
                 "1" + std::to_string(i) + "-" + std::to_string(j);
             viewer->addLine(pt_r, pt_q, string_id, v1);
@@ -286,10 +294,10 @@ void BackgroundVizThread() {
         viewer->removeAllShapes(v0);
         viewer->removeAllShapes(v1);
       }
-      radius_toggled = false;
+      ImGuiState::DatasetTesting::radius_toggled = false;
     }
 
-    if (update_cloud) {
+    if (ImGuiState::DatasetTesting::update_cloud) {
       // TODO try and replace this with updateCloud instead if everything
       // works
       viewer->removeAllPointClouds(v0);
@@ -297,8 +305,10 @@ void BackgroundVizThread() {
       viewer->removeAllShapes(v0);
       viewer->removeAllShapes(v1);
 
-      viewer->addPointCloud(thread_cloud1, "cloud1", v0);
-      viewer->addPointCloud(thread_cloud2, "cloud2", v1);
+      viewer->addPointCloud(ImGuiState::DatasetTesting::q_so.cloud, "cloud1",
+                            v0);
+      viewer->addPointCloud(ImGuiState::DatasetTesting::r_so.cloud, "cloud2",
+                            v1);
 
       viewer->setPointCloudRenderingProperties(
           pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud1", v0);
@@ -306,42 +316,56 @@ void BackgroundVizThread() {
           pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud2", v1);
 
       // Add Label and ID
-      viewer->addText(ImGuiState::DatasetTesting::cloud_id1, 0, 0, 25, 1, 1, 1,
-                      "text1", v0);
-      viewer->addText(ImGuiState::DatasetTesting::cloud_id2, 0, 0, 25, 1, 1, 1,
-                      "text2", v1);
+      std::string name1 =
+          ImGuiState::DatasetTesting::q_so.label + ": " +
+          std::to_string(ImGuiState::DatasetTesting::q_so.global_id);
+      std::string name2 =
+          ImGuiState::DatasetTesting::r_so.label + ": " +
+          std::to_string(ImGuiState::DatasetTesting::r_so.global_id);
+
+      viewer->addText(name1, 0, 0, 25, 1, 1, 1, "text1", v0);
+      viewer->addText(name2, 0, 0, 25, 1, 1, 1, "text2", v1);
       // Add radii
-      std::string rsize1 = "Radius Size: " + std::to_string(thread_r1);
-      std::string rsize2 = "Radius Size: " + std::to_string(thread_r2);
+      std::string rsize1 =
+          "Radius Size: " +
+          std::to_string(ImGuiState::DatasetTesting::q_so.mcar);
+      std::string rsize2 =
+          "Radius Size: " +
+          std::to_string(ImGuiState::DatasetTesting::r_so.mcar);
       viewer->addText(rsize1, 0, 25, 25, 1, 1, 1, "text3", v0);
       viewer->addText(rsize2, 0, 25, 25, 1, 1, 1, "text4", v1);
+
       // Add cloud size
       std::string csize1 =
-          "Cloud Size: " + std::to_string(thread_cloud1->size());
+          "Cloud Size: " +
+          std::to_string(ImGuiState::DatasetTesting::q_so.cloud->size());
       std::string csize2 =
-          "Cloud Size: " + std::to_string(thread_cloud2->size());
+          "Cloud Size: " +
+          std::to_string(ImGuiState::DatasetTesting::r_so.cloud->size());
       viewer->addText(csize1, 0, 50, 25, 1, 1, 1, "text5", v0);
       viewer->addText(csize2, 0, 50, 25, 1, 1, 1, "text6", v1);
 
-      if (show_radius) {
+      if (ImGuiState::DatasetTesting::show_radius) {
         unsigned int max_nn = 1000;
         pcl::KdTreeFLANN<pcl::PointXYZRGB> kdTree;
 
         // TODO Maybe separate this so we are not duplicating code
-        kdTree.setInputCloud(thread_cloud1);
-        int size1 = thread_cloud1->size();
+        kdTree.setInputCloud(ImGuiState::DatasetTesting::q_so.cloud);
+        int size1 = ImGuiState::DatasetTesting::q_so.cloud->size();
 
         for (int i = 0; i < size1; i++) {
           std::vector<int> indicies_found;
           std::vector<float> squaredDistances;
-          kdTree.radiusSearch(i, thread_r1, indicies_found, squaredDistances,
-                              max_nn);
+          kdTree.radiusSearch(i, ImGuiState::DatasetTesting::q_so.mcar,
+                              indicies_found, squaredDistances, max_nn);
 
-          pcl::PointXYZRGB pt_r = thread_cloud1->points[i];
+          pcl::PointXYZRGB pt_r =
+              ImGuiState::DatasetTesting::q_so.cloud->points[i];
 
           for (int j = 1; j < indicies_found.size(); j++) {
             int idx = indicies_found[j];
-            pcl::PointXYZRGB pt_q = thread_cloud1->points[idx];
+            pcl::PointXYZRGB pt_q =
+                ImGuiState::DatasetTesting::q_so.cloud->points[idx];
             // viewer->addLine(pt_r, pt_q, "line", 0);
             std::string string_id =
                 "0" + std::to_string(i) + "-" + std::to_string(j);
@@ -349,20 +373,22 @@ void BackgroundVizThread() {
           }
         }
 
-        kdTree.setInputCloud(thread_cloud2);
-        int size2 = thread_cloud2->size();
+        kdTree.setInputCloud(ImGuiState::DatasetTesting::r_so.cloud);
+        int size2 = ImGuiState::DatasetTesting::r_so.cloud->size();
 
         for (int i = 0; i < size2; i++) {
           std::vector<int> indicies_found;
           std::vector<float> squaredDistances;
-          kdTree.radiusSearch(i, thread_r2, indicies_found, squaredDistances,
-                              max_nn);
+          kdTree.radiusSearch(i, ImGuiState::DatasetTesting::r_so.mcar,
+                              indicies_found, squaredDistances, max_nn);
 
-          pcl::PointXYZRGB pt_r = thread_cloud2->points[i];
+          pcl::PointXYZRGB pt_r =
+              ImGuiState::DatasetTesting::r_so.cloud->points[i];
 
           for (int j = 1; j < indicies_found.size(); j++) {
             int idx = indicies_found[j];
-            pcl::PointXYZRGB pt_q = thread_cloud2->points[idx];
+            pcl::PointXYZRGB pt_q =
+                ImGuiState::DatasetTesting::r_so.cloud->points[idx];
             std::string string_id =
                 "1" + std::to_string(i) + "-" + std::to_string(j);
             viewer->addLine(pt_r, pt_q, string_id, v1);
@@ -370,9 +396,9 @@ void BackgroundVizThread() {
         }
       }
 
-      update_cloud = false;
+      ImGuiState::DatasetTesting::update_cloud = false;
     }
-    mtx.unlock();
+    ImGuiState::DatasetTesting::mtx.unlock();
     viewer->spinOnce(1);
     // std::this_thread::sleep_for(100ms);
   }
@@ -888,37 +914,18 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                          ImGuiState::DatasetTesting::query_obj_idx,
                          ImGuiState::DatasetTesting::ref_obj_idx)) {
 
-      ImGuiState::DatasetTesting::cloud1.reset();
-      ImGuiState::DatasetTesting::cloud2.reset();
-
-      ImGuiState::DatasetTesting::cloud1 =
-          boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
-      ImGuiState::DatasetTesting::cloud2 =
-          boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
-
       ImGuiState::DatasetTesting::ref_obj_exists = true;
+
       // Get Point Clouds
-      pl->GetQueryRefCloudObjPair(std::string(selected_query_scan),
-                                  std::string(selected_ref_scan),
-                                  ImGuiState::DatasetTesting::query_obj_idx,
-                                  ImGuiState::DatasetTesting::ref_obj_idx,
-                                  ImGuiState::DatasetTesting::cloud1,
-                                  ImGuiState::DatasetTesting::cloud2,
-                                  ImGuiState::DatasetTesting::cloud_id1,
-                                  ImGuiState::DatasetTesting::cloud_id2);
+      ImGuiState::DatasetTesting::mtx.lock();
+      pl->GetQueryRefCloudObjPair(
+          std::string(selected_query_scan), std::string(selected_ref_scan),
+          ImGuiState::DatasetTesting::query_obj_idx,
+          ImGuiState::DatasetTesting::ref_obj_idx,
+          ImGuiState::DatasetTesting::q_so, ImGuiState::DatasetTesting::q_so);
 
-      thread_r1 = pl->GetRadius(std::string(selected_query_scan),
-                                ImGuiState::DatasetTesting::query_obj_idx);
-      thread_r2 = pl->GetRadius(std::string(selected_ref_scan),
-                                ImGuiState::DatasetTesting::ref_obj_idx);
-
-      mtx.lock();
-      thread_cloud1.reset();
-      thread_cloud1 = ImGuiState::DatasetTesting::cloud1;
-      thread_cloud2.reset();
-      thread_cloud2 = ImGuiState::DatasetTesting::cloud2;
-      update_cloud = true;
-      mtx.unlock();
+      ImGuiState::DatasetTesting::update_cloud = true;
+      ImGuiState::DatasetTesting::mtx.unlock();
 
       //----------------------------------------------------------------------
       // DELETEME
@@ -965,14 +972,25 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       // t2.detach();
       //----------------------------------------------------------------------
 
-      eigs_mtx.lock();
-      pl->GetEigs(ImGuiState::DatasetTesting::eig_srv,
-                  std::string(selected_query_scan),
-                  ImGuiState::DatasetTesting::query_obj_idx,
-                  std::string(selected_ref_scan),
-                  ImGuiState::DatasetTesting::ref_obj_idx);
-      update_hist = true;
-      eigs_mtx.unlock();
+      ImGuiState::DatasetTesting::eigs_mtx.lock();
+
+      ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+          arma::conv_to<std::vector<double>>::from(
+              ImGuiState::DatasetTesting::q_so.eigenvalues);
+      ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+          arma::conv_to<std::vector<double>>::from(
+              ImGuiState::DatasetTesting::r_so.eigenvalues);
+      ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+          ImGuiState::DatasetTesting::q_so.gfaFeatures;
+      ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+          ImGuiState::DatasetTesting::r_so.gfaFeatures;
+      // pl->GetEigs(ImGuiState::DatasetTesting::eig_srv,
+      //             std::string(selected_query_scan),
+      //             ImGuiState::DatasetTesting::query_obj_idx,
+      //             std::string(selected_ref_scan),
+      //             ImGuiState::DatasetTesting::ref_obj_idx);
+      ImGuiState::DatasetTesting::update_hist = true;
+      ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
       // if (histogram_service_client.call(eig_srv)) {
       //   ROS_INFO("histogram service success!!! %f",
@@ -1015,14 +1033,16 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       //   ROS_ERROR("Failed to call service add_two_ints");
       // }
 
-      ImGuiState::DatasetTesting::cloud1.reset();
-      ImGuiState::DatasetTesting::cloud2.reset();
-
     } else {
       ImGuiState::DatasetTesting::ref_obj_exists = false;
     }
 
     ImGuiState::DatasetTesting::query_obj_idx++;
+  }
+
+  // TODO add button to viz post pre preocessing results
+  if (ImGui::Button("Vizualize Pre Process")) {
+    std::cout << "TODO" << std::endl;
   }
 
   // TODO need a scene is done function
@@ -1113,6 +1133,561 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::End();
 }
 
+void newDatasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
+
+  ImGui::Begin("New Dataset Testing");
+
+  // --------------------------------------------------------------
+  ImGui::Text("Dataset");
+
+  ImGui::Combo("Choose Dataset", &ImGuiState::DatasetTesting::dataset_idx,
+               ImGuiState::datasets, IM_ARRAYSIZE(ImGuiState::datasets));
+
+  ImGui::InputInt("Max number of points in point cloud",
+                  &ImGuiState::DatasetTesting::max_pts);
+
+  if (ImGui::Button("Button 1")) {
+    pl.reset();
+    switch (ImGuiState::DatasetTesting::dataset_idx) {
+    case 0:
+      pl = std::make_shared<RScanPipeline>();
+      break;
+    case 1:
+      // pl = std::make_shared<MatterPortPipeline>();
+      break;
+    case 2:
+      // pl = std::make_shared<SemanticKittiPipeline>();
+      break;
+    default:
+      break;
+    }
+
+    pl->ParseDataset();
+    pl->ExtractObjectPointClouds(ImGuiState::DatasetTesting::max_pts);
+    // TODO need to remove compute edges, It is added here for convenience
+    pl->ComputeEdges(ImGuiState::DatasetTesting::edge_heuristic_idx);
+    ImGuiState::DatasetTesting::dataset_parsed = true;
+  }
+
+  ImGui::SameLine();
+  (ImGuiState::DatasetTesting::DatasetParsed())
+      ? ImGui::Text("Success! Parse datset")
+      : ImGui::Text("Click to parse dataset");
+
+  if (!ImGuiState::DatasetTesting::DatasetParsed()) {
+    ImGui::BeginDisabled();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Graph Formulation");
+
+  ImGui::Combo(
+      "Edge Heuristic", &ImGuiState::DatasetTesting::edge_heuristic_idx,
+      ImGuiState::edge_heuristics, IM_ARRAYSIZE(ImGuiState::edge_heuristics));
+
+  // if (ImGui::Button("Button 2")) {
+  //   pl->ComputeEdges(ImGuiState::DatasetTesting::edge_heuristic_idx);
+  //   ImGuiState::DatasetTesting::edges_created = true;
+  // }
+
+  // ImGui::SameLine();
+  //(ImGuiState::DatasetTesting::EdgesCreated())
+  //     ? ImGui::Text("Success! graph edges created")
+  //     : ImGui::Text("Click to compute graph edges");
+
+  if (!ImGuiState::DatasetTesting::DatasetParsed())
+    ImGui::EndDisabled();
+
+  // if (!ImGuiState::DatasetTesting::EdgesCreated()) {
+  //   ImGui::BeginDisabled();
+  // }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Laplacian");
+
+  ImGui::Combo("Laplacian Algorithm",
+               &ImGuiState::DatasetTesting::laplacian_idx,
+               ImGuiState::laplacians, IM_ARRAYSIZE(ImGuiState::laplacians));
+
+  // if (ImGui::Button("Button 3")) {
+  //   pl->ComputeLaplacian(ImGuiState::DatasetTesting::laplacian_idx);
+  //   ImGuiState::DatasetTesting::laplacian_created = true;
+  // }
+
+  // ImGui::SameLine();
+  //(ImGuiState::DatasetTesting::LaplacianCreated())
+  //     ? ImGui::Text("Success! Laplacian computed")
+  //     : ImGui::Text("Click to compute Laplacian");
+
+  // if (!ImGuiState::DatasetTesting::EdgesCreated())
+  //   ImGui::EndDisabled();
+
+  // if (!ImGuiState::DatasetTesting::LaplacianCreated())
+  //   ImGui::BeginDisabled();
+
+  //// --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Eigenvalues");
+
+  ImGui::RadioButton("All Eigenvalues",
+                     &ImGuiState::DatasetTesting::eigendecomposition_method, 0);
+  ImGui::SameLine();
+  ImGui::RadioButton("Specific # of Eigenvalues",
+                     &ImGuiState::DatasetTesting::eigendecomposition_method, 1);
+
+  //// --- Input Box
+  // if (ImGuiState::DatasetTesting::eigendecomposition_method == 0)
+  //   ImGui::BeginDisabled();
+
+  ImGui::InputInt("# of Eigenvalues to compute",
+                  &ImGuiState::DatasetTesting::eigs_number);
+
+  // if (ImGuiState::DatasetTesting::eigendecomposition_method == 0)
+  //   ImGui::EndDisabled();
+  //// --- ! Input Box
+
+  // if (ImGui::Button("Button 4")) {
+  //   int eigs_num = (ImGuiState::DatasetTesting::eigendecomposition_method ==
+  //   0)
+  //                      ? -1
+  //                      : ImGuiState::DatasetTesting::eigs_number;
+  //   pl->ComputeEigs(eigs_num);
+  //   ImGuiState::DatasetTesting::eigs = true;
+  // }
+
+  // ImGui::SameLine();
+  //(ImGuiState::DatasetTesting::ComputedEigs())
+  //     ? ImGui::Text("Success! Eigenvalues computed")
+  //     : ImGui::Text("Click to compute eigenvalues");
+
+  // if (!ImGuiState::DatasetTesting::LaplacianCreated())
+  //   ImGui::EndDisabled();
+
+  // if (!ImGuiState::DatasetTesting::ComputedEigs())
+  //   ImGui::BeginDisabled();
+
+  //// --------------------------------------------------------------
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Choose Scans");
+
+  if (ImGuiState::DatasetTesting::GetQueryScans()) {
+    pl->GetQueryScans(ImGuiState::DatasetTesting::query_scans);
+  }
+
+  const char *selected_query_scan =
+      ImGuiState::DatasetTesting::GetSelectedQueryScan();
+
+  if (ImGui::BeginCombo("Choose A Query Scan", selected_query_scan)) {
+    for (int i = 0; i < ImGuiState::DatasetTesting::query_scans.size(); i++) {
+      const bool isSelected = (ImGuiState::DatasetTesting::query_scan_idx == i);
+      if (ImGui::Selectable(ImGuiState::DatasetTesting::query_scans[i].c_str(),
+                            isSelected)) {
+        ImGuiState::DatasetTesting::query_scan_idx = i;
+      }
+
+      if (isSelected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  const char *selected_ref_scan =
+      (ImGuiState::DatasetTesting::query_scans.size() > 0)
+          ? pl->GetMappedRefScan(ImGuiState::DatasetTesting::query_scans,
+                                 ImGuiState::DatasetTesting::query_scan_idx)
+          : "";
+
+  if (ImGuiState::DatasetTesting::GetRefScans())
+    pl->GetRefScans(ImGuiState::DatasetTesting::ref_scans);
+
+  if (ImGuiState::DatasetTesting::UpdateRefScanSelected()) {
+    ImGuiState::DatasetTesting::last_query_scan_idx =
+        ImGuiState::DatasetTesting::query_scan_idx;
+    std::string ref = std::string(selected_ref_scan);
+    auto it = std::find(ImGuiState::DatasetTesting::ref_scans.begin(),
+                        ImGuiState::DatasetTesting::ref_scans.end(), ref);
+
+    if (it != ImGuiState::DatasetTesting::ref_scans.end()) {
+      ImGuiState::DatasetTesting::ref_scan_idx =
+          it - ImGuiState::DatasetTesting::ref_scans.begin();
+    } else {
+      std::cout << "ERROR reference scan not in list" << std::endl;
+      std::exit(1);
+    }
+  }
+
+  if (ImGui::BeginCombo("Choose A Reference Scan", selected_ref_scan)) {
+    for (int i = 0; i < ImGuiState::DatasetTesting::ref_scans.size(); i++) {
+      const bool isSelected = (ImGuiState::DatasetTesting::ref_scan_idx == i);
+      if (ImGui::Selectable(ImGuiState::DatasetTesting::ref_scans[i].c_str(),
+                            isSelected)) {
+        ImGuiState::DatasetTesting::ref_scan_idx = i;
+      }
+
+      if (isSelected) {
+        ImGui::SetItemDefaultFocus();
+      }
+    }
+    ImGui::EndCombo();
+  }
+
+  // --------------------------------------------------------------
+  ImGui::Separator();
+  ImGui::Text("Visualizer");
+
+  if (ImGui::Button("Init Scene")) {
+    std::cout << "INIT Pressed" << std::endl;
+    ImGuiState::DatasetTesting::query_obj_scene_ids.clear();
+    ImGuiState::DatasetTesting::query_obj_idx = 0;
+    pl->GetQuerySpectralObjIds(ImGuiState::DatasetTesting::query_obj_scene_ids,
+                               std::string(selected_query_scan));
+  }
+
+  if (ImGui::Button("Pre Filtered Object Pairs")) {
+
+    if (pl->RefObjExists(std::string(selected_query_scan),
+                         ImGuiState::DatasetTesting::query_obj_idx,
+                         ImGuiState::DatasetTesting::ref_obj_idx)) {
+
+      // Get Spectral Objects
+      ImGuiState::DatasetTesting::ref_obj_exists = true;
+
+      // Get Point Clouds
+      ImGuiState::DatasetTesting::mtx.lock();
+      pl->GetQueryRefCloudObjPair(
+          std::string(selected_query_scan), std::string(selected_ref_scan),
+          ImGuiState::DatasetTesting::query_obj_idx,
+          ImGuiState::DatasetTesting::ref_obj_idx,
+          ImGuiState::DatasetTesting::q_so, ImGuiState::DatasetTesting::r_so);
+
+      // TODO compute lapalcians
+      Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
+      Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+
+      // TODO compute eigenvalues
+      Processing::Eigen::computeEigenvalues(
+          ImGuiState::DatasetTesting::q_so,
+          ImGuiState::DatasetTesting::eigs_number);
+      Processing::Eigen::computeEigenvalues(
+          ImGuiState::DatasetTesting::r_so,
+          ImGuiState::DatasetTesting::eigs_number);
+
+      ImGuiState::DatasetTesting::update_cloud = true;
+      ImGuiState::DatasetTesting::mtx.unlock();
+
+      //----------------------------------------------------------------------
+      // DELETEME
+      // Call viz thread
+      // std::thread t1(RunVizThread, ImGuiState::DatasetTesting::cloud1,
+      //               ImGuiState::DatasetTesting::cloud2);
+      // t1.detach();
+      //----------------------------------------------------------------------
+
+      // Todo convert pcl point cloud to pointcloud 2 and send them
+
+      // std::cout << "Cloud1 size: " << thread_cloud1->size() << std::endl;
+      // std::cout << "Cloud2 size: " << thread_cloud2->size() << std::endl;
+
+      // std::cout << "r1 size:" << thread_r1 << std::endl;
+      // std::cout << "r2 size:" << thread_r2 << std::endl;
+
+      // sensor_msgs::PointCloud2 ros_cloud1, ros_cloud2;
+      // pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud1, ros_cloud1);
+      // pcl::toROSMsg(*ImGuiState::DatasetTesting::cloud2, ros_cloud2);
+
+      // sgpr_ros::PointClouds pc_srv;
+      // pc_srv.request.cloud1 = ros_cloud1;
+      // pc_srv.request.cloud2 = ros_cloud2;
+      // pc_srv.request.radius1 = r1;
+      // pc_srv.request.radius2 = r2;
+      // if (point_cloud_service_client.call(pc_srv)) {
+      //   ROS_INFO("Point cloud service success!!! %d",
+      //   pc_srv.response.done);
+      // } else {
+      //   ROS_ERROR("Point cloud service failed");
+      // }
+
+      // call point cloud connetion viz thread
+
+      // std::cout << "r1: " << r1 << std::endl;
+      // std::cout << "r2: " << r2 << std::endl;
+
+      //----------------------------------------------------------------------
+      // DELETEME
+      // std::thread t2(RunVizConnectionThread,
+      // ImGuiState::DatasetTesting::cloud1,
+      //              ImGuiState::DatasetTesting::cloud2, r1, r2);
+      // t2.detach();
+      //----------------------------------------------------------------------
+
+      ImGuiState::DatasetTesting::eigs_mtx.lock();
+
+      ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+          arma::conv_to<std::vector<double>>::from(
+              ImGuiState::DatasetTesting::q_so.eigenvalues);
+      ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+          arma::conv_to<std::vector<double>>::from(
+              ImGuiState::DatasetTesting::r_so.eigenvalues);
+      ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+          ImGuiState::DatasetTesting::q_so.gfaFeatures;
+      ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+          ImGuiState::DatasetTesting::r_so.gfaFeatures;
+      // pl->GetEigs(ImGuiState::DatasetTesting::eig_srv,
+      //             std::string(selected_query_scan),
+      //             ImGuiState::DatasetTesting::query_obj_idx,
+      //             std::string(selected_ref_scan),
+      //             ImGuiState::DatasetTesting::ref_obj_idx);
+      ImGuiState::DatasetTesting::update_hist = true;
+      ImGuiState::DatasetTesting::eigs_mtx.unlock();
+
+      // if (histogram_service_client.call(eig_srv)) {
+      //   ROS_INFO("histogram service success!!! %f",
+      //            eig_srv.response.results[0]);
+      // } else {
+      //   ROS_ERROR("histogram service failed");
+      // }
+
+      //// Eval service
+      if (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv)) {
+        ROS_INFO("eval service success!!! %f",
+                 ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+      } else {
+        ROS_ERROR("eval service failed");
+      }
+
+      //----------------------------------------------------------------------
+      // DELETEME
+      /// Call matplot lib histogram func
+      // pl->PlotHistograms(std::string(selected_ref_scan),
+      //                    std::string(selected_query_scan),
+      //                    ImGuiState::DatasetTesting::query_obj_idx,
+      //                    ImGuiState::DatasetTesting::ref_obj_idx);
+
+      //----------------------------------------------------------------------
+
+      // Call rosservice for ad and ks test
+      // sgpr_ros::Eigenvalues srv;
+      // srv.request.a = 1;
+      // srv.request.b = 2;
+      // if (ks_service_client.call(srv)) {
+      //  ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+      //} else {
+      //  ROS_ERROR("Failed to call service add_two_ints");
+      //}
+
+      // if (ad_service_client.call(srv)) {
+      //   ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+      // } else {
+      //   ROS_ERROR("Failed to call service add_two_ints");
+      // }
+
+    } else {
+      ImGuiState::DatasetTesting::ref_obj_exists = false;
+    }
+
+    ImGuiState::DatasetTesting::query_obj_idx++;
+  }
+
+  // TODO add button to viz post pre preocessing results
+  if (ImGui::Button("Vizualize SOR")) {
+    ImGuiState::DatasetTesting::mtx.lock();
+    // Run SOR outlier filter
+    Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::q_so);
+    Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::r_so);
+
+    // run MCAR
+    Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
+    Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
+
+    // compute lapalcians
+    Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
+    Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+
+    // compute eigenvalues
+    Processing::Eigen::computeEigenvalues(
+        ImGuiState::DatasetTesting::q_so,
+        ImGuiState::DatasetTesting::eigs_number);
+    Processing::Eigen::computeEigenvalues(
+        ImGuiState::DatasetTesting::r_so,
+        ImGuiState::DatasetTesting::eigs_number);
+
+    ImGuiState::DatasetTesting::update_cloud = true;
+    ImGuiState::DatasetTesting::mtx.unlock();
+
+    // EIGS mutex for histogram and eval service data
+    ImGuiState::DatasetTesting::eigs_mtx.lock();
+    ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+        arma::conv_to<std::vector<double>>::from(
+            ImGuiState::DatasetTesting::q_so.eigenvalues);
+    ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+        arma::conv_to<std::vector<double>>::from(
+            ImGuiState::DatasetTesting::r_so.eigenvalues);
+    ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+        ImGuiState::DatasetTesting::q_so.gfaFeatures;
+    ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+        ImGuiState::DatasetTesting::r_so.gfaFeatures;
+    ImGuiState::DatasetTesting::update_hist = true;
+    ImGuiState::DatasetTesting::eigs_mtx.unlock();
+
+    // Eval service
+    if (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv)) {
+      ROS_INFO("eval service success!!! %f",
+               ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+    } else {
+      ROS_ERROR("eval service failed");
+    }
+  }
+
+  if (ImGui::Button("Vizualize FPS")) {
+    ImGuiState::DatasetTesting::mtx.lock();
+
+    int size = 1000;
+    if (ImGuiState::DatasetTesting::q_so.cloud->size() < 1000 || ImGuiState::DatasetTesting::r_so.cloud->size() < 1000) {
+      size = std::min(ImGuiState::DatasetTesting::q_so.cloud->size(), ImGuiState::DatasetTesting::r_so.cloud->size());
+    }
+
+    Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so, size);
+    Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so, size);
+
+    Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
+    Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
+
+    double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar, ImGuiState::DatasetTesting::r_so.mcar);
+    ImGuiState::DatasetTesting::q_so.mcar = mcar;
+    ImGuiState::DatasetTesting::r_so.mcar = mcar;
+
+    // compute lapalcians
+    Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
+    Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+
+    // compute eigenvalues
+    Processing::Eigen::computeEigenvalues(
+        ImGuiState::DatasetTesting::q_so,
+        ImGuiState::DatasetTesting::eigs_number);
+    Processing::Eigen::computeEigenvalues(
+        ImGuiState::DatasetTesting::r_so,
+        ImGuiState::DatasetTesting::eigs_number);
+
+    ImGuiState::DatasetTesting::update_cloud = true;
+    ImGuiState::DatasetTesting::mtx.unlock();
+
+    // EIGS mutex for histogram and eval service data
+    ImGuiState::DatasetTesting::eigs_mtx.lock();
+    ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+        arma::conv_to<std::vector<double>>::from(
+            ImGuiState::DatasetTesting::q_so.eigenvalues);
+    ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+        arma::conv_to<std::vector<double>>::from(
+            ImGuiState::DatasetTesting::r_so.eigenvalues);
+    ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+        ImGuiState::DatasetTesting::q_so.gfaFeatures;
+    ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+        ImGuiState::DatasetTesting::r_so.gfaFeatures;
+    ImGuiState::DatasetTesting::update_hist = true;
+    ImGuiState::DatasetTesting::eigs_mtx.unlock();
+
+    // Eval service
+    if (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv)) {
+      ROS_INFO("eval service success!!! %f",
+               ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+    } else {
+      ROS_ERROR("eval service failed");
+    }
+  }
+
+  // TODO need a scene is done function
+  if (!ImGuiState::DatasetTesting::ReadyToStep())
+    ImGui::BeginDisabled();
+
+  if (!ImGuiState::DatasetTesting::RefObjExists())
+    ImGui::Text("Ref Object Does Not Exist");
+
+  // TODO
+  // First try and figure out why the viz thread is not closing
+  // options:
+  //  a) do get viz thread to close
+  //  b) keep doing what we are doing
+  //  c) (Probably the cleanest but most work) throw it in ros and create a
+  //  service msg which will do all the viz stuff in different processes
+  //}
+
+  if (!ImGuiState::DatasetTesting::ReadyToStep())
+    ImGui::EndDisabled();
+
+  // if (!ImGuiState::DatasetTesting::ShouldStep())
+  //   ImGui::EndDisabled();
+
+  // if (!ImGuiState::DatasetTesting::ComputedEigs())
+  //   ImGui::EndDisabled();
+
+  // if (!ImGuiState::PointCloudsRead()) // || TODO viz is already open)
+  //   ImGui::BeginDisabled();
+
+  //// --------------------------------------------------------------
+  // ImGui::Separator();
+  // ImGui::Text("Visualizer");
+
+  // if (ImGui::Button("Button 6")) {
+  //   ImGuiState::pcl_viz = true;
+  //   auto pointCloudPair = pl.GetPointCloudPair();
+
+  //  std::thread t1(RunVizThread, pointCloudPair.first,
+  //  pointCloudPair.second); t1.detach();
+  //}
+
+  // ImGui::SameLine();
+  //(ImGuiState::PCLViz()) ? ImGui::Text("Success! PCL visualizer is running")
+  //                        : ImGui::Text("Click to run PCL visualizer");
+
+  // if (!ImGuiState::EdgesCreated())
+  //   ImGui::BeginDisabled();
+
+  // if (ImGui::Button("Button 7")) {
+  //   ImGuiState::pcl_viz_connection = true;
+  //   auto pointCloudPair = pl.GetPointCloudPair();
+
+  //  std::thread t1(RunVizConnectionThread, pointCloudPair.first,
+  //                 pointCloudPair.second, pl.GetRadius1(), pl.GetRadius2());
+  //  t1.detach();
+  //}
+
+  // ImGui::SameLine();
+  //(ImGuiState::PCLConnectionViz())
+  //     ? ImGui::Text("Success! PCL graph connection visualizer is running")
+  //     : ImGui::Text("Click to run PCL graph connection visualizer");
+
+  // if (!ImGuiState::EdgesCreated())
+  //   ImGui::EndDisabled();
+
+  // if (!ImGuiState::ComputedEigs()) // || TODO viz is already open)
+  //   ImGui::BeginDisabled();
+
+  // if (ImGui::Button("Button 8")) {
+  //   ImGuiState::matplot = true;
+  //   pl->PlotHistograms();
+  // }
+
+  // ImGui::SameLine();
+  //(ImGuiState::MatplotViz())
+  //     ? ImGui::Text("Success! Matplot++ visualizer is running")
+  //     : ImGui::Text("Click to run MatPlot++ visualizer");
+
+  // if (!ImGuiState::ComputedEigs())
+  //   ImGui::EndDisabled();
+
+  // if (!ImGuiState::PointCloudsRead())
+  //   ImGui::EndDisabled();
+
+  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+              1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+  ImGui::End();
+}
+
 // NOTE: Only for laptop. Throw it under Begin block for the window
 // ImGui::SetWindowFontScale(5.0f);
 
@@ -1133,10 +1708,9 @@ int main(int argc, char **argv) {
   NovelMethodTestingPipeline nmtPipeline;
   std::shared_ptr<Pipeline> datasetPipeline;
 
-  nmtPipeline.ParsePointCloudPair("/home/nate/Datasets/teddyPly/b1.ply",
-                                  "/home/nate/Datasets/teddyPly/b7.ply", 300);
-  thread_cloud1 = nmtPipeline.GetCloud1();
-  thread_cloud2 = nmtPipeline.GetCloud1();
+  // nmtPipeline.ParsePointCloudPair("/home/nate/Datasets/teddyPly/b1.ply",
+  //                                 "/home/nate/Datasets/teddyPly/b7.ply",
+  //                                 300);
 
   // Background threads running
   std::thread viz_t(BackgroundVizThread);
@@ -1145,8 +1719,8 @@ int main(int argc, char **argv) {
   std::thread spectra_t(PlotSpectra);
   spectra_t.detach();
 
-  //std::thread gfa_t(PlotGFA);
-  //gfa_t.detach();
+  // std::thread gfa_t(PlotGFA);
+  // gfa_t.detach();
 
   GLFWwindow *window = initGUI();
 
@@ -1159,8 +1733,9 @@ int main(int argc, char **argv) {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    novelMethodsTesting(nmtPipeline);
-    datasetTestingPipeline(datasetPipeline);
+    // novelMethodsTesting(nmtPipeline);
+    // datasetTestingPipeline(datasetPipeline);
+    newDatasetTestingPipeline(datasetPipeline);
 
     // Rendering
     ImGui::Render();

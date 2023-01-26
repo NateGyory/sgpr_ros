@@ -287,21 +287,12 @@ bool RScanPipeline::RefObjExists(std::string query_scan, int query_obj_idx,
   return it != end_it;
 }
 
-void RScanPipeline::GetQueryRefCloudObjPair(
-    std::string query_scan, std::string ref_scan, int q_idx, int r_idx,
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud1,
-    pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud2, std::string &cloud_id1,
-    std::string &cloud_id2) {
-  pcl::copyPointCloud(*mSceneMap[query_scan].spectral_objects[q_idx].cloud,
-                      *cloud1);
-  pcl::copyPointCloud(*mSceneMap[ref_scan].spectral_objects[r_idx].cloud,
-                      *cloud2);
-  cloud_id1 =
-      mSceneMap[query_scan].spectral_objects[q_idx].label + " : " +
-      std::to_string(mSceneMap[query_scan].spectral_objects[q_idx].global_id);
-  cloud_id2 =
-      mSceneMap[ref_scan].spectral_objects[r_idx].label + " : " +
-      std::to_string(mSceneMap[ref_scan].spectral_objects[r_idx].global_id);
+void RScanPipeline::GetQueryRefCloudObjPair(std::string query_scan,
+                                            std::string ref_scan, int q_idx,
+                                            int r_idx, SpectralObject &q_so,
+                                            SpectralObject &r_so) {
+  q_so = mSceneMap[query_scan].spectral_objects[q_idx];
+  r_so = mSceneMap[ref_scan].spectral_objects[r_idx];
 }
 
 double RScanPipeline::GetRadius(std::string scan, int obj_idx) {

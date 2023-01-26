@@ -4,21 +4,49 @@
 #include <Types/Scene.h>
 #include <Utils/Visualization.hpp>
 
-#include <boost/smart_ptr/make_shared_array.hpp>
 #include <cmath>
 #include <memory>
 #include <pcl/common/io.h>
 #include <pcl/filters/conditional_removal.h>
+#include <pcl/filters/farthest_point_sampling.h>
+#include <pcl/filters/statistical_outlier_removal.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/point_cloud.h>
 
-#include "Types/GraphLaplacian.h"
 #include "Processing/GFA.hpp"
+#include "Types/GraphLaplacian.h"
 
 namespace Processing {
 namespace PointCloud {
+
+inline void computeFPS(SpectralObject &so, int size) {
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr fps_cloud(
+      new pcl::PointCloud<pcl::PointXYZRGB>);
+
+  pcl::FarthestPointSampling<pcl::PointXYZRGB> fps;
+  fps.setInputCloud(so.cloud);
+  fps.setSample(size);
+  fps.setSeed(time(0));
+  fps.filter(*fps_cloud);
+
+  so.cloud.reset();
+  so.cloud = fps_cloud;
+}
+
+inline void computeSOR(SpectralObject &so) {
+  pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
+  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(
+      new pcl::PointCloud<pcl::PointXYZRGB>);
+  sor.setInputCloud(so.cloud);
+  sor.setMeanK(3);
+  sor.setStddevMulThresh(5.0);
+  sor.filter(*cloud_filtered);
+
+  so.cloud.reset();
+  so.cloud = cloud_filtered;
+}
 
 // TODO probably need to template this
 inline void filterPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,
@@ -67,10 +95,9 @@ inline void computeMCAR(SpectralObject &spectral_object) {
 inline void findObjectPointCloud(SpectralObject &spectral_object,
                                  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud,
                                  int max_pts) {
-  spectral_object.cloud =
-      boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+  spectral_object.cloud = std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered =
-      boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+      std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
   uint8_t r = (uint8_t)strtol(spectral_object.ply_color.substr(0, 2).c_str(),
                               nullptr, 16);
   uint8_t g = (uint8_t)strtol(spectral_object.ply_color.substr(2, 2).c_str(),
@@ -98,7 +125,7 @@ inline void findObjectPointCloud(SpectralObject &spectral_object,
   condrem.setInputCloud(cloud);
   condrem.filter(*cloud_filtered);
 
-  filterPointCloud(cloud_filtered, max_pts);
+  // filterPointCloud(cloud_filtered, max_pts);
   spectral_object.cloud = cloud_filtered;
 }
 

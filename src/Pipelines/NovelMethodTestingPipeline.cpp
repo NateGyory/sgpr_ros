@@ -17,7 +17,7 @@ void NovelMethodTestingPipeline::ParsePointCloudPair(std::string f_ply1,
   s1.reference_id_match = "";
   s1.spectral_objects.emplace_back(SpectralObject());
   s1.spectral_objects[0].cloud =
-      boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+      std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
 
   s2.scan_id = "2";
   s2.ply_file_path = f_ply2;
@@ -25,7 +25,7 @@ void NovelMethodTestingPipeline::ParsePointCloudPair(std::string f_ply1,
   s2.reference_id_match = "1";
   s2.spectral_objects.emplace_back(SpectralObject());
   s2.spectral_objects[0].cloud =
-      boost::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
+      std::make_shared<pcl::PointCloud<pcl::PointXYZRGB>>();
 
   // TODO Read into an XYZ then copy to an XYZRGB cloud
   // pcl::PointCloud<pcl::PointXYZ> xyz_cloud;
