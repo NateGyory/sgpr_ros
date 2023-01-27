@@ -35,7 +35,7 @@ inline void computeFPS(SpectralObject &so, int size) {
   so.cloud = fps_cloud;
 }
 
-inline void computeSOR(SpectralObject &so) {
+inline void computeSOR(SpectralObject &so, int meanK, double stdThresh) {
   pcl::StatisticalOutlierRemoval<pcl::PointXYZRGB> sor;
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered(
       new pcl::PointCloud<pcl::PointXYZRGB>);

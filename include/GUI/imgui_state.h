@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Types/Scene.h"
-#include "sgpr_ros/Eigenvalues.h"
 #include "imgui.h"
+#include "sgpr_ros/Eigenvalues.h"
 #include <pcl/point_cloud.h>
+#include <pcl/visualization/pcl_visualizer.h>
 #include <string>
 #include <vector>
-#include <pcl/visualization/pcl_visualizer.h>
 namespace ImGuiState {
 
 // Shared
@@ -63,10 +63,10 @@ inline static bool ShowRadius() {
 
 namespace DatasetTesting {
 
-//inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
-//inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
-//inline static std::string cloud_id1;
-//inline static std::string cloud_id2;
+// inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud1;
+// inline static pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud2;
+// inline static std::string cloud_id1;
+// inline static std::string cloud_id2;
 
 inline static sgpr_ros::Eigenvalues eig_srv;
 inline static SpectralObject q_so;
@@ -76,7 +76,6 @@ inline static bool update_hist = false;
 inline static bool show_radius = false;
 inline static bool radius_toggled = false;
 inline static std::mutex mtx, eigs_mtx;
-
 
 inline static std::vector<std::string> query_scans;
 inline static std::vector<std::string> ref_scans;
@@ -108,6 +107,8 @@ inline static bool c_ks_test = true;
 // Input box values
 inline static int eigs_number = 100;
 inline static int max_pts = 300;
+inline static int meanK = 3;
+inline static double stdThresh = 3;
 
 // GUI state variables
 inline static bool dataset_parsed = false;
@@ -139,7 +140,10 @@ inline static const char *GetSelectedQueryScan() {
   return (query_scans.size() > 0) ? query_scans[query_scan_idx].c_str() : "";
 }
 
-inline static bool ReadyToStep() { return query_obj_scene_ids.size() > 0 && query_obj_idx < query_obj_scene_ids.size(); }
+inline static bool ReadyToStep() {
+  return query_obj_scene_ids.size() > 0 &&
+         query_obj_idx < query_obj_scene_ids.size();
+}
 inline static bool RefObjExists() { return ref_obj_exists; }
 inline static bool EdgesCreated() { return edges_created; }
 inline static bool LaplacianCreated() { return laplacian_created; }

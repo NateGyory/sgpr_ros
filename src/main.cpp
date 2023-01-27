@@ -229,11 +229,11 @@ void BackgroundVizThread() {
     viewer->initCameraParameters();
     viewer->createViewPort(0.0, 0.0, 0.5, 1.0, v0);
     viewer->setBackgroundColor(0, 0, 0, v0);
-    //viewer->addCoordinateSystem(1.0, "coord1", v0);
+    // viewer->addCoordinateSystem(1.0, "coord1", v0);
 
     viewer->createViewPort(0.5, 0.0, 1.0, 1.0, v1);
     viewer->setBackgroundColor(0.3, 0.3, 0.3, v1);
-    //viewer->addCoordinateSystem(1.0, "coord2", v1);
+    // viewer->addCoordinateSystem(1.0, "coord2", v1);
   }
 
   while (!viewer->wasStopped()) {
@@ -1493,12 +1493,73 @@ void newDatasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     ImGuiState::DatasetTesting::query_obj_idx++;
   }
 
-  // TODO add button to viz post pre preocessing results
+  if (ImGui::Button("Voxel Filter")) {
+    ImGuiState::DatasetTesting::mtx.lock();
+
+    Processing::PointCloud::filterPointCloud(
+        ImGuiState::DatasetTesting::q_so.cloud,
+        ImGuiState::DatasetTesting::max_pts);
+    Processing::PointCloud::filterPointCloud(
+        ImGuiState::DatasetTesting::r_so.cloud,
+        ImGuiState::DatasetTesting::max_pts);
+
+    // run MCAR
+    Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
+    Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
+
+    // compute lapalcians
+    Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
+    Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+
+    // compute eigenvalues
+    Processing::Eigen::computeEigenvalues(
+        ImGuiState::DatasetTesting::q_so,
+        ImGuiState::DatasetTesting::eigs_number);
+    Processing::Eigen::computeEigenvalues(
+        ImGuiState::DatasetTesting::r_so,
+        ImGuiState::DatasetTesting::eigs_number);
+
+    ImGuiState::DatasetTesting::update_cloud = true;
+    ImGuiState::DatasetTesting::mtx.unlock();
+
+    // EIGS mutex for histogram and eval service data
+    ImGuiState::DatasetTesting::eigs_mtx.lock();
+    ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+        arma::conv_to<std::vector<double>>::from(
+            ImGuiState::DatasetTesting::q_so.eigenvalues);
+    ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+        arma::conv_to<std::vector<double>>::from(
+            ImGuiState::DatasetTesting::r_so.eigenvalues);
+    ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+        ImGuiState::DatasetTesting::q_so.gfaFeatures;
+    ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+        ImGuiState::DatasetTesting::r_so.gfaFeatures;
+    ImGuiState::DatasetTesting::update_hist = true;
+    ImGuiState::DatasetTesting::eigs_mtx.unlock();
+
+    // Eval service
+    if (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv)) {
+      ROS_INFO("eval service success!!! %f",
+               ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+    } else {
+      ROS_ERROR("eval service failed");
+    }
+  }
+
+  ImGui::InputInt("# SOR mean K", &ImGuiState::DatasetTesting::meanK);
+
+  ImGui::InputDouble("# SOR Std Thresh",
+                     &ImGuiState::DatasetTesting::stdThresh);
+
   if (ImGui::Button("Vizualize SOR")) {
     ImGuiState::DatasetTesting::mtx.lock();
     // Run SOR outlier filter
-    Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::q_so);
-    Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::r_so);
+    Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::q_so,
+                                       ImGuiState::DatasetTesting::meanK,
+                                       ImGuiState::DatasetTesting::stdThresh);
+    Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::r_so,
+                                       ImGuiState::DatasetTesting::meanK,
+                                       ImGuiState::DatasetTesting::stdThresh);
 
     // run MCAR
     Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
@@ -1546,9 +1607,11 @@ void newDatasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   if (ImGui::Button("Vizualize FPS")) {
     ImGuiState::DatasetTesting::mtx.lock();
 
-    int size = 1000;
-    if (ImGuiState::DatasetTesting::q_so.cloud->size() < 1000 || ImGuiState::DatasetTesting::r_so.cloud->size() < 1000) {
-      size = std::min(ImGuiState::DatasetTesting::q_so.cloud->size(), ImGuiState::DatasetTesting::r_so.cloud->size());
+    int size = ImGuiState::DatasetTesting::max_pts;
+    if (ImGuiState::DatasetTesting::q_so.cloud->size() < size ||
+        ImGuiState::DatasetTesting::r_so.cloud->size() < size ) {
+      size = std::min(ImGuiState::DatasetTesting::q_so.cloud->size(),
+                      ImGuiState::DatasetTesting::r_so.cloud->size());
     }
 
     Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so, size);
@@ -1557,7 +1620,8 @@ void newDatasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
     Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
 
-    double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar, ImGuiState::DatasetTesting::r_so.mcar);
+    double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
+                           ImGuiState::DatasetTesting::r_so.mcar);
     ImGuiState::DatasetTesting::q_so.mcar = mcar;
     ImGuiState::DatasetTesting::r_so.mcar = mcar;
 
