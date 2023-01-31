@@ -1,9 +1,35 @@
 #include "Pipelines/RScanPipeline.h"
+#include "Processing/PointCloud.hpp"
+#include <algorithm>
 #include <pcl/common/io.h>
 #include <string>
 
 // NOTE: for gdb debugging
 std::string make_string(const char *x) { return x; }
+
+int RScanPipeline::GetSize(int filtering_opts, int sample_size,
+                           double filter_percent, int q_size, int r_size) {
+
+  int min_size = std::min(q_size, r_size);
+  int ret = 0;
+  switch (filtering_opts) {
+  case 0:
+    // TODO smallest cloud
+    ret = min_size;
+    break;
+  case 1:
+    // TODO percent
+    ret = int(min_size * filter_percent);
+    break;
+  case 2:
+    // TODO sample size
+    ret = (min_size < sample_size) ? min_size : sample_size;
+    break;
+  default:
+    break;
+  }
+  return ret;
+}
 
 void RScanPipeline::ParseDataset() {
   std::cout << "Parsing Dataset" << std::endl;
@@ -112,13 +138,73 @@ void RScanPipeline::ExtractObjectPointClouds(int max_pts) {
                                                                    max_pts);
                 });
   std::cout << "Finished ExtractObjectPointClouds" << std::endl;
+
   std::cout << "Calculating GFA Features" << std::endl;
-  // TODO calculate GFA
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
                 [](std::pair<const std::string, Scene> &pair) {
                   Processing::PointCloud::CalculateGFAFeatures(pair.second);
                 });
   std::cout << "Finished Calculating GFA Features" << std::endl;
+}
+
+void RScanPipeline::ComputeSOR(int meanK, double stdThresh) {
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [meanK, stdThresh](std::pair<const std::string, Scene> &pair) {
+                  Processing::PointCloud::ComputeSceneSOR(pair.second, meanK,
+                                                          stdThresh);
+                });
+}
+
+void RScanPipeline::ComputeSceneFPS(Scene &scene, int filtering_opts,
+                                    int sample_size, double percent) {
+  // Do not process if it is a reference scene
+  if (scene.is_reference)
+    return;
+  for (SpectralObject &so : scene.spectral_objects) {
+    // Find the matching object in the reference_scan
+    auto begin_it =
+        mSceneMap[scene.reference_id_match].spectral_objects.begin();
+    auto end_it = mSceneMap[scene.reference_id_match].spectral_objects.end();
+
+    int scene_id = so.scene_id;
+
+    auto it =
+        std::find_if(begin_it, end_it, [scene_id](const SpectralObject &r_so) {
+          return r_so.scene_id == scene_id;
+        });
+
+    int ref_obj_idx = it - begin_it;
+
+    if (it != end_it) {
+      // Now do check
+      double size =
+          GetSize(filtering_opts, sample_size, percent, so.cloud->size(),
+                  mSceneMap[scene.reference_id_match]
+                      .spectral_objects[ref_obj_idx]
+                      .cloud->size());
+
+      Processing::PointCloud::computeFPS(so, size);
+      Processing::PointCloud::computeFPS(
+          mSceneMap[scene.reference_id_match].spectral_objects[ref_obj_idx],
+          size);
+
+      if (so.cloud->size() != mSceneMap[scene.reference_id_match].spectral_objects[ref_obj_idx].cloud->size()){
+        std::cout << "ERROR clouds not same" << std::endl;
+        exit(1);
+      }
+    }
+  }
+}
+
+void RScanPipeline::ComputeFPS(int filtering_opts, int sample_size,
+                               double percent) {
+  // TODO
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [this, filtering_opts, sample_size,
+                 percent](std::pair<const std::string, Scene> &pair) {
+                  ComputeSceneFPS(pair.second, filtering_opts, sample_size,
+                                  percent);
+                });
 }
 
 void RScanPipeline::ComputeEdges(int edge_heuristic) {

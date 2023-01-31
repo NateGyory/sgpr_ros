@@ -40,17 +40,18 @@ inline static int last_query_scan_idx = 0;
 inline static int ref_scan_idx = 0;
 
 // Input string boxes
-inline static char eigenvalue_json_f[64] = "DT_eigs.json";
+inline static char eigenvalue_json_f[64] = "eigs.json";
 
 // Radio indexes
 inline static int eigendecomposition_method = 1;
 inline static int should_step = 0;
 inline static int obj_compare_method = 0;
 inline static int filtering_opts = 0;
-inline static int eval_opts= 0;
+inline static int eval_opts = 0;
 
 // Checkboxes
 inline static bool sor_check = true;
+inline static bool same_radius = true;
 
 // Input box values
 inline static int eigs_number = 100;
@@ -58,7 +59,7 @@ inline static int max_pts = 300;
 inline static int meanK = 3;
 inline static int sample_size = 1000;
 inline static double stdThresh = 3;
-inline static double filter_percent = 75.0;
+inline static double filter_percent = 0.75f;
 
 // GUI state variables
 inline static bool dataset_parsed = false;
@@ -96,6 +97,8 @@ inline static bool EdgesCreated() { return edges_created; }
 inline static bool LaplacianCreated() { return laplacian_created; }
 inline static bool ComputedEigs() { return eigs; }
 inline static bool SavedEigs() { return saved_eigs; }
+inline static bool FilterPercent() { return filtering_opts == 1;}
+inline static bool SampleSize() { return filtering_opts == 2;}
 
 }; // namespace DatasetTesting
 } // namespace ImGuiState

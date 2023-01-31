@@ -153,6 +153,13 @@ inline void CalculateGFAFeatures(Scene &scene) {
                 Processing::GFA::calculateGFA);
 }
 
+inline void ComputeSceneSOR(Scene &scene, int meanK, double stdThresh) {
+  std::for_each(scene.spectral_objects.begin(), scene.spectral_objects.end(),
+                [meanK, stdThresh](SpectralObject &so) {
+                  computeSOR(so, meanK, stdThresh);
+                });
+}
+
 }; // namespace PointCloud
 }; // namespace Processing
 

@@ -1,0 +1,3874 @@
+{
+    "query_scans": [
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        130.21275472387703,
+                        132.14335569382675
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        78.51357114595237,
+                        85.3750769656001
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        105.99999999998514,
+                        108.4250591688745
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        40.66435480157561,
+                        41.65081524638502
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        71.11851283302194,
+                        71.60645159970616
+                    ],
+                    "global_id": 37,
+                    "label": "bed",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        64.96906757856567,
+                        66.28357919022412
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        131.41876623103866,
+                        132.1915973645984
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        110.21543047437902,
+                        112.2079635504117
+                    ],
+                    "global_id": 129,
+                    "label": "curtain",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        67.9511285636106,
+                        70.34640608862205
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        41.986741538825726,
+                        43.20359790021216
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        52.98188004605254,
+                        54.915265305681146
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        102.2942494295523,
+                        102.99222784295156
+                    ],
+                    "global_id": 138,
+                    "label": "desk",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        48.53185835241662,
+                        49.14077774074296
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        53.15317013119302,
+                        53.75398246608374
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        67.81591052462603,
+                        69.3124673018863
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        25.31319145010628,
+                        26.571855858582502
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        115.32665579311629,
+                        116.45255272115764
+                    ],
+                    "global_id": 68,
+                    "label": "cabinet",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        33.24963876433251,
+                        34.074533515278446
+                    ],
+                    "global_id": 298,
+                    "label": "object",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        34.00000000000007,
+                        34.57986945630962
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        27.51813463285922,
+                        28.03361856461498
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        49.058485380121766,
+                        50.76432497184999
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        31.52293147740998,
+                        32.358742300836646
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "926fc2",
+                    "scene_id": 34
+                },
+                {
+                    "eigenvalues": [
+                        35.99999999997913,
+                        36.65970513640427
+                    ],
+                    "global_id": 236,
+                    "label": "item",
+                    "ply_color": "caae67",
+                    "scene_id": 35
+                },
+                {
+                    "eigenvalues": [
+                        59.12556498967719,
+                        65.32464181975145
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "60cfd1",
+                    "scene_id": 36
+                },
+                {
+                    "eigenvalues": [
+                        48.38050094078724,
+                        49.38167741599554
+                    ],
+                    "global_id": 391,
+                    "label": "shelf",
+                    "ply_color": "8cd65b",
+                    "scene_id": 38
+                },
+                {
+                    "eigenvalues": [
+                        77.99999999999997,
+                        78.57969792009234
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "5e6ad3",
+                    "scene_id": 39
+                },
+                {
+                    "eigenvalues": [
+                        43.108450498571926,
+                        47.490839117721066
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "cd7864",
+                    "scene_id": 40
+                },
+                {
+                    "eigenvalues": [
+                        25.702744792906092,
+                        26.406208745620738
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "6cc597",
+                    "scene_id": 41
+                },
+                {
+                    "eigenvalues": [
+                        22.52647834517516,
+                        24.268777636431025
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "ad74bd",
+                    "scene_id": 42
+                },
+                {
+                    "eigenvalues": [
+                        16.194505133941913,
+                        16.415637947487102
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "b1b57c",
+                    "scene_id": 43
+                },
+                {
+                    "eigenvalues": [
+                        22.239567804189832,
+                        23.575452650071497
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "829eaf",
+                    "scene_id": 44
+                },
+                {
+                    "eigenvalues": [
+                        46.80004932633125,
+                        48.39348751859839
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "895b6b",
+                    "scene_id": 45
+                }
+            ],
+            "reference_scan_id": "4e858c81-fd93-2cb4-8469-d9226116b5de",
+            "scan_id": "4e858c89-fd93-2cb4-8459-7542184fd2ad"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        119.42523599841114,
+                        119.6127991861226
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        77.86482199889997,
+                        80.50092399337842
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        55.42996472318216,
+                        56.2708260689076
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        101.92129044405377,
+                        102.29248540879686
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        45.87416540297308,
+                        46.85891544664952
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        26.48155825838834,
+                        27.145233929077257
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        31.999999999999982,
+                        32.625943902268354
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        54.1970533120662,
+                        55.537139827586685
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        31.000000000000263,
+                        31.190824039712748
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        23.738906017042503,
+                        25.60081598480405
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        55.134239682270355,
+                        55.60661335018419
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        36.78445412757606,
+                        37.29682849057659
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        64.19143453819211,
+                        64.38755393045875
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        49.525355093916914,
+                        51.151985484365454
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        33.30533485359157,
+                        34.18641888125084
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        28.48836338861756,
+                        29.366026212277234
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        67.00000000000003,
+                        67.29829083320847
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        12.50742823680482,
+                        13.50518670584918
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        46.71494290174818,
+                        47.20821248784911
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        90.00000000000016,
+                        90.91761586713905
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        18.193055642579168,
+                        19.84350270984951
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        45.670760525738345,
+                        47.8041060803926
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        285.6941440291613,
+                        287.5746474979268
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        72.88466657302888,
+                        74.09974334110106
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        89.99999999999993,
+                        91.72059730773945
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        113.00000000000027,
+                        113.66807181560112
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        83.29901326266807,
+                        83.83728057799122
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        96.5975407692789,
+                        104.32922411542455
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        81.00000000058245,
+                        81.48791818261307
+                    ],
+                    "global_id": 516,
+                    "label": "watering can",
+                    "ply_color": "b27f87",
+                    "scene_id": 32
+                },
+                {
+                    "eigenvalues": [
+                        76.99999999989556,
+                        79.46350715289068
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        22.00855940681242,
+                        23.549378415214548
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "8eabc403-5af7-2f32-84aa-ecb06ef26b8b"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        78.99999999999989,
+                        79.36706360584844
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        49.39048537536918,
+                        51.351159441074074
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        21.146285397567734,
+                        22.04937184483571
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        35.905411464830394,
+                        36.82637389221097
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        41.205260465361114,
+                        43.18450294304941
+                    ],
+                    "global_id": 37,
+                    "label": "bed",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        36.28635524707453,
+                        36.32925944583843
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        41.40169335006942,
+                        42.20734474046978
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        149.71567113442853,
+                        153.81638753114572
+                    ],
+                    "global_id": 129,
+                    "label": "curtain",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        73.11456231879818,
+                        73.61266165329131
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        14.165936679969708,
+                        14.471533333641169
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        40.90234745854609,
+                        42.149791002053675
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        52.08133575944181,
+                        55.55959643089366
+                    ],
+                    "global_id": 138,
+                    "label": "desk",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        27.878165025170865,
+                        28.345396176948206
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        56.983008312931915,
+                        58.42323131674618
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        17.568314660530007,
+                        17.787300895626444
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        56.23916196348085,
+                        56.769423369666384
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        15.631233867126415,
+                        16.6267749257769
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        25.548308485588585,
+                        25.99148039867341
+                    ],
+                    "global_id": 68,
+                    "label": "cabinet",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        22.87308087835882,
+                        25.312801694074558
+                    ],
+                    "global_id": 298,
+                    "label": "object",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        18.342051350828225,
+                        19.25109876960818
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        18.21056472434315,
+                        18.839900768934527
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        62.239003088719045,
+                        65.27212310369245
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "926fc2",
+                    "scene_id": 34
+                },
+                {
+                    "eigenvalues": [
+                        15.25072341864056,
+                        15.652656344462565
+                    ],
+                    "global_id": 236,
+                    "label": "item",
+                    "ply_color": "caae67",
+                    "scene_id": 35
+                },
+                {
+                    "eigenvalues": [
+                        30.627552333374325,
+                        31.425703791618503
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "60cfd1",
+                    "scene_id": 36
+                },
+                {
+                    "eigenvalues": [
+                        1.0000000000000007,
+                        2.999999999999999
+                    ],
+                    "global_id": 236,
+                    "label": "item",
+                    "ply_color": "d55cb0",
+                    "scene_id": 37
+                },
+                {
+                    "eigenvalues": [
+                        47.46408373082258,
+                        55.285453481966385
+                    ],
+                    "global_id": 391,
+                    "label": "shelf",
+                    "ply_color": "8cd65b",
+                    "scene_id": 38
+                },
+                {
+                    "eigenvalues": [
+                        16.646800232030785,
+                        18.53230007931355
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "5e6ad3",
+                    "scene_id": 39
+                },
+                {
+                    "eigenvalues": [
+                        21.598320614292543,
+                        21.92236095742287
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "cd7864",
+                    "scene_id": 40
+                },
+                {
+                    "eigenvalues": [
+                        17.84984717869914,
+                        19.53521056061492
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "6cc597",
+                    "scene_id": 41
+                },
+                {
+                    "eigenvalues": [
+                        21.460890777604117,
+                        22.45406189669921
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "ad74bd",
+                    "scene_id": 42
+                },
+                {
+                    "eigenvalues": [
+                        27.000000000000057,
+                        27.762983232031566
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "b1b57c",
+                    "scene_id": 43
+                },
+                {
+                    "eigenvalues": [
+                        46.39188590998833,
+                        47.42559695030231
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "829eaf",
+                    "scene_id": 44
+                },
+                {
+                    "eigenvalues": [
+                        31.399235588109907,
+                        35.73005426466109
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "895b6b",
+                    "scene_id": 45
+                }
+            ],
+            "reference_scan_id": "4e858c81-fd93-2cb4-8469-d9226116b5de",
+            "scan_id": "4e858c83-fd93-2cb4-864f-f127e87e0783"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        120.17175374462583,
+                        120.82558031966647
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        67.29281902688378,
+                        67.98933248921264
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        49.93031267935079,
+                        50.70123175130607
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        82.38992433474728,
+                        83.65068213522812
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        22.231176381544785,
+                        22.56272548491657
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        33.962947508347504,
+                        35.23769790871212
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        37.338861948998186,
+                        40.40152370852883
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        11.398171036956704,
+                        12.672828561295848
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        11.403149871704478,
+                        11.403642974481091
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        88.692937278284,
+                        89.53872063627264
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        23.115496026891808,
+                        24.221214754405622
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        46.37558886690802,
+                        46.75848009142426
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        66.17475094876107,
+                        68.21280498085275
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        83.41921408649644,
+                        84.1139431426474
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        77.0,
+                        77.56136165923546
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        21.634035249293255,
+                        22.697562803345313
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        32.12935153347779,
+                        32.296746871745164
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        18.249274913742667,
+                        18.282342707905585
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        41.074585179218786,
+                        42.1105196565867
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        9.520984955034557,
+                        10.265651499906463
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        10.64648529726141,
+                        10.727616027736111
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        81.00000000000017,
+                        81.58103568819588
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        45.14409968085845,
+                        45.15026621156012
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        180.99999999999955,
+                        181.97500923475292
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        128.24977951106916,
+                        129.23460116839618
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        157.00000000000006,
+                        157.25418935417034
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        186.22288377041468,
+                        187.50220661728633
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        25.459705652228592,
+                        26.667967563563423
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        78.188142990599,
+                        78.63483943647844
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        76.41835683509285,
+                        82.2225699882103
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        27.019813799842296,
+                        27.74362832080987
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "754e884c-ea24-2175-8b34-cead19d4198d"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        85.39947748505497,
+                        88.3257683412233
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        86.36124934579448,
+                        86.4664898509798
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        39.94936538613534,
+                        41.033118918950166
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        60.37801879887788,
+                        62.40568628749682
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        93.16181947342835
+                    ],
+                    "global_id": 37,
+                    "label": "bed",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        59.95317700562608,
+                        60.77797795381836
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        45.423349405367205,
+                        45.72051680219573
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        97.00000000000234,
+                        98.21604888392665
+                    ],
+                    "global_id": 129,
+                    "label": "curtain",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        93.00000000000003,
+                        94.12638277949584
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        106.99999999999979,
+                        108.13947643482086
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        45.053296688980936,
+                        45.65406277115417
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        53.395177027348545,
+                        54.37319358523946
+                    ],
+                    "global_id": 138,
+                    "label": "desk",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        23.47806789129905,
+                        24.5790007179151
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        12.999999999999993,
+                        13.336869709329756
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        23.73852919877055,
+                        24.66137951134509
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        28.07016843066115,
+                        28.663627784643708
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        15.167667552637361,
+                        15.86761026013604
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        35.79833187641013,
+                        36.53100197713201
+                    ],
+                    "global_id": 68,
+                    "label": "cabinet",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        44.70154050253653,
+                        45.50794495825467
+                    ],
+                    "global_id": 298,
+                    "label": "object",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        14.41271823159418,
+                        15.01698907143739
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        81.53256976373586,
+                        95.1437941412087
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        52.999999999986116,
+                        53.51715762758759
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "926fc2",
+                    "scene_id": 34
+                },
+                {
+                    "eigenvalues": [
+                        34.48103290619673,
+                        35.44272936454984
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "60cfd1",
+                    "scene_id": 36
+                },
+                {
+                    "eigenvalues": [
+                        1.0000000000000007,
+                        2.999999999999999
+                    ],
+                    "global_id": 236,
+                    "label": "item",
+                    "ply_color": "d55cb0",
+                    "scene_id": 37
+                },
+                {
+                    "eigenvalues": [
+                        30.49781394064808,
+                        31.462592378962718
+                    ],
+                    "global_id": 391,
+                    "label": "shelf",
+                    "ply_color": "8cd65b",
+                    "scene_id": 38
+                },
+                {
+                    "eigenvalues": [
+                        32.79694888421813,
+                        33.32228894087748
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "5e6ad3",
+                    "scene_id": 39
+                },
+                {
+                    "eigenvalues": [
+                        17.411425815454187,
+                        18.293044377921973
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "cd7864",
+                    "scene_id": 40
+                },
+                {
+                    "eigenvalues": [
+                        14.818766282305152,
+                        15.360458207220997
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "6cc597",
+                    "scene_id": 41
+                },
+                {
+                    "eigenvalues": [
+                        19.158661036147123,
+                        20.31505590219271
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "ad74bd",
+                    "scene_id": 42
+                },
+                {
+                    "eigenvalues": [
+                        25.243988723388913,
+                        26.030858196669243
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "b1b57c",
+                    "scene_id": 43
+                },
+                {
+                    "eigenvalues": [
+                        47.787542533977174,
+                        50.33871316718975
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "829eaf",
+                    "scene_id": 44
+                },
+                {
+                    "eigenvalues": [
+                        52.999999999999964,
+                        53.36241039517998
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "895b6b",
+                    "scene_id": 45
+                },
+                {
+                    "eigenvalues": [
+                        53.29162134539695,
+                        54.267260001885084
+                    ],
+                    "global_id": 45,
+                    "label": "bin",
+                    "ply_color": "5c8b5a",
+                    "scene_id": 46
+                }
+            ],
+            "reference_scan_id": "4e858c81-fd93-2cb4-8469-d9226116b5de",
+            "scan_id": "4e858c85-fd93-2cb4-87e4-8d8ff1f31652"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        141.42779865143572,
+                        141.5377904375894
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        45.29447844100929,
+                        46.20180839463498
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        112.44961074626153,
+                        115.10832163175502
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        57.61617900648665,
+                        58.657218064055954
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        18.052101798498832,
+                        18.686407297116894
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        18.639778102028558,
+                        21.416541501727004
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        19.595600878803317,
+                        21.715131391771436
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        11.283859471662101,
+                        11.438305249275082
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        26.913722413172003,
+                        28.58566587186425
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        29.677314714972198,
+                        31.626860219840744
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        39.83772446459862,
+                        40.54943742643698
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        20.280655125787348,
+                        20.596962506967614
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        42.19070191625532,
+                        42.42146057642221
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        81.66745365954128,
+                        84.34581480584072
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        35.26668089732195,
+                        35.40476989574558
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        42.999999999969695,
+                        44.43981107757607
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        38.49585813588407,
+                        42.141517641840565
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        21.852997835867143,
+                        22.626830851187684
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        52.588478381005764,
+                        53.578801088073064
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        9.60230087211285,
+                        9.915568107314613
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        19.54901607529119,
+                        19.8100231052609
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        80.478846093601,
+                        82.30521373547148
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        22.55255492512861,
+                        23.280673541530383
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        21.45706092869633,
+                        23.11575047686845
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        67.66735473371665,
+                        68.55278711086552
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        62.56756660704657,
+                        63.778179711001826
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        175.0000000000001,
+                        175.66644607725942
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        130.0000000000004,
+                        130.89444893593273
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        9.218284928622895,
+                        9.605984572328595
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        43.79729646252654,
+                        45.19953827081035
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        17.23416698675645,
+                        17.765661282320742
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "4acaebce-6c10-2a2a-852f-98c6902bcc88"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        86.73489516866287,
+                        88.8828702758598
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        52.17443927443766,
+                        53.17638843572125
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        85.8886159574561,
+                        86.55585935759103
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        101.37878190912505,
+                        106.30241973750299
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        14.498281198303376,
+                        15.213772047313476
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        42.00000000000001,
+                        42.22239465569959
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        30.33683274776323,
+                        31.071476981383498
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        9.683883758113016,
+                        10.04281816348039
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        14.476276565209504,
+                        14.596535783282564
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        19.91042396914856,
+                        20.749398908939575
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        55.42637852620679,
+                        57.24482967703132
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        24.66124616455706,
+                        26.65656877308411
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        45.60634292355011,
+                        45.672120747941534
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        41.30331375143441,
+                        42.70528805825515
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        47.73736338701412,
+                        50.38671581765742
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        30.610628384568404,
+                        33.20245004331271
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        49.215854921738796,
+                        51.19509135129958
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        20.862076471361842,
+                        22.40497460877929
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        44.40820166533718,
+                        44.75239652102779
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        10.436352616202717,
+                        11.307258648120616
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        25.355895188966343,
+                        27.224722893020413
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        44.753757897867104,
+                        45.381915667256195
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        13.27684167732854,
+                        14.372644572816952
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        34.4588703362677,
+                        37.328262940517476
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        85.45856522102179,
+                        86.38692655067699
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        97.78008778763859,
+                        98.35461896267614
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        73.7532689152358,
+                        75.41215068488867
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        78.20477816612801,
+                        80.20887026522983
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        11.567858722953147,
+                        12.552593921064545
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        48.559720159828714,
+                        49.07450940860021
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        26.800641172068204,
+                        28.29892354780788
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        26.93993075612039,
+                        27.195786298625787
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "531cfefe-0021-28f6-8c6c-35ae26d2158f"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        165.61518985296894,
+                        166.22051669012416
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        168.7249394243325,
+                        172.60995400833417
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        64.21986386843349,
+                        65.20332175302747
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        152.25189064141196,
+                        155.62792535492724
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        16.848426618230626,
+                        17.60552950711909
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        17.6437470546647,
+                        18.78271760116693
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        44.37433067998209,
+                        45.15665793519728
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        31.72696528856026,
+                        33.21716636199688
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        39.99999999999991,
+                        40.26290717212735
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        67.99999999999986,
+                        69.39119825704985
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        58.33362573884569,
+                        60.30229015576877
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        21.21961143779125,
+                        22.064124195510125
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        23.652369256918,
+                        24.05197643657195
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        54.28683174389057,
+                        56.172055865047554
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        38.129168354940376,
+                        38.52898439518004
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        60.000000000000014,
+                        60.44609459337345
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        31.50400513017346,
+                        32.33919124988549
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        25.508169393717452,
+                        26.339355982471055
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        43.54720087178133,
+                        44.857700957110055
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        9.522501343954959,
+                        9.704054611402277
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        21.233124656431713,
+                        21.25415648070235
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        85.08769019722891,
+                        85.11258612925387
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        15.224630788425438,
+                        15.654744296934995
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        26.00000000000003,
+                        27.236634054807475
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        46.46852776938813,
+                        48.34981685252589
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        78.92611617578284,
+                        80.64066841790682
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        68.5177675874412,
+                        68.66357259956942
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        64.2989977308702,
+                        66.41599868516178
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        35.000000000000504,
+                        36.60023428011259
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        24.659970563544732,
+                        25.68099258185797
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "50e7c0b1-0730-2a5f-8471-b240fa51b1d7"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        147.87964265103307,
+                        150.10578185814103
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        11.448643086977944,
+                        11.643638545971008
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        48.719843729813924,
+                        49.63594526709427
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        47.83900764890657,
+                        49.43701363469489
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        17.704218482910143,
+                        18.45128263611032
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        12.185643550044698,
+                        12.523842740119818
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        24.953047884937753,
+                        25.380726730897052
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        60.00000000000001,
+                        60.40194114607125
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        77.00000000000047,
+                        77.65679356076437
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        21.297954166136595,
+                        23.0122122893477
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        16.264562954920518,
+                        16.56751195133264
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        53.96710736272063,
+                        54.28845067728038
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        44.55624842176004,
+                        45.50010257621466
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        18.661724844155138,
+                        19.317707520333848
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        16.283972218788488,
+                        16.88930249641163
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        25.44627255740333,
+                        26.823277475954377
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        46.823497870960054
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        7.526754381819598,
+                        8.39358353445959
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        22.587468725531913,
+                        24.44634396183872
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        88.99999999999955,
+                        89.43949463447248
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        22.57679346053931,
+                        22.945511712737947
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        35.04635853546603,
+                        35.913654348991955
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        8.18579659547613,
+                        8.660853324896738
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        14.418311615988767,
+                        14.506714834031303
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        43.76675004080619,
+                        46.655821189035805
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        176.11749479447423,
+                        177.05813537217267
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        12.52470804273547,
+                        13.428560350425986
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        61.34037407194114,
+                        62.43617987703983
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        40.89834184605566,
+                        41.87761668325557
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        25.574274452779605,
+                        26.099982432379264
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "0f2f2719-b736-2f71-8e3e-46490f5fe5fe"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        45.26888473211105,
+                        45.305742210893726
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        17.089715425684187,
+                        17.15685868631082
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        110.00000000000044,
+                        110.82925862617577
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        57.191076243635045,
+                        57.316688927768716
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        25.602445286467752,
+                        26.15817673119102
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        15.535120022271387,
+                        16.403203091636993
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        33.59412936746558,
+                        34.046424172292014
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        49.080651626003075,
+                        50.40671213665583
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        40.417136805115916,
+                        43.280656543383785
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        19.557541522799127,
+                        20.627499788431948
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        54.99999999999992,
+                        55.89914204857194
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        68.05406911551663,
+                        69.51287797242796
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        50.28618300055107,
+                        50.49730301111199
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        29.172813231138335,
+                        31.13683675290985
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        29.99400136114152,
+                        31.024449969836084
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        27.147973428435172,
+                        27.461654684089293
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        65.64411858931277,
+                        67.54109925335737
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        15.544396820787004,
+                        15.794416112713492
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        27.489852626903396,
+                        28.380540814967727
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        85.19671283809033,
+                        86.0953626540288
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        12.999999999999973,
+                        13.309614982668112
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        50.58322459706922,
+                        56.100632061836706
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        8.274723883915788,
+                        9.160006115242272
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        23.65898654046173,
+                        24.348754347563172
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        101.28377540509564,
+                        102.26614431064661
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        219.56570599605615,
+                        223.69512538319407
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        8.80884438959853,
+                        9.335097059330781
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        11.795410831281634,
+                        11.83575797585854
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        67.0,
+                        69.4416002963647
+                    ],
+                    "global_id": 516,
+                    "label": "watering can",
+                    "ply_color": "b27f87",
+                    "scene_id": 32
+                },
+                {
+                    "eigenvalues": [
+                        39.51999659467743,
+                        40.31885052843748
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        52.241171135232634,
+                        54.19940315086433
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "reference_scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+            "scan_id": "8eabc401-5af7-2f32-85fe-77e22d8d97f8"
+        }
+    ],
+    "reference_scans": [
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        54.61108034436944,
+                        55.57320236554486
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        101.00000000000045,
+                        101.70081464862403
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        52.237586525154825,
+                        53.61937002002426
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        59.6833895166248,
+                        60.28370285954048
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        36.43308193744714,
+                        38.46389760769553
+                    ],
+                    "global_id": 37,
+                    "label": "bed",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        34.68106201796046,
+                        35.73821358045136
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        27.529997232288334,
+                        27.65558054551662
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        45.440232840921425,
+                        45.472724871664916
+                    ],
+                    "global_id": 129,
+                    "label": "curtain",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        57.27294401545298,
+                        58.28579684145191
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        13.897069916556422,
+                        14.161016000669402
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        26.451426147424158,
+                        27.369104242917068
+                    ],
+                    "global_id": 85,
+                    "label": "chair",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        60.06461307677888,
+                        61.17772517931306
+                    ],
+                    "global_id": 138,
+                    "label": "desk",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        11.275844665197386,
+                        11.721940435598038
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        6.573431739905454,
+                        7.40214107017351
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        18.436455349267558,
+                        19.497759865477278
+                    ],
+                    "global_id": 295,
+                    "label": "nightstand",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        25.54942754382139,
+                        25.749850419261257
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        11.90689506980355,
+                        12.320483152070022
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        22.048671792069054,
+                        23.267960746902723
+                    ],
+                    "global_id": 68,
+                    "label": "cabinet",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        13.84652325726012,
+                        14.408822754510311
+                    ],
+                    "global_id": 298,
+                    "label": "object",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        19.498475645397875,
+                        19.95658825419119
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        42.54171680957634,
+                        43.687712230578
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        10.977884082814157,
+                        11.789131631765486
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        32.41548872663034,
+                        33.31715716478394
+                    ],
+                    "global_id": 100,
+                    "label": "clothes",
+                    "ply_color": "926fc2",
+                    "scene_id": 34
+                },
+                {
+                    "eigenvalues": [
+                        17.35445178560207,
+                        17.528251172409398
+                    ],
+                    "global_id": 236,
+                    "label": "item",
+                    "ply_color": "caae67",
+                    "scene_id": 35
+                },
+                {
+                    "eigenvalues": [
+                        61.07739273078498,
+                        61.53403355635059
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "60cfd1",
+                    "scene_id": 36
+                },
+                {
+                    "eigenvalues": [
+                        0.9999999999999973,
+                        3.0
+                    ],
+                    "global_id": 236,
+                    "label": "item",
+                    "ply_color": "d55cb0",
+                    "scene_id": 37
+                },
+                {
+                    "eigenvalues": [
+                        53.304273813927544,
+                        54.23842385195779
+                    ],
+                    "global_id": 391,
+                    "label": "shelf",
+                    "ply_color": "8cd65b",
+                    "scene_id": 38
+                },
+                {
+                    "eigenvalues": [
+                        13.431449780789947,
+                        13.848305202148186
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "5e6ad3",
+                    "scene_id": 39
+                },
+                {
+                    "eigenvalues": [
+                        46.04894884202203,
+                        46.17728332765511
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "cd7864",
+                    "scene_id": 40
+                },
+                {
+                    "eigenvalues": [
+                        39.80058501573888,
+                        41.21329254960244
+                    ],
+                    "global_id": 263,
+                    "label": "lamp",
+                    "ply_color": "6cc597",
+                    "scene_id": 41
+                },
+                {
+                    "eigenvalues": [
+                        19.3179993200319,
+                        20.167678790083045
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "ad74bd",
+                    "scene_id": 42
+                },
+                {
+                    "eigenvalues": [
+                        7.841216722010426,
+                        8.492799051847198
+                    ],
+                    "global_id": 338,
+                    "label": "pillow",
+                    "ply_color": "b1b57c",
+                    "scene_id": 43
+                },
+                {
+                    "eigenvalues": [
+                        17.949571359501512,
+                        18.556839929706037
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "829eaf",
+                    "scene_id": 44
+                },
+                {
+                    "eigenvalues": [
+                        31.658609393729613,
+                        32.19357827270295
+                    ],
+                    "global_id": 47,
+                    "label": "blanket",
+                    "ply_color": "895b6b",
+                    "scene_id": 45
+                }
+            ],
+            "scan_id": "4e858c81-fd93-2cb4-8469-d9226116b5de"
+        },
+        {
+            "objects": [
+                {
+                    "eigenvalues": [
+                        74.54492274765059,
+                        75.50208856220004
+                    ],
+                    "global_id": 188,
+                    "label": "floor",
+                    "ply_color": "aec7e8",
+                    "scene_id": 1
+                },
+                {
+                    "eigenvalues": [
+                        12.03163545149436,
+                        12.398799016409466
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "1f77b4",
+                    "scene_id": 2
+                },
+                {
+                    "eigenvalues": [
+                        77.4804420483762,
+                        78.04915943134506
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "ffbb78",
+                    "scene_id": 3
+                },
+                {
+                    "eigenvalues": [
+                        76.50616677907664,
+                        78.04662997060566
+                    ],
+                    "global_id": 525,
+                    "label": "windowsill",
+                    "ply_color": "ff7f0e",
+                    "scene_id": 4
+                },
+                {
+                    "eigenvalues": [
+                        24.223507602538195,
+                        25.25411348364434
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "98df8a",
+                    "scene_id": 5
+                },
+                {
+                    "eigenvalues": [
+                        12.904936475691898,
+                        14.197543518150958
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "2ca02c",
+                    "scene_id": 6
+                },
+                {
+                    "eigenvalues": [
+                        13.189649286581862,
+                        16.299499307219627
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ff9896",
+                    "scene_id": 7
+                },
+                {
+                    "eigenvalues": [
+                        13.204113767544657,
+                        14.622236872945255
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "d62728",
+                    "scene_id": 8
+                },
+                {
+                    "eigenvalues": [
+                        12.617801977640205,
+                        14.313804287152042
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "c5b0d5",
+                    "scene_id": 9
+                },
+                {
+                    "eigenvalues": [
+                        98.98802234944355,
+                        100.34680095382382
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "9467bd",
+                    "scene_id": 10
+                },
+                {
+                    "eigenvalues": [
+                        57.35332402810212,
+                        57.78477002798822
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "c49c94",
+                    "scene_id": 11
+                },
+                {
+                    "eigenvalues": [
+                        22.590401842588573,
+                        25.209871820389736
+                    ],
+                    "global_id": 388,
+                    "label": "shades",
+                    "ply_color": "8c564b",
+                    "scene_id": 12
+                },
+                {
+                    "eigenvalues": [
+                        49.000000000000014,
+                        49.9532428056381
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "f7b6d2",
+                    "scene_id": 13
+                },
+                {
+                    "eigenvalues": [
+                        50.69736618522641,
+                        50.933696443613265
+                    ],
+                    "global_id": 503,
+                    "label": "wall",
+                    "ply_color": "e377c2",
+                    "scene_id": 14
+                },
+                {
+                    "eigenvalues": [
+                        50.051901037984045,
+                        51.02788426791767
+                    ],
+                    "global_id": 228,
+                    "label": "heater",
+                    "ply_color": "dbdb8d",
+                    "scene_id": 15
+                },
+                {
+                    "eigenvalues": [
+                        24.355276149637078,
+                        25.460386440992227
+                    ],
+                    "global_id": 482,
+                    "label": "trash can",
+                    "ply_color": "bcbd22",
+                    "scene_id": 16
+                },
+                {
+                    "eigenvalues": [
+                        35.290676487297254,
+                        35.364089284434435
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "9edae5",
+                    "scene_id": 17
+                },
+                {
+                    "eigenvalues": [
+                        22.009495229754762,
+                        23.20584433071471
+                    ],
+                    "global_id": 35,
+                    "label": "beanbag",
+                    "ply_color": "17becf",
+                    "scene_id": 18
+                },
+                {
+                    "eigenvalues": [
+                        62.26979543373322,
+                        63.23313015180675
+                    ],
+                    "global_id": 455,
+                    "label": "table",
+                    "ply_color": "b24c4c",
+                    "scene_id": 19
+                },
+                {
+                    "eigenvalues": [
+                        8.943965832652705,
+                        9.69519909768987
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "42bc66",
+                    "scene_id": 20
+                },
+                {
+                    "eigenvalues": [
+                        16.381772368350124,
+                        17.16046826105189
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "8c39c5",
+                    "scene_id": 21
+                },
+                {
+                    "eigenvalues": [
+                        86.99999999999973,
+                        87.29264933667248
+                    ],
+                    "global_id": 423,
+                    "label": "sofa",
+                    "ply_color": "cab934",
+                    "scene_id": 22
+                },
+                {
+                    "eigenvalues": [
+                        8.431826319424356,
+                        8.62346303281987
+                    ],
+                    "global_id": 131,
+                    "label": "cushion",
+                    "ply_color": "33b0cb",
+                    "scene_id": 23
+                },
+                {
+                    "eigenvalues": [
+                        40.51831147008343,
+                        41.16179130078181
+                    ],
+                    "global_id": 489,
+                    "label": "tv",
+                    "ply_color": "c83683",
+                    "scene_id": 24
+                },
+                {
+                    "eigenvalues": [
+                        8.410297203036134,
+                        10.199917886799895
+                    ],
+                    "global_id": 110,
+                    "label": "commode",
+                    "ply_color": "5cc13d",
+                    "scene_id": 25
+                },
+                {
+                    "eigenvalues": [
+                        10.746091980957413,
+                        11.158123821886594
+                    ],
+                    "global_id": 82,
+                    "label": "ceiling",
+                    "ply_color": "4e47b7",
+                    "scene_id": 26
+                },
+                {
+                    "eigenvalues": [
+                        87.15153272992102,
+                        87.95118860120974
+                    ],
+                    "global_id": 342,
+                    "label": "plant",
+                    "ply_color": "ac7252",
+                    "scene_id": 27
+                },
+                {
+                    "eigenvalues": [
+                        44.51603571109358,
+                        47.28565843744299
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "5ba38a",
+                    "scene_id": 28
+                },
+                {
+                    "eigenvalues": [
+                        13.681035122157123,
+                        14.16332896063319
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "99629c",
+                    "scene_id": 29
+                },
+                {
+                    "eigenvalues": [
+                        15.951282713150137,
+                        16.326899224486937
+                    ],
+                    "global_id": 267,
+                    "label": "light",
+                    "ply_color": "8c9965",
+                    "scene_id": 30
+                },
+                {
+                    "eigenvalues": [
+                        25.264184279553756,
+                        25.301586272650848
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "78b980",
+                    "scene_id": 33
+                },
+                {
+                    "eigenvalues": [
+                        41.61654568037217,
+                        44.19825019400403
+                    ],
+                    "global_id": 520,
+                    "label": "window",
+                    "ply_color": "bf3f4e",
+                    "scene_id": 100
+                }
+            ],
+            "scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d"
+        }
+    ]
+}

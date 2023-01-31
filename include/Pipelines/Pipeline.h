@@ -28,6 +28,9 @@ public:
 
   virtual void ParseDataset() = 0;
   virtual void ExtractObjectPointClouds(int max_pts) = 0;
+  virtual void ComputeSOR(int meanK, double stdThresh) = 0;
+  virtual void ComputeFPS(int filtering_opts, int sample_size,
+                          double percent) = 0;
   virtual void ComputeEdges(int edge_heuristic) = 0;
   virtual void ComputeLaplacian(int laplacian_type) = 0;
   virtual void ComputeEigs(int max_eigs) = 0;
@@ -51,6 +54,8 @@ public:
   virtual void GetEigs(sgpr_ros::Eigenvalues &eig_srv, std::string query_scan,
                        int query_obj_idx, std::string ref_scan,
                        int ref_obj_idx) = 0;
+  virtual int GetSize(int filtering_opts, int sample_size,
+                      double filter_percent, int q_size, int r_size) = 0;
 
 protected:
   scene_map_t mSceneMap;

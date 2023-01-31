@@ -11,6 +11,11 @@ public:
 
   void ParseDataset() override;
   void ExtractObjectPointClouds(int max_pts) override;
+  void ComputeSOR(int meanK, double stdThresh) override;
+  void ComputeSceneFPS(Scene &scene, int filtering_opts,
+                                    int sample_size, double percent);
+  void ComputeFPS(int filtering_opts, int sample_size,
+                          double percent) override;
   void ComputeEdges(int edge_heuristic) override;
   void ComputeLaplacian(int laplacian_type) override;
   void ComputeEigs(int max_eigs) override;
@@ -33,4 +38,6 @@ public:
   void GetEigs(sgpr_ros::Eigenvalues &eig_srv, std::string query_scan,
                int query_obj_idx, std::string ref_scan,
                int ref_obj_idx) override;
+  int GetSize(int filtering_opts, int sample_size, double filter_percent,
+               int q_size, int r_size) override;
 };
