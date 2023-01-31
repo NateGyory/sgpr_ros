@@ -97,7 +97,9 @@ class MainWindow(QMainWindow):
 
         current_req = req
         update = True
-        return EigenvaluesResponse([.5,.5])
+        ks_ret = self.ks_test(current_req.q_eigs, current_req.r_eigs)
+        ad_ret = self.ad_test(current_req.q_eigs, current_req.r_eigs)
+        return EigenvaluesResponse([int(ks_ret),int(ad_ret)])
 
     def initUI(self):
 

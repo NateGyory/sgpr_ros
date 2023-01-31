@@ -51,6 +51,7 @@ inline static int eval_opts = 0;
 
 // Checkboxes
 inline static bool sor_check = true;
+inline static bool double_sor = false;
 inline static bool same_radius = true;
 
 // Input box values
@@ -97,8 +98,8 @@ inline static bool EdgesCreated() { return edges_created; }
 inline static bool LaplacianCreated() { return laplacian_created; }
 inline static bool ComputedEigs() { return eigs; }
 inline static bool SavedEigs() { return saved_eigs; }
-inline static bool FilterPercent() { return filtering_opts == 1;}
-inline static bool SampleSize() { return filtering_opts == 2;}
+inline static bool FilterPercent() { return filtering_opts == 1; }
+inline static bool SampleSize() { return filtering_opts == 2; }
 
 }; // namespace DatasetTesting
 } // namespace ImGuiState

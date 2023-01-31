@@ -34,6 +34,7 @@ int RScanPipeline::GetSize(int filtering_opts, int sample_size,
 void RScanPipeline::ParseDataset() {
   std::cout << "Parsing Dataset" << std::endl;
   std::string dataset_dir, config_dir, rscan_json, config_json, objects_json;
+  mSceneMap.clear();
 
   //  ros::param::get("ros_pkg_dir", config_dir);
   //  ros::param::get("dataset_dir", dataset_dir);
