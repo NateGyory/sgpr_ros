@@ -543,6 +543,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::RadioButton("Eval From Config", &ImGuiState::DatasetTesting::eval_opts,
                      1);
 
+  ImGui::Checkbox("Debug Bulk Eval", &ImGuiState::DatasetTesting::debug_eval);
+
   if (ImGui::Button("Eval Obj Precision Recall")) {
 
     int total_compared = 0;
@@ -555,6 +557,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       if (kv.second.is_reference)
         continue;
 
+      std::cout << "-------------------------" << std::endl;
+      std::cout << "For Query Scan: " << kv.first << std::endl;
       // Find the matching reference_scan
       std::string ref_id = kv.second.reference_id_match;
 
@@ -569,7 +573,7 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
           if (r_so.scene_id == q_so.scene_id) {
             // Do all the fancy matches
-            // ImGuiState::DatasetTesting::mtx.lock();
+            ImGuiState::DatasetTesting::mtx.lock();
 
             Processing::PointCloud::computeSOR(
                 ImGuiState::DatasetTesting::q_so,
@@ -632,10 +636,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             Processing::Eigen::computeEigenvalues(
                 ImGuiState::DatasetTesting::r_so, number_eigs);
 
-            // ImGuiState::DatasetTesting::update_cloud = true;
-            // ImGuiState::DatasetTesting::mtx.unlock();
+            ImGuiState::DatasetTesting::update_cloud = true;
+            ImGuiState::DatasetTesting::mtx.unlock();
 
-            // ImGuiState::DatasetTesting::eigs_mtx.lock();
+            ImGuiState::DatasetTesting::eigs_mtx.lock();
 
             ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
                 arma::conv_to<std::vector<double>>::from(
@@ -648,8 +652,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
                 ImGuiState::DatasetTesting::r_so.gfaFeatures;
 
-            // ImGuiState::DatasetTesting::update_hist = true;
-            // ImGuiState::DatasetTesting::eigs_mtx.unlock();
+            ImGuiState::DatasetTesting::update_hist = true;
+            ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
             // Eval service
             if (evaluation_service_client.call(
@@ -669,12 +673,18 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
               TP++;
             } else {
               FN++;
+              std::cout << "----------" << std::endl;
+              std::cout << "FN" << std::endl;
+              std::cout << "query: " << q_so.label << "-" << q_so.scene_id
+                        << "-" << q_so.global_id << std::endl;
+              std::cout << "ref: " << r_so.label << "-" << r_so.scene_id << "-"
+                        << r_so.global_id << std::endl;
             }
 
           } else {
             // TODO need to add back in MTX locking when we want to viz each
             // step
-            // ImGuiState::DatasetTesting::mtx.lock();
+            ImGuiState::DatasetTesting::mtx.lock();
 
             Processing::PointCloud::computeMCAR(
                 ImGuiState::DatasetTesting::q_so);
@@ -694,10 +704,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                 ImGuiState::DatasetTesting::r_so,
                 ImGuiState::DatasetTesting::r_so.cloud->size());
 
-            // ImGuiState::DatasetTesting::update_cloud = true;
-            // ImGuiState::DatasetTesting::mtx.unlock();
+            ImGuiState::DatasetTesting::update_cloud = true;
+            ImGuiState::DatasetTesting::mtx.unlock();
 
-            // ImGuiState::DatasetTesting::eigs_mtx.lock();
+            ImGuiState::DatasetTesting::eigs_mtx.lock();
 
             ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
                 arma::conv_to<std::vector<double>>::from(
@@ -710,8 +720,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
                 ImGuiState::DatasetTesting::r_so.gfaFeatures;
 
-            // ImGuiState::DatasetTesting::update_hist = true;
-            // ImGuiState::DatasetTesting::eigs_mtx.unlock();
+            ImGuiState::DatasetTesting::update_hist = true;
+            ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
             // Eval service
             if (evaluation_service_client.call(
@@ -729,12 +739,23 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
             if (ks_result || ad_result) {
               FP++;
+              std::cout << "----------" << std::endl;
+              std::cout << "FP" << std::endl;
+              std::cout << "query: " << q_so.label << "-" << q_so.scene_id
+                        << "-" << q_so.global_id << std::endl;
+              std::cout << "ref: " << r_so.label << "-" << r_so.scene_id << "-"
+                        << r_so.global_id << std::endl;
             } else {
               TN++;
             }
           }
 
           total_compared++;
+          if (ImGuiState::DatasetTesting::debug_eval) {
+            std::cout << '\n' << "Press Enter";
+            while (std::cin.get() != '\n') {
+            }
+          }
         }
       }
     }
@@ -801,7 +822,7 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           if (it == end_it)
             continue;
 
-          // ImGuiState::DatasetTesting::mtx.lock();
+          ImGuiState::DatasetTesting::mtx.lock();
           ImGuiState::DatasetTesting::q_so = q_so;
           ImGuiState::DatasetTesting::r_so =
               r_kv.second.spectral_objects[ref_obj_idx];
@@ -865,10 +886,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           Processing::Eigen::computeEigenvalues(
               ImGuiState::DatasetTesting::r_so, number_eigs);
 
-          // ImGuiState::DatasetTesting::update_cloud = true;
-          // ImGuiState::DatasetTesting::mtx.unlock();
+          ImGuiState::DatasetTesting::update_cloud = true;
+          ImGuiState::DatasetTesting::mtx.unlock();
 
-          // ImGuiState::DatasetTesting::eigs_mtx.lock();
+          ImGuiState::DatasetTesting::eigs_mtx.lock();
 
           ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
               arma::conv_to<std::vector<double>>::from(
@@ -881,8 +902,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
               ImGuiState::DatasetTesting::r_so.gfaFeatures;
 
-          // ImGuiState::DatasetTesting::update_hist = true;
-          // ImGuiState::DatasetTesting::eigs_mtx.unlock();
+          ImGuiState::DatasetTesting::update_hist = true;
+          ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
           // Eval service
           if (evaluation_service_client.call(
@@ -901,326 +922,338 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           } else {
             incorrect_matches++;
           }
-        }
-        Result scene_result;
-        scene_result.ref_scan_id = r_kv.first;
-        scene_result.correct_ref_scan_id = q_kv.reference_id_match;
-        scene_result.correct_count = correct_matches;
-        scene_result.incorrect_count.incorrect_count;
-        result_map[q_kv.first].push_back()
-      }
-    }
 
-    // Loop over the scene_result map and get TP TN FP FN
-    int TP = 0;
-    int TN = 0;
-    int FP = 0;
-    int FN = 0;
-    std::cout << "Place Recognition Results!" << std::endl;
-    // TODO play with PR thresholds for what is considered a match or not
-    for (auto const &kv : result_map) {
-      std::cout << "Ref Scan: " << kv.first << std::endl;
-      int max_correct = 0;
-      std::string matched_scan_id for (auto const &result : kv.second) {
-        if (result.correct_count > max_count) {
-          matched_scan_id = result.ref_scan_id;
+          if (ImGuiState::DatasetTesting::debug_eval) {
+            std::cout << '\n' << "Press Enter";
+            while (std::cin.get() != '\n') {
+            }
+          }
+          Result scene_result;
+          scene_result.ref_scan_id = r_kv.first;
+          scene_result.correct_ref_scan_id = q_kv.reference_id_match;
+          scene_result.correct_count = correct_matches;
+          scene_result.incorrect_count.incorrect_count;
+          result_map[q_kv.first].push_back()
         }
       }
-      if (matched_scan_id == kv.second[0].correct_ref_scan_id) {
-        std::cout << "Correct!" << std::endl;
-        TP++;
-        TN += kv.second.size() - 1;
-      } else {
-        std::cout << "Incorrect!" << std::endl;
-        FP++;
-        FN++;
-        TN += kv.second.size() - 2;
+
+      // Loop over the scene_result map and get TP TN FP FN
+      int TP = 0;
+      int TN = 0;
+      int FP = 0;
+      int FN = 0;
+      std::cout << "Place Recognition Results!" << std::endl;
+      // TODO play with PR thresholds for what is considered a match or not
+      for (auto const &kv : result_map) {
+        std::cout << "Ref Scan: " << kv.first << std::endl;
+        int max_correct = 0;
+        std::string matched_scan_id for (auto const &result : kv.second) {
+          if (result.correct_count > max_count) {
+            matched_scan_id = result.ref_scan_id;
+          }
+        }
+        if (matched_scan_id == kv.second[0].correct_ref_scan_id) {
+          std::cout << "Correct!" << std::endl;
+          TP++;
+          TN += kv.second.size() - 1;
+        } else {
+          std::cout << "Incorrect!" << std::endl;
+          FP++;
+          FN++;
+          TN += kv.second.size() - 2;
+        }
       }
+
+      double accuracy = (TP + TN) / (TN + TP + FN + FP);
+      double precision = TP / (TP + FP);
+      double recall = TP / (TP + FN);
+      double f1_score = (2 * precision * recall) / (precision + recall);
+      std::cout << "Accuracy: " << accuracy << std::endl;
+      std::cout << "Precision: " << precision << std::endl;
+      std::cout << "Recall: " << recall << std::endl;
+      std::cout << "f1_score: " << f1_score << std::endl;
+      std::cout << "\nConfusion Matrix" << std::endl;
+      std::cout << "          Negative | Poistive" << std::endl;
+      std::cout << "Negative | " << TN << "    | " < FN << std::endl;
+      std::cout << "Positive | " << FP << "    | " < TP << std::endl;
     }
 
-    double accuracy = (TP + TN) / (TN + TP + FN + FP);
-    double precision = TP / (TP + FP);
-    double recall = TP / (TP + FN);
-    double f1_score = (2 * precision * recall) / (precision + recall);
-    std::cout << "Accuracy: " << accuracy << std::endl;
-    std::cout << "Precision: " << precision << std::endl;
-    std::cout << "Recall: " << recall << std::endl;
-    std::cout << "f1_score: " << f1_score << std::endl;
-    std::cout << "\nConfusion Matrix" << std::endl;
-    std::cout << "          Negative | Poistive" << std::endl;
-    std::cout << "Negative | " << TN << "    | " < FN << std::endl;
-    std::cout << "Positive | " << FP << "    | " < TP << std::endl;
-  }
+    // --------------------------------------------------------------
 
-  // --------------------------------------------------------------
+    // ImGui::InputText("File Name",
+    // ImGuiState::DatasetTesting::eigenvalue_json_f,
+    //                  64);
+    // if (ImGui::Button("Eval and Save")) {
+    //   pl->ComputeSOR(ImGuiState::DatasetTesting::meanK,
+    //                  ImGuiState::DatasetTesting::stdThresh);
+    //   pl->ComputeFPS(ImGuiState::DatasetTesting::filtering_opts,
+    //                  ImGuiState::DatasetTesting::sample_size,
+    //                  ImGuiState::DatasetTesting::filter_percent);
+    //   pl->ComputeEdges(ImGuiState::DatasetTesting::edge_heuristic_idx);
+    //   pl->ComputeLaplacian(ImGuiState::DatasetTesting::laplacian_idx);
 
-  // ImGui::InputText("File Name",
-  // ImGuiState::DatasetTesting::eigenvalue_json_f,
-  //                  64);
-  // if (ImGui::Button("Eval and Save")) {
-  //   pl->ComputeSOR(ImGuiState::DatasetTesting::meanK,
-  //                  ImGuiState::DatasetTesting::stdThresh);
-  //   pl->ComputeFPS(ImGuiState::DatasetTesting::filtering_opts,
-  //                  ImGuiState::DatasetTesting::sample_size,
-  //                  ImGuiState::DatasetTesting::filter_percent);
-  //   pl->ComputeEdges(ImGuiState::DatasetTesting::edge_heuristic_idx);
-  //   pl->ComputeLaplacian(ImGuiState::DatasetTesting::laplacian_idx);
+    //  int eigs_num = (ImGuiState::DatasetTesting::eigendecomposition_method
+    //  == 0)
+    //                     ? -1
+    //                     : ImGuiState::DatasetTesting::eigs_number;
 
-  //  int eigs_num = (ImGuiState::DatasetTesting::eigendecomposition_method
-  //  == 0)
-  //                     ? -1
-  //                     : ImGuiState::DatasetTesting::eigs_number;
+    //  pl->ComputeEigs(eigs_num);
+    //  pl->SaveEigenvalues(ImGuiState::DatasetTesting::eigenvalue_json_f);
+    //}
 
-  //  pl->ComputeEigs(eigs_num);
-  //  pl->SaveEigenvalues(ImGuiState::DatasetTesting::eigenvalue_json_f);
-  //}
+    // if (ImGui::Button("Eval Init Scene")) {
+    //   std::cout << "INIT Pressed" << std::endl;
+    //   ImGuiState::DatasetTesting::query_obj_scene_ids.clear();
+    //   ImGuiState::DatasetTesting::query_obj_idx = 0;
+    //   pl->GetQuerySpectralObjIds(ImGuiState::DatasetTesting::query_obj_scene_ids,
+    //                              std::string(selected_query_scan));
+    // }
 
-  // if (ImGui::Button("Eval Init Scene")) {
-  //   std::cout << "INIT Pressed" << std::endl;
-  //   ImGuiState::DatasetTesting::query_obj_scene_ids.clear();
-  //   ImGuiState::DatasetTesting::query_obj_idx = 0;
-  //   pl->GetQuerySpectralObjIds(ImGuiState::DatasetTesting::query_obj_scene_ids,
-  //                              std::string(selected_query_scan));
-  // }
+    // if (ImGui::Button("Eval Object Pair")) {
 
-  // if (ImGui::Button("Eval Object Pair")) {
+    //  if (pl->RefObjExists(std::string(selected_query_scan),
+    //                       ImGuiState::DatasetTesting::query_obj_idx,
+    //                       ImGuiState::DatasetTesting::ref_obj_idx)) {
 
-  //  if (pl->RefObjExists(std::string(selected_query_scan),
-  //                       ImGuiState::DatasetTesting::query_obj_idx,
-  //                       ImGuiState::DatasetTesting::ref_obj_idx)) {
+    //    ImGuiState::DatasetTesting::ref_obj_exists = true;
+    //    ImGuiState::DatasetTesting::mtx.lock();
 
-  //    ImGuiState::DatasetTesting::ref_obj_exists = true;
-  //    ImGuiState::DatasetTesting::mtx.lock();
+    //    pl->GetQueryRefCloudObjPair(
+    //        std::string(selected_query_scan),
+    //        std::string(selected_ref_scan),
+    //        ImGuiState::DatasetTesting::query_obj_idx,
+    //        ImGuiState::DatasetTesting::ref_obj_idx,
+    //        ImGuiState::DatasetTesting::q_so,
+    //        ImGuiState::DatasetTesting::r_so);
 
-  //    pl->GetQueryRefCloudObjPair(
-  //        std::string(selected_query_scan),
-  //        std::string(selected_ref_scan),
-  //        ImGuiState::DatasetTesting::query_obj_idx,
-  //        ImGuiState::DatasetTesting::ref_obj_idx,
-  //        ImGuiState::DatasetTesting::q_so,
-  //        ImGuiState::DatasetTesting::r_so);
+    //    ImGuiState::DatasetTesting::update_cloud = true;
+    //    ImGuiState::DatasetTesting::mtx.unlock();
 
-  //    ImGuiState::DatasetTesting::update_cloud = true;
-  //    ImGuiState::DatasetTesting::mtx.unlock();
+    //    ImGuiState::DatasetTesting::eigs_mtx.lock();
 
-  //    ImGuiState::DatasetTesting::eigs_mtx.lock();
+    //    ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+    //        arma::conv_to<std::vector<double>>::from(
+    //            ImGuiState::DatasetTesting::q_so.eigenvalues);
+    //    ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+    //        arma::conv_to<std::vector<double>>::from(
+    //            ImGuiState::DatasetTesting::r_so.eigenvalues);
+    //    ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+    //        ImGuiState::DatasetTesting::q_so.gfaFeatures;
+    //    ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+    //        ImGuiState::DatasetTesting::r_so.gfaFeatures;
 
-  //    ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
-  //        arma::conv_to<std::vector<double>>::from(
-  //            ImGuiState::DatasetTesting::q_so.eigenvalues);
-  //    ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
-  //        arma::conv_to<std::vector<double>>::from(
-  //            ImGuiState::DatasetTesting::r_so.eigenvalues);
-  //    ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
-  //        ImGuiState::DatasetTesting::q_so.gfaFeatures;
-  //    ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
-  //        ImGuiState::DatasetTesting::r_so.gfaFeatures;
+    //    ImGuiState::DatasetTesting::update_hist = true;
+    //    ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
-  //    ImGuiState::DatasetTesting::update_hist = true;
-  //    ImGuiState::DatasetTesting::eigs_mtx.unlock();
+    //    // Eval service
+    //    if
+    //    (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv))
+    //    {
+    //      ROS_INFO("eval service success!!! %f",
+    //               ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+    //    } else {
+    //      ROS_ERROR("eval service failed");
+    //    }
 
-  //    // Eval service
-  //    if
-  //    (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv))
-  //    {
-  //      ROS_INFO("eval service success!!! %f",
-  //               ImGuiState::DatasetTesting::eig_srv.response.results[0]);
-  //    } else {
-  //      ROS_ERROR("eval service failed");
-  //    }
+    //  } else {
+    //    ImGuiState::DatasetTesting::ref_obj_exists = false;
+    //  }
 
-  //  } else {
-  //    ImGuiState::DatasetTesting::ref_obj_exists = false;
-  //  }
+    //  ImGuiState::DatasetTesting::query_obj_idx++;
+    //}
 
-  //  ImGuiState::DatasetTesting::query_obj_idx++;
-  //}
+    // --------------------------------------------------------------
+    ImGui::Separator();
+    ImGui::Text("Eval Obj Pairs");
 
-  // --------------------------------------------------------------
-  ImGui::Separator();
-  ImGui::Text("Eval Obj Pairs");
+    if (ImGui::Button("Init Scene")) {
+      std::cout << "INIT Pressed" << std::endl;
+      ImGuiState::DatasetTesting::query_obj_scene_ids.clear();
+      ImGuiState::DatasetTesting::query_obj_idx = 0;
+      pl->GetQuerySpectralObjIds(
+          ImGuiState::DatasetTesting::query_obj_scene_ids,
+          std::string(selected_query_scan));
+    }
 
-  if (ImGui::Button("Init Scene")) {
-    std::cout << "INIT Pressed" << std::endl;
-    ImGuiState::DatasetTesting::query_obj_scene_ids.clear();
-    ImGuiState::DatasetTesting::query_obj_idx = 0;
-    pl->GetQuerySpectralObjIds(ImGuiState::DatasetTesting::query_obj_scene_ids,
-                               std::string(selected_query_scan));
-  }
+    if (ImGui::Button("Compaire Object Pair")) {
 
-  if (ImGui::Button("Compaire Object Pair")) {
+      if (pl->RefObjExists(std::string(selected_query_scan),
+                           ImGuiState::DatasetTesting::query_obj_idx,
+                           ImGuiState::DatasetTesting::ref_obj_idx)) {
 
-    if (pl->RefObjExists(std::string(selected_query_scan),
-                         ImGuiState::DatasetTesting::query_obj_idx,
-                         ImGuiState::DatasetTesting::ref_obj_idx)) {
+        ImGuiState::DatasetTesting::ref_obj_exists = true;
+        ImGuiState::DatasetTesting::mtx.lock();
 
-      ImGuiState::DatasetTesting::ref_obj_exists = true;
-      ImGuiState::DatasetTesting::mtx.lock();
+        pl->GetQueryRefCloudObjPair(
+            std::string(selected_query_scan), std::string(selected_ref_scan),
+            ImGuiState::DatasetTesting::query_obj_idx,
+            ImGuiState::DatasetTesting::ref_obj_idx,
+            ImGuiState::DatasetTesting::q_so, ImGuiState::DatasetTesting::r_so);
 
-      pl->GetQueryRefCloudObjPair(
-          std::string(selected_query_scan), std::string(selected_ref_scan),
-          ImGuiState::DatasetTesting::query_obj_idx,
-          ImGuiState::DatasetTesting::ref_obj_idx,
-          ImGuiState::DatasetTesting::q_so, ImGuiState::DatasetTesting::r_so);
-
-      Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::q_so,
-                                         ImGuiState::DatasetTesting::meanK,
-                                         ImGuiState::DatasetTesting::stdThresh);
-      Processing::PointCloud::computeSOR(ImGuiState::DatasetTesting::r_so,
-                                         ImGuiState::DatasetTesting::meanK,
-                                         ImGuiState::DatasetTesting::stdThresh);
-
-      double size = pl->GetSize(ImGuiState::DatasetTesting::filtering_opts,
-                                ImGuiState::DatasetTesting::sample_size,
-                                ImGuiState::DatasetTesting::filter_percent,
-                                ImGuiState::DatasetTesting::q_so.cloud->size(),
-                                ImGuiState::DatasetTesting::r_so.cloud->size());
-
-      Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so,
-                                         size);
-      Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so,
-                                         size);
-
-      if (ImGuiState::DatasetTesting::double_sor) {
         Processing::PointCloud::computeSOR(
             ImGuiState::DatasetTesting::q_so, ImGuiState::DatasetTesting::meanK,
             ImGuiState::DatasetTesting::stdThresh);
         Processing::PointCloud::computeSOR(
             ImGuiState::DatasetTesting::r_so, ImGuiState::DatasetTesting::meanK,
             ImGuiState::DatasetTesting::stdThresh);
-      }
 
-      Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
-      Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
+        double size =
+            pl->GetSize(ImGuiState::DatasetTesting::filtering_opts,
+                        ImGuiState::DatasetTesting::sample_size,
+                        ImGuiState::DatasetTesting::filter_percent,
+                        ImGuiState::DatasetTesting::q_so.cloud->size(),
+                        ImGuiState::DatasetTesting::r_so.cloud->size());
 
-      if (ImGuiState::DatasetTesting::same_radius) {
-        double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
-                               ImGuiState::DatasetTesting::r_so.mcar);
-        ImGuiState::DatasetTesting::q_so.mcar = mcar;
-        ImGuiState::DatasetTesting::r_so.mcar = mcar;
-      }
+        Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so,
+                                           size);
+        Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so,
+                                           size);
 
-      Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
-      Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+        if (ImGuiState::DatasetTesting::double_sor) {
+          Processing::PointCloud::computeSOR(
+              ImGuiState::DatasetTesting::q_so,
+              ImGuiState::DatasetTesting::meanK,
+              ImGuiState::DatasetTesting::stdThresh);
+          Processing::PointCloud::computeSOR(
+              ImGuiState::DatasetTesting::r_so,
+              ImGuiState::DatasetTesting::meanK,
+              ImGuiState::DatasetTesting::stdThresh);
+        }
 
-      int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
-      if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
-        number_eigs = ImGuiState::DatasetTesting::eigs_number;
-      }
+        Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
+        Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
 
-      Processing::Eigen::computeEigenvalues(ImGuiState::DatasetTesting::q_so,
-                                            number_eigs);
-      Processing::Eigen::computeEigenvalues(ImGuiState::DatasetTesting::r_so,
-                                            number_eigs);
+        if (ImGuiState::DatasetTesting::same_radius) {
+          double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
+                                 ImGuiState::DatasetTesting::r_so.mcar);
+          ImGuiState::DatasetTesting::q_so.mcar = mcar;
+          ImGuiState::DatasetTesting::r_so.mcar = mcar;
+        }
 
-      ImGuiState::DatasetTesting::update_cloud = true;
-      ImGuiState::DatasetTesting::mtx.unlock();
+        Processing::Laplacian::genericLaplacian(
+            ImGuiState::DatasetTesting::q_so);
+        Processing::Laplacian::genericLaplacian(
+            ImGuiState::DatasetTesting::r_so);
 
-      ImGuiState::DatasetTesting::eigs_mtx.lock();
+        int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
+        if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
+          number_eigs = ImGuiState::DatasetTesting::eigs_number;
+        }
 
-      ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
-          arma::conv_to<std::vector<double>>::from(
-              ImGuiState::DatasetTesting::q_so.eigenvalues);
-      ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
-          arma::conv_to<std::vector<double>>::from(
-              ImGuiState::DatasetTesting::r_so.eigenvalues);
-      ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
-          ImGuiState::DatasetTesting::q_so.gfaFeatures;
-      ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
-          ImGuiState::DatasetTesting::r_so.gfaFeatures;
+        Processing::Eigen::computeEigenvalues(ImGuiState::DatasetTesting::q_so,
+                                              number_eigs);
+        Processing::Eigen::computeEigenvalues(ImGuiState::DatasetTesting::r_so,
+                                              number_eigs);
 
-      ImGuiState::DatasetTesting::update_hist = true;
-      ImGuiState::DatasetTesting::eigs_mtx.unlock();
+        ImGuiState::DatasetTesting::update_cloud = true;
+        ImGuiState::DatasetTesting::mtx.unlock();
 
-      // Eval service
-      if (evaluation_service_client.call(ImGuiState::DatasetTesting::eig_srv)) {
-        ROS_INFO("eval service success!!! %f",
-                 ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+        ImGuiState::DatasetTesting::eigs_mtx.lock();
+
+        ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+            arma::conv_to<std::vector<double>>::from(
+                ImGuiState::DatasetTesting::q_so.eigenvalues);
+        ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+            arma::conv_to<std::vector<double>>::from(
+                ImGuiState::DatasetTesting::r_so.eigenvalues);
+        ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+            ImGuiState::DatasetTesting::q_so.gfaFeatures;
+        ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+            ImGuiState::DatasetTesting::r_so.gfaFeatures;
+
+        ImGuiState::DatasetTesting::update_hist = true;
+        ImGuiState::DatasetTesting::eigs_mtx.unlock();
+
+        // Eval service
+        if (evaluation_service_client.call(
+                ImGuiState::DatasetTesting::eig_srv)) {
+          ROS_INFO("eval service success!!! %f",
+                   ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+        } else {
+          ROS_ERROR("eval service failed");
+        }
+
       } else {
-        ROS_ERROR("eval service failed");
+        ImGuiState::DatasetTesting::ref_obj_exists = false;
       }
 
-    } else {
-      ImGuiState::DatasetTesting::ref_obj_exists = false;
+      ImGuiState::DatasetTesting::query_obj_idx++;
     }
 
-    ImGuiState::DatasetTesting::query_obj_idx++;
+    if (!ImGuiState::DatasetTesting::ReadyToStep())
+      ImGui::BeginDisabled();
+
+    if (!ImGuiState::DatasetTesting::RefObjExists())
+      ImGui::Text("Ref Object Does Not Exist");
+
+    if (!ImGuiState::DatasetTesting::ReadyToStep())
+      ImGui::EndDisabled();
+
+    if (!ImGuiState::DatasetTesting::DatasetParsed()) {
+      ImGui::EndDisabled();
+    }
+
+    ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+    ImGui::End();
   }
 
-  if (!ImGuiState::DatasetTesting::ReadyToStep())
-    ImGui::BeginDisabled();
+  int main(int argc, char **argv) {
+    ros::init(argc, argv, "sgpr_ros_node");
+    ros::NodeHandle n;
 
-  if (!ImGuiState::DatasetTesting::RefObjExists())
-    ImGui::Text("Ref Object Does Not Exist");
+    evaluation_service_client =
+        n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
 
-  if (!ImGuiState::DatasetTesting::ReadyToStep())
-    ImGui::EndDisabled();
+    evaluation_service_client.waitForExistence(ros::Duration(10));
 
-  if (!ImGuiState::DatasetTesting::DatasetParsed()) {
-    ImGui::EndDisabled();
+    // Todo need to use the param server at somepoint
+    // ros::param::get("dataset", dataset);
+
+    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    std::shared_ptr<Pipeline> datasetPipeline;
+
+    // Background threads running
+    std::thread viz_t(BackgroundVizThread);
+    viz_t.detach();
+
+    std::thread spectra_t(PlotSpectra);
+    spectra_t.detach();
+
+    GLFWwindow *window = initGUI();
+
+    // GUI loop
+    while (!glfwWindowShouldClose(window)) {
+      glfwPollEvents();
+
+      // Start the Dear ImGui frame
+      ImGui_ImplOpenGL3_NewFrame();
+      ImGui_ImplGlfw_NewFrame();
+      ImGui::NewFrame();
+
+      datasetTestingPipeline(datasetPipeline);
+
+      // Rendering
+      ImGui::Render();
+      int display_w, display_h;
+      glfwGetFramebufferSize(window, &display_w, &display_h);
+      glViewport(0, 0, display_w, display_h);
+      glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
+                   clear_color.z * clear_color.w, clear_color.w);
+      glClear(GL_COLOR_BUFFER_BIT);
+
+      ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+      glfwSwapBuffers(window);
+    }
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 1;
   }
-
-  ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-              1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-  ImGui::End();
-}
-
-int main(int argc, char **argv) {
-  ros::init(argc, argv, "sgpr_ros_node");
-  ros::NodeHandle n;
-
-  evaluation_service_client =
-      n.serviceClient<sgpr_ros::Eigenvalues>("evaluation_service");
-
-  evaluation_service_client.waitForExistence(ros::Duration(10));
-
-  // Todo need to use the param server at somepoint
-  // ros::param::get("dataset", dataset);
-
-  ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
-  std::shared_ptr<Pipeline> datasetPipeline;
-
-  // Background threads running
-  std::thread viz_t(BackgroundVizThread);
-  viz_t.detach();
-
-  std::thread spectra_t(PlotSpectra);
-  spectra_t.detach();
-
-  GLFWwindow *window = initGUI();
-
-  // GUI loop
-  while (!glfwWindowShouldClose(window)) {
-    glfwPollEvents();
-
-    // Start the Dear ImGui frame
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplGlfw_NewFrame();
-    ImGui::NewFrame();
-
-    datasetTestingPipeline(datasetPipeline);
-
-    // Rendering
-    ImGui::Render();
-    int display_w, display_h;
-    glfwGetFramebufferSize(window, &display_w, &display_h);
-    glViewport(0, 0, display_w, display_h);
-    glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
-                 clear_color.z * clear_color.w, clear_color.w);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-    glfwSwapBuffers(window);
-  }
-
-  // Cleanup
-  ImGui_ImplOpenGL3_Shutdown();
-  ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();
-
-  glfwDestroyWindow(window);
-  glfwTerminate();
-
-  return 1;
-}

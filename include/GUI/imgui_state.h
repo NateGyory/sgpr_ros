@@ -53,6 +53,7 @@ inline static int eval_opts = 0;
 inline static bool sor_check = true;
 inline static bool double_sor = false;
 inline static bool same_radius = true;
+inline static bool debug_eval = false;
 
 // Input box values
 inline static int eigs_number = 100;
