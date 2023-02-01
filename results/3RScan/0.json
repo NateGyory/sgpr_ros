@@ -1,0 +1,11 @@
+{
+  "dataset": "3RScan",
+  "sample_size": "50",
+  "mean_k": "3",
+  "std_thresh": "3.0",
+  "laplacian": "generic",
+  "accuracy": ".9",
+  "precision": ".8",
+  "recall": ".7",
+  "f1_score": ".75",
+}

@@ -26,6 +26,7 @@
 #include "Processing/Eigen.hpp"
 #include "Processing/Laplacian.hpp"
 #include "Processing/PointCloud.hpp"
+#include "Processing/Files.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -716,6 +717,34 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     std::cout << "          Negative | Poistive" << std::endl;
     std::cout << "Negative | " << TN << "    | " << FN << std::endl;
     std::cout << "Positive | " << FP << "    | " << TP << std::endl;
+
+
+    EvalMetrics em;
+    em.dataset = (ImGuiState::DatasetTesting::dataset_idx == 0) ? "3RScan" : "SemanticKitti";
+    em.sample_size = ImGuiState::DatasetTesting::sample_size;
+    em.mean_k = ImGuiState::DatasetTesting::meanK;
+    em.std_thresh = ImGuiState::DatasetTesting::stdThresh;
+    em.laplacian = "TODO";
+    em.accuracy = accuracy;
+    em.precision = precision;
+
+    // Save the file now
+    em.recall = recall;
+    em.f1_score = f1_score;
+
+    Processing::Files::SaveEvalMetrics(em);
+    // File name will be results/3RScan/laplacian_name/idx.json
+    // TODO need to save a, p, r, f1 to json file
+    // {
+    //   sample_size:
+    //   meak_k:
+    //   std_thresh:
+    //   laplacian:
+    //   Accuracy:
+    //   Precision:
+    //   Recall:
+    //   F1_Score
+    // }
 
     if (total_compared != (TP + TN + FP + FN)) {
       std::cout << "ERROR total compared DNE all added: " << total_compared
