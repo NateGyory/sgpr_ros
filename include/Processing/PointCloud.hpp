@@ -54,7 +54,6 @@ inline void filterPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr &cloud,
   double leafInc = 0.01;
   double leafValue = 0.1;
   while (cloud->points.size() > max_points) {
-    std::cout << "Filtering cloud" << std::endl;
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr vox_cloud(
         new pcl::PointCloud<pcl::PointXYZRGB>);
     pcl::VoxelGrid<pcl::PointXYZRGB> sor;
@@ -83,7 +82,6 @@ inline void computeMCAR(SpectralObject &spectral_object) {
     int num_edges = indicies_found.size() - 1;
 
     if (num_edges == 0) {
-      std::cout << "Increasing radius" << std::endl;
       i--;
       radius += 0.01f;
     }
