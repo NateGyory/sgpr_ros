@@ -56,6 +56,7 @@ public:
                        int ref_obj_idx) = 0;
   virtual int GetSize(int filtering_opts, int sample_size,
                       double filter_percent, int q_size, int r_size) = 0;
+  virtual void Laplacian(int laplacian_type, SpectralObject &so) = 0;
 
   scene_map_t mSceneMap;
 

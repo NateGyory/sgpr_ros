@@ -1,11 +1,11 @@
 #pragma once
 
+#include <dirent.h>
 #include <fstream>
 #include <iomanip>
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-#include <dirent.h>
 
 using json = nlohmann::json;
 
@@ -44,6 +44,8 @@ inline void SaveEvalMetrics(EvalMetrics &em) {
   std::vector<std::string> files = GetFilenameFromFolder(path);
   int number = -1;
   for (auto file : files) {
+    if (file == "." || file == "..")
+      continue;
     int dot_position = file.find(".");
     if (dot_position != std::string::npos) {
       file.erase(dot_position, file.length() - dot_position);

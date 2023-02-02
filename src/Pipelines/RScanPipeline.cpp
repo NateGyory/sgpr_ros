@@ -1,4 +1,5 @@
 #include "Pipelines/RScanPipeline.h"
+#include "Processing/Laplacian.hpp"
 #include "Processing/PointCloud.hpp"
 #include <algorithm>
 #include <pcl/common/io.h>
@@ -6,6 +7,19 @@
 
 // NOTE: for gdb debugging
 std::string make_string(const char *x) { return x; }
+
+void RScanPipeline::Laplacian(int laplacian_type, SpectralObject &so) {
+  switch (laplacian_type) {
+  case 0: // Generic
+    Processing::Laplacian::genericLaplacian(so);
+    break;
+  case 1: // Normalized
+    Processing::Laplacian::normalizedLaplacian(so);
+    break;
+  default:
+    break;
+  }
+}
 
 int RScanPipeline::GetSize(int filtering_opts, int sample_size,
                            double filter_percent, int q_size, int r_size) {
@@ -88,8 +102,8 @@ void RScanPipeline::ParseDataset() {
 
     mSceneMap[ref_scene.scan_id] = ref_scene;
 
-    // For each reference scan we need to find all the query scans and populate
-    // the queryscan map
+    // For each reference scan we need to find all the query scans and
+    // populate the queryscan map
     // TODO do this in parallel
     for (auto const &scan : refQueryMapData["scans"]) {
       if (scan["reference"] == ref_scene.scan_id) {
@@ -189,7 +203,9 @@ void RScanPipeline::ComputeSceneFPS(Scene &scene, int filtering_opts,
           mSceneMap[scene.reference_id_match].spectral_objects[ref_obj_idx],
           size);
 
-      if (so.cloud->size() != mSceneMap[scene.reference_id_match].spectral_objects[ref_obj_idx].cloud->size()){
+      if (so.cloud->size() != mSceneMap[scene.reference_id_match]
+                                  .spectral_objects[ref_obj_idx]
+                                  .cloud->size()) {
         std::cout << "ERROR clouds not same" << std::endl;
         exit(1);
       }

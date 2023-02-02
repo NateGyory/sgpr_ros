@@ -24,9 +24,9 @@
 #include "Pipelines/RScanPipeline.h"
 
 #include "Processing/Eigen.hpp"
+#include "Processing/Files.hpp"
 #include "Processing/Laplacian.hpp"
 #include "Processing/PointCloud.hpp"
-#include "Processing/Files.hpp"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -77,29 +77,31 @@ void PlotSpectra() {
       std::vector<double> query =
           ImGuiState::DatasetTesting::eig_srv.request.q_eigs;
 
-      double min_ref = *std::min_element(ref.begin(), ref.end());
-      double max_ref = *std::max_element(ref.begin(), ref.end());
-      double min_query = *std::min_element(query.begin(), query.end());
-      double max_query = *std::max_element(query.begin(), query.end());
+      if (ref.size() > 0 && query.size() > 0) {
+        double min_ref = *std::min_element(ref.begin(), ref.end());
+        double max_ref = *std::max_element(ref.begin(), ref.end());
+        double min_query = *std::min_element(query.begin(), query.end());
+        double max_query = *std::max_element(query.begin(), query.end());
 
-      double min = std::min(min_ref, min_query);
-      double max = std::max(max_ref, max_query);
+        double min = std::min(min_ref, min_query);
+        double max = std::max(max_ref, max_query);
 
-      double bin_width = (max - min) / 25;
+        double bin_width = (max - min) / 25;
 
-      auto h1 = hist(ref);
-      h1->face_color("r");
-      h1->edge_color("r");
-      h1->bin_width(bin_width);
-      hold(on);
-      auto h2 = hist(query);
-      h2->face_color("b");
-      h2->edge_color("b");
-      h2->bin_width(bin_width);
-      title("Eigenvalue Spectras");
-      f->draw();
-      ImGuiState::DatasetTesting::update_hist = false;
-      ImGuiState::DatasetTesting::eigs_mtx.unlock();
+        auto h1 = hist(ref);
+        h1->face_color("r");
+        h1->edge_color("r");
+        h1->bin_width(bin_width);
+        hold(on);
+        auto h2 = hist(query);
+        h2->face_color("b");
+        h2->edge_color("b");
+        h2->bin_width(bin_width);
+        title("Eigenvalue Spectras");
+        f->draw();
+        ImGuiState::DatasetTesting::update_hist = false;
+        ImGuiState::DatasetTesting::eigs_mtx.unlock();
+      }
     }
   }
 }
@@ -572,12 +574,11 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
           if (q_so.global_id == r_so.global_id) {
 
-            ImGuiState::DatasetTesting::q_so = q_so;
-            ImGuiState::DatasetTesting::r_so = r_so;
-
             // if (r_so.scene_id == q_so.scene_id) {
             //   Do all the fancy matches
             ImGuiState::DatasetTesting::mtx.lock();
+            ImGuiState::DatasetTesting::q_so = q_so;
+            ImGuiState::DatasetTesting::r_so = r_so;
 
             // if (r_so.scene_id == q_so.scene_id) {
             Processing::PointCloud::computeSOR(
@@ -629,10 +630,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
             // TODO will need to add Laplacian choice when adding more in
             // future
-            Processing::Laplacian::genericLaplacian(
-                ImGuiState::DatasetTesting::q_so);
-            Processing::Laplacian::genericLaplacian(
-                ImGuiState::DatasetTesting::r_so);
+            pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+                          ImGuiState::DatasetTesting::q_so);
+            pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+                          ImGuiState::DatasetTesting::r_so);
 
             int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
             if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
@@ -718,17 +719,16 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     std::cout << "Negative | " << TN << "    | " << FN << std::endl;
     std::cout << "Positive | " << FP << "    | " << TP << std::endl;
 
-
     EvalMetrics em;
-    em.dataset = (ImGuiState::DatasetTesting::dataset_idx == 0) ? "3RScan" : "SemanticKitti";
+    em.dataset = (ImGuiState::DatasetTesting::dataset_idx == 0)
+                     ? "3RScan"
+                     : "SemanticKitti";
     em.sample_size = ImGuiState::DatasetTesting::sample_size;
     em.mean_k = ImGuiState::DatasetTesting::meanK;
     em.std_thresh = ImGuiState::DatasetTesting::stdThresh;
-    em.laplacian = "TODO";
+    em.laplacian = ImGuiState::DatasetTesting::GetLaplacianName();
     em.accuracy = accuracy;
     em.precision = precision;
-
-    // Save the file now
     em.recall = recall;
     em.f1_score = f1_score;
 
@@ -843,10 +843,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
           // TODO will need to add Laplacian choice when adding more in
           // the future
-          Processing::Laplacian::genericLaplacian(
-              ImGuiState::DatasetTesting::q_so);
-          Processing::Laplacian::genericLaplacian(
-              ImGuiState::DatasetTesting::r_so);
+          pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+                        ImGuiState::DatasetTesting::q_so);
+          pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+                        ImGuiState::DatasetTesting::r_so);
 
           int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
           if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
@@ -1096,8 +1096,12 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         ImGuiState::DatasetTesting::r_so.mcar = mcar;
       }
 
-      Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
-      Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+      // Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::q_so);
+      // Processing::Laplacian::genericLaplacian(ImGuiState::DatasetTesting::r_so);
+      pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+                    ImGuiState::DatasetTesting::q_so);
+      pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+                    ImGuiState::DatasetTesting::r_so);
 
       int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
       if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {

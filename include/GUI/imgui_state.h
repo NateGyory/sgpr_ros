@@ -11,7 +11,7 @@ namespace ImGuiState {
 
 inline const char *datasets[] = {"3RScan", "Matterport3D", "SemanticKitti"};
 inline const char *edge_heuristics[] = {"Knn", "MCAR", "Fully Connected"};
-inline const char *laplacians[] = {"Generic", "Normalized IDW"};
+inline const char *laplacians[] = {"Generic", "Normalized", "IDW", "Geometric"};
 inline const char *filtering[] = {"FPS", "VOX", "URS"};
 
 namespace DatasetTesting {
@@ -101,6 +101,26 @@ inline static bool ComputedEigs() { return eigs; }
 inline static bool SavedEigs() { return saved_eigs; }
 inline static bool FilterPercent() { return filtering_opts == 1; }
 inline static bool SampleSize() { return filtering_opts == 2; }
+inline static std::string GetLaplacianName() {
+  std::string name = "";
+  switch (laplacian_idx) {
+  case 0:
+    name = "Generic";
+    break;
+  case 1:
+    name = "Normalized";
+    break;
+  case 2:
+    name = "IDW";
+    break;
+  case 3:
+    name = "Geometric";
+    break;
+  default:
+    break;
+  }
+  return name;
+}
 
 }; // namespace DatasetTesting
 } // namespace ImGuiState

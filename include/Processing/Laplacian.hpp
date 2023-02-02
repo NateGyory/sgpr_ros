@@ -90,7 +90,67 @@ inline void genericLaplacian(SpectralObject &spectral_object) {
   // Call checkLaplacian(spectral_object) to verify the laplacian is correct
 }
 
-inline void normalizedLaplacian(SpectralObject &spectral_object) {
+inline void normalizedLaplacian(SpectralObject &so) {
+
+  std::cout << "NORMALIZED" << std::endl;
+  unsigned int max_nn = 1000;
+
+  int size = so.cloud->size();
+  so.laplacian = arma::sp_mat(size, size);
+
+  // Make degree matrix first
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    so.kdTree.radiusSearch(i, so.mcar, indicies_found, squaredDistances,
+                           max_nn);
+
+    int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
+    so.laplacian(i, i) = num_edges;
+
+    // for (int j = 0; j < indicies_found.size(); j++) {
+    //   if (indicies_found[j] == i)
+    //     continue;
+    //   so.laplacian(i, indicies_found[j]) = -1;
+    //   so.laplacian(indicies_found[j], i) = -1;
+    // }
+  }
+
+  // Make adjecency matrix next
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    so.kdTree.radiusSearch(i, so.mcar, indicies_found, squaredDistances,
+                           max_nn);
+
+    for (int j = 0; j < indicies_found.size(); j++) {
+      if (indicies_found[j] == i)
+        continue;
+      so.laplacian(i, indicies_found[j]) =
+          -1 / std::sqrt(so.laplacian(i, i) * so.laplacian(j, j));
+      so.laplacian(indicies_found[j], i) =
+          -1 / std::sqrt(so.laplacian(i, i) * so.laplacian(j, j));
+    }
+  }
+
+  // Set diagonal to 1
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    so.kdTree.radiusSearch(i, so.mcar, indicies_found, squaredDistances,
+                           max_nn);
+
+
+    so.laplacian(i, i) = 1;
+  }
+}
+
+inline void IDWLaplacian(SpectralObject &spectral_object) {
 
   setSmallestDistance(spectral_object);
   double bias = 1.0 - spectral_object.smallest_distance;
