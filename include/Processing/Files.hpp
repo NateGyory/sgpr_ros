@@ -15,10 +15,12 @@ struct EvalMetrics {
   int mean_k;
   double std_thresh;
   std::string laplacian;
-  double accuracy;
+  double class_accuracy;
+  double instance_accuracy;
   double precision;
   double recall;
   double f1_score;
+  double threshold;
 };
 
 namespace Processing {
@@ -62,10 +64,12 @@ inline void SaveEvalMetrics(EvalMetrics &em) {
   data["mean_k"] = em.mean_k;
   data["std_thresh"] = em.std_thresh;
   data["laplacian"] = em.laplacian;
-  data["accuracy"] = em.accuracy;
+  data["instance_accuracy"] = em.instance_accuracy;
+  data["class_accuracy"] = em.class_accuracy;
   data["precision"] = em.precision;
   data["recall"] = em.recall;
   data["f1_score"] = em.f1_score;
+  data["threshold"] = em.threshold;
 
   std::string filename = std::to_string(number) + ".json";
   std::ofstream o(path + filename);

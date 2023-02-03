@@ -42,10 +42,11 @@ using namespace std::chrono_literals;
 using namespace matplot;
 
 struct Result {
-  std::string ref_scan_id;
-  std::string correct_ref_scan_id;
-  int correct_count;
-  int incorrect_count;
+  //int obj_match_vote;
+  //int obj_dnm_vote;
+  //int obj_total;
+  double obj_match_ratio;
+  bool is_match;
 };
 
 ros::ServiceClient evaluation_service_client;
@@ -556,6 +557,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     int FN = 0;
     int TN = 0;
     bool TN_flag = false;
+    int class_id_correct = 0;
+    int class_id_wrong = 0;
     for (auto &kv : pl->mSceneMap) {
       if (kv.second.is_reference)
         continue;
@@ -679,17 +682,29 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             }
 
             if (ks_result || ad_result) {
-              if (r_so.scene_id == q_so.scene_id) {
+              // if (r_so.scene_id == q_so.scene_id) {
+              if (r_so.global_id == q_so.global_id &&
+                  r_so.scene_id == q_so.scene_id) {
                 TP++;
               } else {
                 FP++;
               }
+              //          if (r_so.global_id == q_so.global_id)
+              //            class_id_correct++;
+              //          else
+              //            class_id_wrong++;
             } else {
-              if (r_so.scene_id == q_so.scene_id) {
+              // if (r_so.scene_id == q_so.scene_id) {
+              if (r_so.global_id == q_so.global_id &&
+                  r_so.scene_id == q_so.scene_id) {
                 FN++;
               } else {
                 TN++;
               }
+              //            if (r_so.global_id == q_so.global_id)
+              //             class_id_wrong++;
+              //           else
+              //             class_id_correct++;
             }
             total_compared++;
             if (ImGuiState::DatasetTesting::debug_eval) {
@@ -706,11 +721,14 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     // business
 
     // double accuracy = (TP + TN) / double(total_compared);
-    double accuracy = (TP + TN) / double(TP + TN + FP + FN);
+    double class_accuracy =
+        class_id_correct / double(class_id_correct + class_id_wrong);
+    double instance_accuracy = (TP + TN) / double(TP + TN + FP + FN);
     double precision = TP / double(TP + FP);
     double recall = TP / double(TP + FN);
     double f1_score = (2 * precision * recall) / (precision + recall);
-    std::cout << "Accuracy: " << accuracy << std::endl;
+    std::cout << "Class Accuracy: " << class_accuracy << std::endl;
+    std::cout << "Instance Accuracy: " << instance_accuracy << std::endl;
     std::cout << "Precision: " << precision << std::endl;
     std::cout << "Recall: " << recall << std::endl;
     std::cout << "f1_score: " << f1_score << std::endl;
@@ -727,10 +745,12 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     em.mean_k = ImGuiState::DatasetTesting::meanK;
     em.std_thresh = ImGuiState::DatasetTesting::stdThresh;
     em.laplacian = ImGuiState::DatasetTesting::GetLaplacianName();
-    em.accuracy = accuracy;
+    em.class_accuracy = class_accuracy;
+    em.instance_accuracy = instance_accuracy;
     em.precision = precision;
     em.recall = recall;
     em.f1_score = f1_score;
+    em.threshold = 1.0;
 
     Processing::Files::SaveEvalMetrics(em);
     // File name will be results/3RScan/laplacian_name/idx.json
@@ -773,8 +793,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           continue;
 
         // For all the objects in the query scan
-        int correct_matches = 0;
-        int incorrect_matches = 0;
+        int obj_match_vote = 0;
+        int obj_dnm_vote = 0;
         bool ks_result, ad_result;
         for (auto &q_so : q_kv.second.spectral_objects) {
 
@@ -782,11 +802,11 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           auto begin_it = r_kv.second.spectral_objects.begin();
           auto end_it = r_kv.second.spectral_objects.end();
 
-          int scene_id = q_so.scene_id;
+          int global_id = q_so.global_id;
 
           auto it = std::find_if(begin_it, end_it,
-                                 [scene_id](const SpectralObject &r_so) {
-                                   return r_so.scene_id == scene_id;
+                                 [global_id](const SpectralObject &r_so) {
+                                   return r_so.global_id == global_id;
                                  });
 
           int ref_obj_idx = it - begin_it;
@@ -890,9 +910,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
           }
 
           if (ks_result || ad_result) {
-            correct_matches++;
+            obj_match_vote++;
           } else {
-            incorrect_matches++;
+            obj_dnm_vote++;
           }
 
           if (ImGuiState::DatasetTesting::debug_eval) {
@@ -901,51 +921,118 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             }
           }
         }
+
         Result scene_result;
-        scene_result.ref_scan_id = r_kv.first;
-        scene_result.correct_ref_scan_id = q_kv.second.reference_id_match;
-        scene_result.correct_count = correct_matches;
-        scene_result.incorrect_count = incorrect_matches;
-        result_map[q_kv.first].push_back(scene_result);
+        //scene_result.ref_scan_id = r_kv.first;
+        //scene_result.correct_ref_scan_id = q_kv.second.reference_id_match;
+        //scene_result.obj_match_vote = obj_match_vote;
+        //scene_result.obj_dnm_vote = obj_dnm_vote;
+        //scene_result.obj_total = r_kv.second.spectral_objects.size();
+        //scene_result.obj_match_ratio = obj_match_vote / (double(obj_match_vote + obj_dnm_vote));
+        scene_result.obj_match_ratio = obj_match_vote / double(r_kv.second.spectral_objects.size());
+        scene_result.is_match = r_kv.first == q_kv.second.reference_id_match;
+        result_map[r_kv.first].push_back(scene_result);
       }
     }
+
+    // {
+    //   results : [
+    //     ref_scan_id: scan_id
+    //     query_scan_truth: [... 0 or 1 for correct pred]
+    //     query_scan_pred: [... the pred percent]
+    //   ]
+    // }
+
+
+    std::ofstream o("/home/nate/Development/catkin_ws/src/sgpr_ros/results/pr.json");
+    json data;
+    for (auto kv : result_map) {
+      json result;
+      result["ref_scan_id"] = kv.first;
+      std::cout << "Ref: " << kv.first << std::endl;
+      for (auto res : kv.second) {
+        std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
+        std::cout << "truth" << res.is_match << std::endl;
+        result["query_scan_truth"].push_back(res.is_match);
+        result["query_scan_pred"].push_back(res.obj_match_ratio);
+      }
+      data["results"].push_back(result);
+    }
+
+
+    o << std::setw(4) << data << std::endl;
+    o.close();
 
     // Loop over the scene_result map and get TP TN FP FN
-    std::cout << "Place Recognition Results!" << std::endl;
-    // TODO play with PR thresholds for what is considered a match or not
-    for (auto const &kv : result_map) {
-      std::cout << "Ref Scan: " << kv.first << std::endl;
-      int max_correct = 0;
-      std::string matched_scan_id;
-      for (auto const &result : kv.second) {
-        if (result.correct_count > max_correct) {
-          matched_scan_id = result.ref_scan_id;
-        }
-      }
-      if (matched_scan_id == kv.second[0].correct_ref_scan_id) {
-        std::cout << "Correct!" << std::endl;
-        TP++;
-        TN += kv.second.size() - 1;
-      } else {
-        std::cout << "Incorrect!" << std::endl;
-        FP++;
-        FN++;
-        TN += kv.second.size() - 2;
-      }
-    }
+    //std::cout << "Place Recognition Results!" << std::endl;
+    //double threshold = .5;
+    //for (auto const &kv : result_map) {
+    //  std::cout << "Query Scan: " << kv.first << std::endl;
+    //  std::cout << "Correct Ref: " << kv.second[0].correct_ref_scan_id
+    //            << std::endl;
+    //  // int max_correct = 0;
+    //  std::vector<std::string> matched_scan_ids;
+    //  for (auto const &result : kv.second) {
+    //    std::cout << "Ref: " << result.ref_scan_id << std::endl;
+    //    std::cout << "Obj match vote: " << result.obj_match_vote <<
+    //    std::endl; std::cout << "Total Objs: " << result.obj_total
+    //               << std::endl;
+    //    double ratio_matched = result.obj_match_vote / double(result.obj_total);
+    //    std::cout << "Ratio" << ratio_matched << std::endl;
+    //    if (ratio_matched > threshold) {
+    //      // max_correct = result.obj_match_vote;
+    //      matched_scan_ids.push_back(result.ref_scan_id);
+    //    }
+    //  }
 
-    double accuracy = (TP + TN) / double(TN + TP + FN + FP);
-    double precision = TP / double(TP + FP);
-    double recall = TP / double(TP + FN);
-    double f1_score = (2 * precision * recall) / (precision + recall);
-    std::cout << "Accuracy: " << accuracy << std::endl;
-    std::cout << "Precision: " << precision << std::endl;
-    std::cout << "Recall: " << recall << std::endl;
-    std::cout << "f1_score: " << f1_score << std::endl;
-    std::cout << "\nConfusion Matrix" << std::endl;
-    std::cout << "          Negative | Poistive" << std::endl;
-    std::cout << "Negative | " << TN << "    | " << FN << std::endl;
-    std::cout << "Positive | " << FP << "    | " << TP << std::endl;
+    //  std::cout << "--------------" << std::endl;
+    //  for (std::string scan : matched_scan_ids) {
+    //    if (scan == kv.second[0].correct_ref_scan_id) {
+    //      std::cout << "Correct!" << std::endl;
+    //      TP++;
+    //    } else {
+    //      std::cout << "Incorrect!" << std::endl;
+    //      FP++;
+    //    }
+    //  }
+    //  std::cout << "--------------" << std::endl;
+    //  if (matched_scan_ids.size() == 0)
+    //    FN++;
+
+    //  TN += kv.second.size() - matched_scan_ids.size();
+
+    //  //std::cout << "scan with the mosted matches: " << matched_scan_id
+    //  //          << std::endl;
+    //  //std::cout << "correct scan: " << kv.second[0].correct_ref_scan_id
+    //  //          << std::endl;
+    //  //std::cout << "-------------------------" << std::endl;
+    //  //if (matched_scan_id == kv.second[0].correct_ref_scan_id) {
+    //  //  std::cout << "Correct!" << std::endl;
+    //  //  TP++;
+    //  //  TN += kv.second.size() - 1;
+    //  //} else {
+    //  //  std::cout << "Incorrect!" << std::endl;
+    //  //  FP++;
+    //  //  FN++;
+    //  //  TN += kv.second.size() - 2;
+    //  //}
+    //  std::cout << "-------------------------" << std::endl;
+    //}
+
+    //double accuracy = (TP + TN) / double(TN + TP + FN + FP);
+    //double precision = TP / double(TP + FP);
+    //double recall = TP / double(TP + FN);
+    //double f1_score = (2 * precision * recall) / (precision + recall);
+    //std::cout << "Accuracy: " << accuracy << std::endl;
+    //std::cout << "Precision: " << precision << std::endl;
+    //std::cout << "Recall: " << recall << std::endl;
+    //std::cout << "f1_score: " << f1_score << std::endl;
+    //std::cout << "\nConfusion Matrix" << std::endl;
+    //std::cout << "          Negative | Poistive" << std::endl;
+    //std::cout << "Negative | " << TN << "    | " << FN << std::endl;
+    //std::cout << "Positive | " << FP << "    | " << TP << std::endl;
+
+    // 
   }
 
   // --------------------------------------------------------------

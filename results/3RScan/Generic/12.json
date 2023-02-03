@@ -1,0 +1,12 @@
+{
+    "class_accuracy": 0.8525752314814815,
+    "f1_score": 0.31596925704526047,
+    "instance_accuracy": 0.8841145833333334,
+    "laplacian": "Generic",
+    "mean_k": 3,
+    "precision": 0.1931106471816284,
+    "recall": 0.8685446009389671,
+    "sample_size": 50,
+    "std_thresh": 3.0,
+    "threshold": 1.0
+}
