@@ -559,6 +559,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     bool TN_flag = false;
     int class_id_correct = 0;
     int class_id_wrong = 0;
+    std::vector<int> truth_label;
+    std::vector<int> pred_label;
     for (auto &kv : pl->mSceneMap) {
       if (kv.second.is_reference)
         continue;
@@ -683,10 +685,13 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
             if (ks_result || ad_result) {
               // if (r_so.scene_id == q_so.scene_id) {
+              pred_label.push_back(1);
               if (r_so.global_id == q_so.global_id &&
                   r_so.scene_id == q_so.scene_id) {
+                truth_label.push_back(1);
                 TP++;
               } else {
+                truth_label.push_back(0);
                 FP++;
               }
               //          if (r_so.global_id == q_so.global_id)
@@ -695,10 +700,13 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
               //            class_id_wrong++;
             } else {
               // if (r_so.scene_id == q_so.scene_id) {
+              pred_label.push_back(0);
               if (r_so.global_id == q_so.global_id &&
                   r_so.scene_id == q_so.scene_id) {
+                truth_label.push_back(1);
                 FN++;
               } else {
+                truth_label.push_back(0);
                 TN++;
               }
               //            if (r_so.global_id == q_so.global_id)
@@ -721,13 +729,13 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     // business
 
     // double accuracy = (TP + TN) / double(total_compared);
-    double class_accuracy =
-        class_id_correct / double(class_id_correct + class_id_wrong);
+    //double class_accuracy =
+    //    class_id_correct / double(class_id_correct + class_id_wrong);
     double instance_accuracy = (TP + TN) / double(TP + TN + FP + FN);
     double precision = TP / double(TP + FP);
     double recall = TP / double(TP + FN);
     double f1_score = (2 * precision * recall) / (precision + recall);
-    std::cout << "Class Accuracy: " << class_accuracy << std::endl;
+    //std::cout << "Class Accuracy: " << class_accuracy << std::endl;
     std::cout << "Instance Accuracy: " << instance_accuracy << std::endl;
     std::cout << "Precision: " << precision << std::endl;
     std::cout << "Recall: " << recall << std::endl;
@@ -745,12 +753,14 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     em.mean_k = ImGuiState::DatasetTesting::meanK;
     em.std_thresh = ImGuiState::DatasetTesting::stdThresh;
     em.laplacian = ImGuiState::DatasetTesting::GetLaplacianName();
-    em.class_accuracy = class_accuracy;
+    //em.class_accuracy = class_accuracy;
     em.instance_accuracy = instance_accuracy;
     em.precision = precision;
     em.recall = recall;
     em.f1_score = f1_score;
     em.threshold = 1.0;
+    em.truth_labels = truth_label;
+    em.pred_labels = pred_label;
 
     Processing::Files::SaveEvalMetrics(em);
     // File name will be results/3RScan/laplacian_name/idx.json
@@ -944,15 +954,19 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     // }
 
 
-    std::ofstream o("/home/nate/Development/catkin_ws/src/sgpr_ros/results/pr.json");
+    std::string file_name = "/pr.json";
+    std::string path = "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/";
+    std::string lap_name = ImGuiState::DatasetTesting::GetLaplacianName();
+    std::string save_path = path + lap_name + file_name;
+    std::ofstream o(save_path);
     json data;
     for (auto kv : result_map) {
       json result;
       result["ref_scan_id"] = kv.first;
-      std::cout << "Ref: " << kv.first << std::endl;
+      //std::cout << "Ref: " << kv.first << std::endl;
       for (auto res : kv.second) {
-        std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
-        std::cout << "truth" << res.is_match << std::endl;
+        //std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
+        //std::cout << "truth" << res.is_match << std::endl;
         result["query_scan_truth"].push_back(res.is_match);
         result["query_scan_pred"].push_back(res.obj_match_ratio);
       }

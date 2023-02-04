@@ -1,18 +1,48 @@
 {
-    "all_scenes": false,
-    "ply_filename": "labels.instances.annotated.v2.ply",
-    "reference_scans": [
-        {
-            "scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d"
-        },
-        {
-            "scan_id": "4d3d829e-8cf4-2e04-8318-b76f02d91c93"
-        },
-        {
-            "scan_id": "4e858c81-fd93-2cb4-8469-d9226116b5de"
-        },
-        {
-            "scan_id": "4e858c8f-fd93-2cb4-8676-36cea7ef23cc"
-        }
-    ]
+  "all_scenes": false,
+  "ply_filename": "labels.instances.annotated.v2.ply",
+  "reference_scans": [
+    {
+      "scan_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d"
+    },
+    {
+      "scan_id": "4d3d829e-8cf4-2e04-8318-b76f02d91c93"
+    },
+    {
+      "scan_id": "4e858c81-fd93-2cb4-8469-d9226116b5de"
+    },
+    {
+      "scan_id": "4e858c8f-fd93-2cb4-8676-36cea7ef23cc"
+    },
+    {
+      "scan_id": "02b33dfb-be2b-2d54-92d2-cd012b2b3c40"
+    },
+    {
+      "scan_id": "02b33e01-be2b-2d54-93fb-4145a709cec5"
+    },
+    {
+      "scan_id": "095821f7-e2c2-2de1-9568-b9ce59920e29"
+    },
+    {
+      "scan_id": "0958224e-e2c2-2de1-943b-38e36345e2e7"
+    },
+    {
+      "scan_id": "0ad2d386-79e2-2212-9b40-43d081db442a"
+    },
+    {
+      "scan_id": "0ad2d38f-79e2-2212-98d2-9b5060e5e9b5"
+    },
+    {
+      "scan_id": "0ad2d399-79e2-2212-99cf-7a3512734bd7"
+    },
+    {
+      "scan_id": "0ad2d39b-79e2-2212-99ae-830c292cd079"
+    },
+    {
+      "scan_id": "0ad2d3a3-79e2-2212-9a51-9094be707ec2"
+    },
+    {
+      "scan_id": "0cac7549-8d6f-2d13-8d56-b895956f571a"
+    }
+  ]
 }

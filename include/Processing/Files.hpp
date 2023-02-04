@@ -21,6 +21,8 @@ struct EvalMetrics {
   double recall;
   double f1_score;
   double threshold;
+  std::vector<int> pred_labels;
+  std::vector<int> truth_labels;
 };
 
 namespace Processing {
@@ -70,6 +72,8 @@ inline void SaveEvalMetrics(EvalMetrics &em) {
   data["recall"] = em.recall;
   data["f1_score"] = em.f1_score;
   data["threshold"] = em.threshold;
+  data["pred_labels"] = em.pred_labels;
+  data["truth_labels"] = em.truth_labels;
 
   std::string filename = std::to_string(number) + ".json";
   std::ofstream o(path + filename);

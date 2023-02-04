@@ -177,12 +177,12 @@ inline void IDWLaplacian(SpectralObject &spectral_object) {
     double norm = 0.0f;
     for (int j = 1; j < indicies_found.size(); j++) {
       double val = 1 / (sqrt(squaredDistances[j]) + bias);
-      norm += val;
+      //norm += val;
       spectral_object.laplacian(i, indicies_found[j]) = -1 * val;
       spectral_object.laplacian(indicies_found[j], i) = -1 * val;
     }
 
-    spectral_object.laplacian(i, i) /= norm; // Normalize the degree value
+    //spectral_object.laplacian(i, i) /= norm; // Normalize the degree value
   }
 }
 

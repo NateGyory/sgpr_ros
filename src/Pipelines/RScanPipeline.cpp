@@ -16,6 +16,8 @@ void RScanPipeline::Laplacian(int laplacian_type, SpectralObject &so) {
   case 1: // Normalized
     Processing::Laplacian::normalizedLaplacian(so);
     break;
+  case 2: // IDW
+    Processing::Laplacian::IDWLaplacian(so);
   default:
     break;
   }
