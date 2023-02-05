@@ -18,6 +18,13 @@ void RScanPipeline::Laplacian(int laplacian_type, SpectralObject &so) {
     break;
   case 2: // IDW
     Processing::Laplacian::IDWLaplacian(so);
+    break;
+  case 3: // Geometric
+    Processing::Laplacian::GeometricLaplacian(so);
+    break;
+  case 4: // Geometric_IDW
+    Processing::Laplacian::GeometricIDWLaplacian(so);
+    break;
   default:
     break;
   }

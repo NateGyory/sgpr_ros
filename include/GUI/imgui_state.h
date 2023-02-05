@@ -11,7 +11,7 @@ namespace ImGuiState {
 
 inline const char *datasets[] = {"3RScan", "Matterport3D", "SemanticKitti"};
 inline const char *edge_heuristics[] = {"Knn", "MCAR", "Fully Connected"};
-inline const char *laplacians[] = {"Generic", "Normalized", "IDW", "Geometric"};
+inline const char *laplacians[] = {"Generic", "Normalized", "IDW", "Geometric", "Geometric_IDW"};
 inline const char *filtering[] = {"FPS", "VOX", "URS"};
 
 namespace DatasetTesting {
@@ -115,6 +115,9 @@ inline static std::string GetLaplacianName() {
     break;
   case 3:
     name = "Geometric";
+    break;
+  case 4:
+    name = "Geometric_IDW";
     break;
   default:
     break;

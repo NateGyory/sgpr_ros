@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <pcl/features/normal_3d.h>
 
 namespace Processing {
 namespace Laplacian {
@@ -145,8 +146,91 @@ inline void normalizedLaplacian(SpectralObject &so) {
     so.kdTree.radiusSearch(i, so.mcar, indicies_found, squaredDistances,
                            max_nn);
 
-
     so.laplacian(i, i) = 1;
+  }
+}
+
+inline void GeometricLaplacian(SpectralObject &spectral_object) {
+  // Compute the normals for every point
+  pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+  pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
+  ne.setInputCloud(spectral_object.cloud);
+  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree(
+      new pcl::search::KdTree<pcl::PointXYZRGB>());
+  ne.setSearchMethod(tree);
+  // ne.setRadiusSearch(spectral_object.mcar);
+  ne.setKSearch(7);
+  ne.compute(*normals);
+
+  unsigned int max_nn = 1000;
+
+  int size = spectral_object.cloud->size();
+  spectral_object.laplacian = arma::sp_mat(size, size);
+
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    spectral_object.kdTree.radiusSearch(i, spectral_object.mcar, indicies_found,
+                                        squaredDistances, max_nn);
+
+    int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
+    spectral_object.laplacian(i, i) = num_edges * normals->points[i].curvature * 10;
+
+    for (int j = 0; j < indicies_found.size(); j++) {
+      if (indicies_found[j] == i)
+        continue;
+      spectral_object.laplacian(i, indicies_found[j]) = -1;
+      spectral_object.laplacian(indicies_found[j], i) = -1;
+    }
+  }
+}
+
+inline void GeometricIDWLaplacian(SpectralObject &spectral_object) {
+  // Compute the normals for every point
+  pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
+  pcl::NormalEstimation<pcl::PointXYZRGB, pcl::Normal> ne;
+  ne.setInputCloud(spectral_object.cloud);
+  pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree(
+      new pcl::search::KdTree<pcl::PointXYZRGB>());
+  ne.setSearchMethod(tree);
+  // ne.setRadiusSearch(spectral_object.mcar);
+  ne.setKSearch(7);
+  ne.compute(*normals);
+
+  unsigned int max_nn = 1000;
+
+  int size = spectral_object.cloud->size();
+  spectral_object.laplacian = arma::sp_mat(size, size);
+
+  setSmallestDistance(spectral_object);
+  double bias = 1.0 - spectral_object.smallest_distance;
+
+  for (int i = 0; i < size; i++) {
+    std::vector<int> indicies_found;
+    std::vector<float> squaredDistances;
+    spectral_object.kdTree.radiusSearch(i, spectral_object.mcar, indicies_found,
+                                        squaredDistances, max_nn);
+
+    int num_edges = indicies_found.size() - 1;
+    if (num_edges == 0) {
+      std::cout << "ERROR, Graph is Disconnected" << std::endl;
+      std::exit(1);
+    }
+
+    spectral_object.laplacian(i, i) =  num_edges * normals->points[i].curvature * 10;
+
+    for (int j = 0; j < indicies_found.size(); j++) {
+      if (indicies_found[j] == i)
+        continue;
+      double val = 1 / (sqrt(squaredDistances[j]) + bias);
+      spectral_object.laplacian(i, indicies_found[j]) = -1 * val;
+      spectral_object.laplacian(indicies_found[j], i) = -1 * val;
+    }
   }
 }
 
@@ -174,15 +258,17 @@ inline void IDWLaplacian(SpectralObject &spectral_object) {
 
     spectral_object.laplacian(i, i) = num_edges;
 
-    double norm = 0.0f;
-    for (int j = 1; j < indicies_found.size(); j++) {
+    //double norm = 0.0f;
+    for (int j = 0; j < indicies_found.size(); j++) {
+      if (indicies_found[j] == i)
+        continue;
       double val = 1 / (sqrt(squaredDistances[j]) + bias);
-      //norm += val;
+      // norm += val;
       spectral_object.laplacian(i, indicies_found[j]) = -1 * val;
       spectral_object.laplacian(indicies_found[j], i) = -1 * val;
     }
 
-    //spectral_object.laplacian(i, i) /= norm; // Normalize the degree value
+    // spectral_object.laplacian(i, i) /= norm; // Normalize the degree value
   }
 }
 

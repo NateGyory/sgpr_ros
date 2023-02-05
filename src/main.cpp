@@ -42,9 +42,9 @@ using namespace std::chrono_literals;
 using namespace matplot;
 
 struct Result {
-  //int obj_match_vote;
-  //int obj_dnm_vote;
-  //int obj_total;
+  // int obj_match_vote;
+  // int obj_dnm_vote;
+  // int obj_total;
   double obj_match_ratio;
   bool is_match;
 };
@@ -561,6 +561,12 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     int class_id_wrong = 0;
     std::vector<int> truth_label;
     std::vector<int> pred_label;
+    std::vector<std::vector<double>> query_gfa;
+    std::vector<std::vector<double>> ref_gfa;
+    std::vector<int> q_global_id;
+    std::vector<int> q_scene_id;
+    std::vector<int> r_global_id;
+    std::vector<int> r_scene_id;
     for (auto &kv : pl->mSceneMap) {
       if (kv.second.is_reference)
         continue;
@@ -584,6 +590,14 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             ImGuiState::DatasetTesting::mtx.lock();
             ImGuiState::DatasetTesting::q_so = q_so;
             ImGuiState::DatasetTesting::r_so = r_so;
+
+            query_gfa.push_back(ImGuiState::DatasetTesting::q_so.gfaFeatures);
+            q_global_id.push_back(ImGuiState::DatasetTesting::q_so.global_id);
+            q_scene_id.push_back(ImGuiState::DatasetTesting::q_so.scene_id);
+
+            ref_gfa.push_back(ImGuiState::DatasetTesting::r_so.gfaFeatures);
+            r_global_id.push_back(ImGuiState::DatasetTesting::r_so.global_id);
+            r_scene_id.push_back(ImGuiState::DatasetTesting::r_so.scene_id);
 
             // if (r_so.scene_id == q_so.scene_id) {
             Processing::PointCloud::computeSOR(
@@ -669,6 +683,11 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             ImGuiState::DatasetTesting::update_hist = true;
             ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
+            //if (ImGuiState::DatasetTesting::eig_srv.request.q_eigs.size() ==
+            //        0 ||
+            //    ImGuiState::DatasetTesting::eig_srv.request.r_eigs.size() == 0)
+            //  continue;
+
             // Eval service
             if (evaluation_service_client.call(
                     ImGuiState::DatasetTesting::eig_srv)) {
@@ -682,6 +701,13 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
               ROS_ERROR("eval service failed");
               exit(1);
             }
+
+            // Save GFA 
+            // {
+            //   query_gfa: []
+            //   reference_gfa: []
+            //   is_match_truth: []
+            // }
 
             if (ks_result || ad_result) {
               // if (r_so.scene_id == q_so.scene_id) {
@@ -729,13 +755,13 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     // business
 
     // double accuracy = (TP + TN) / double(total_compared);
-    //double class_accuracy =
+    // double class_accuracy =
     //    class_id_correct / double(class_id_correct + class_id_wrong);
     double instance_accuracy = (TP + TN) / double(TP + TN + FP + FN);
     double precision = TP / double(TP + FP);
     double recall = TP / double(TP + FN);
     double f1_score = (2 * precision * recall) / (precision + recall);
-    //std::cout << "Class Accuracy: " << class_accuracy << std::endl;
+    // std::cout << "Class Accuracy: " << class_accuracy << std::endl;
     std::cout << "Instance Accuracy: " << instance_accuracy << std::endl;
     std::cout << "Precision: " << precision << std::endl;
     std::cout << "Recall: " << recall << std::endl;
@@ -753,7 +779,7 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     em.mean_k = ImGuiState::DatasetTesting::meanK;
     em.std_thresh = ImGuiState::DatasetTesting::stdThresh;
     em.laplacian = ImGuiState::DatasetTesting::GetLaplacianName();
-    //em.class_accuracy = class_accuracy;
+    // em.class_accuracy = class_accuracy;
     em.instance_accuracy = instance_accuracy;
     em.precision = precision;
     em.recall = recall;
@@ -761,6 +787,19 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     em.threshold = 1.0;
     em.truth_labels = truth_label;
     em.pred_labels = pred_label;
+
+
+    GFAFeatures gfa;
+    gfa.query_gfa = query_gfa;
+    gfa.ref_gfa = ref_gfa;
+    gfa.match_results = truth_label;
+    gfa.q_global_id = q_global_id;
+    gfa.r_global_id = r_global_id;
+    gfa.q_scene_id = q_scene_id;
+    gfa.r_scene_id = r_scene_id;
+
+    // Save GFA results
+    Processing::Files::SaveGFAFeatures(gfa);
 
     Processing::Files::SaveEvalMetrics(em);
     // File name will be results/3RScan/laplacian_name/idx.json
@@ -933,13 +972,15 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         }
 
         Result scene_result;
-        //scene_result.ref_scan_id = r_kv.first;
-        //scene_result.correct_ref_scan_id = q_kv.second.reference_id_match;
-        //scene_result.obj_match_vote = obj_match_vote;
-        //scene_result.obj_dnm_vote = obj_dnm_vote;
-        //scene_result.obj_total = r_kv.second.spectral_objects.size();
-        //scene_result.obj_match_ratio = obj_match_vote / (double(obj_match_vote + obj_dnm_vote));
-        scene_result.obj_match_ratio = obj_match_vote / double(r_kv.second.spectral_objects.size());
+        // scene_result.ref_scan_id = r_kv.first;
+        // scene_result.correct_ref_scan_id = q_kv.second.reference_id_match;
+        // scene_result.obj_match_vote = obj_match_vote;
+        // scene_result.obj_dnm_vote = obj_dnm_vote;
+        // scene_result.obj_total = r_kv.second.spectral_objects.size();
+        // scene_result.obj_match_ratio = obj_match_vote /
+        // (double(obj_match_vote + obj_dnm_vote));
+        scene_result.obj_match_ratio =
+            obj_match_vote / double(r_kv.second.spectral_objects.size());
         scene_result.is_match = r_kv.first == q_kv.second.reference_id_match;
         result_map[r_kv.first].push_back(scene_result);
       }
@@ -953,9 +994,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     //   ]
     // }
 
-
     std::string file_name = "/pr.json";
-    std::string path = "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/";
+    std::string path =
+        "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/";
     std::string lap_name = ImGuiState::DatasetTesting::GetLaplacianName();
     std::string save_path = path + lap_name + file_name;
     std::ofstream o(save_path);
@@ -963,24 +1004,23 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     for (auto kv : result_map) {
       json result;
       result["ref_scan_id"] = kv.first;
-      //std::cout << "Ref: " << kv.first << std::endl;
+      // std::cout << "Ref: " << kv.first << std::endl;
       for (auto res : kv.second) {
-        //std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
-        //std::cout << "truth" << res.is_match << std::endl;
+        // std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
+        // std::cout << "truth" << res.is_match << std::endl;
         result["query_scan_truth"].push_back(res.is_match);
         result["query_scan_pred"].push_back(res.obj_match_ratio);
       }
       data["results"].push_back(result);
     }
 
-
     o << std::setw(4) << data << std::endl;
     o.close();
 
     // Loop over the scene_result map and get TP TN FP FN
-    //std::cout << "Place Recognition Results!" << std::endl;
-    //double threshold = .5;
-    //for (auto const &kv : result_map) {
+    // std::cout << "Place Recognition Results!" << std::endl;
+    // double threshold = .5;
+    // for (auto const &kv : result_map) {
     //  std::cout << "Query Scan: " << kv.first << std::endl;
     //  std::cout << "Correct Ref: " << kv.second[0].correct_ref_scan_id
     //            << std::endl;
@@ -991,9 +1031,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     //    std::cout << "Obj match vote: " << result.obj_match_vote <<
     //    std::endl; std::cout << "Total Objs: " << result.obj_total
     //               << std::endl;
-    //    double ratio_matched = result.obj_match_vote / double(result.obj_total);
-    //    std::cout << "Ratio" << ratio_matched << std::endl;
-    //    if (ratio_matched > threshold) {
+    //    double ratio_matched = result.obj_match_vote /
+    //    double(result.obj_total); std::cout << "Ratio" << ratio_matched <<
+    //    std::endl; if (ratio_matched > threshold) {
     //      // max_correct = result.obj_match_vote;
     //      matched_scan_ids.push_back(result.ref_scan_id);
     //    }
@@ -1033,20 +1073,20 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     //  std::cout << "-------------------------" << std::endl;
     //}
 
-    //double accuracy = (TP + TN) / double(TN + TP + FN + FP);
-    //double precision = TP / double(TP + FP);
-    //double recall = TP / double(TP + FN);
-    //double f1_score = (2 * precision * recall) / (precision + recall);
-    //std::cout << "Accuracy: " << accuracy << std::endl;
-    //std::cout << "Precision: " << precision << std::endl;
-    //std::cout << "Recall: " << recall << std::endl;
-    //std::cout << "f1_score: " << f1_score << std::endl;
-    //std::cout << "\nConfusion Matrix" << std::endl;
-    //std::cout << "          Negative | Poistive" << std::endl;
-    //std::cout << "Negative | " << TN << "    | " << FN << std::endl;
-    //std::cout << "Positive | " << FP << "    | " << TP << std::endl;
+    // double accuracy = (TP + TN) / double(TN + TP + FN + FP);
+    // double precision = TP / double(TP + FP);
+    // double recall = TP / double(TP + FN);
+    // double f1_score = (2 * precision * recall) / (precision + recall);
+    // std::cout << "Accuracy: " << accuracy << std::endl;
+    // std::cout << "Precision: " << precision << std::endl;
+    // std::cout << "Recall: " << recall << std::endl;
+    // std::cout << "f1_score: " << f1_score << std::endl;
+    // std::cout << "\nConfusion Matrix" << std::endl;
+    // std::cout << "          Negative | Poistive" << std::endl;
+    // std::cout << "Negative | " << TN << "    | " << FN << std::endl;
+    // std::cout << "Positive | " << FP << "    | " << TP << std::endl;
 
-    // 
+    //
   }
 
   // --------------------------------------------------------------

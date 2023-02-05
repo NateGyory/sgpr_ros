@@ -25,61 +25,91 @@ struct EvalMetrics {
   std::vector<int> truth_labels;
 };
 
+struct GFAFeatures {
+  std::vector<std::vector<double>> query_gfa;
+  std::vector<std::vector<double>> ref_gfa;
+  std::vector<int> match_results;
+  std::vector<int> q_global_id;
+  std::vector<int> q_scene_id;
+  std::vector<int> r_global_id;
+  std::vector<int> r_scene_id;
+};
+
 namespace Processing {
-namespace Files {
+  namespace Files {
 
-inline std::vector<std::string> GetFilenameFromFolder(std::string folder_path) {
-  std::vector<std::string> filenames;
-  DIR *dirp = opendir(folder_path.c_str());
-  if (dirp) {
-    struct dirent *dp;
-    while ((dp = readdir(dirp)) != nullptr) {
-      filenames.push_back(dp->d_name);
+  inline std::vector<std::string>
+  GetFilenameFromFolder(std::string folder_path) {
+    std::vector<std::string> filenames;
+    DIR *dirp = opendir(folder_path.c_str());
+    if (dirp) {
+      struct dirent *dp;
+      while ((dp = readdir(dirp)) != nullptr) {
+        filenames.push_back(dp->d_name);
+      }
+      closedir(dirp);
     }
-    closedir(dirp);
+    return filenames;
   }
-  return filenames;
-}
 
-inline void SaveEvalMetrics(EvalMetrics &em) {
-  std::string path = "/home/nate/Development/catkin_ws/src/sgpr_ros/results/" +
-                     em.dataset + "/" + em.laplacian + "/";
+  inline void SaveGFAFeatures(GFAFeatures &gfa) {
+    std::string path = "/home/nate/Development/catkin_ws/src/sgpr_ros/results/"
+                       "gfa/results.json";
 
-  std::vector<std::string> files = GetFilenameFromFolder(path);
-  int number = -1;
-  for (auto file : files) {
-    if (file == "." || file == "..")
-      continue;
-    int dot_position = file.find(".");
-    if (dot_position != std::string::npos) {
-      file.erase(dot_position, file.length() - dot_position);
+    json data;
+    data["q_gfa"] = gfa.query_gfa;
+    data["r_gfa"] = gfa.ref_gfa;
+    data["truth_labels"] = gfa.match_results;
+    data["q_global_id"] = gfa.q_global_id;
+    data["r_global_id"] = gfa.r_global_id;
+    data["q_scene_id"] = gfa.q_scene_id;
+    data["r_scene_id"] = gfa.r_scene_id;
+
+    std::ofstream o(path);
+    o << std::setw(4) << data << std::endl;
+    o.close();
+  }
+
+  inline void SaveEvalMetrics(EvalMetrics &em) {
+    std::string path =
+        "/home/nate/Development/catkin_ws/src/sgpr_ros/results/" + em.dataset +
+        "/" + em.laplacian + "/";
+
+    std::vector<std::string> files = GetFilenameFromFolder(path);
+    int number = -1;
+    for (auto file : files) {
+      if (file == "." || file == "..")
+        continue;
+      int dot_position = file.find(".");
+      if (dot_position != std::string::npos) {
+        file.erase(dot_position, file.length() - dot_position);
+      }
+      int file_number = stoi(file);
+      if (file_number > number)
+        number = file_number;
     }
-    int file_number = stoi(file);
-    if (file_number > number)
-      number = file_number;
+    number++;
+
+    // Save the file now
+    json data;
+    data["sample_size"] = em.sample_size;
+    data["mean_k"] = em.mean_k;
+    data["std_thresh"] = em.std_thresh;
+    data["laplacian"] = em.laplacian;
+    data["instance_accuracy"] = em.instance_accuracy;
+    data["class_accuracy"] = em.class_accuracy;
+    data["precision"] = em.precision;
+    data["recall"] = em.recall;
+    data["f1_score"] = em.f1_score;
+    data["threshold"] = em.threshold;
+    data["pred_labels"] = em.pred_labels;
+    data["truth_labels"] = em.truth_labels;
+
+    std::string filename = std::to_string(number) + ".json";
+    std::ofstream o(path + filename);
+    o << std::setw(4) << data << std::endl;
+    o.close();
   }
-  number++;
 
-  // Save the file now
-  json data;
-  data["sample_size"] = em.sample_size;
-  data["mean_k"] = em.mean_k;
-  data["std_thresh"] = em.std_thresh;
-  data["laplacian"] = em.laplacian;
-  data["instance_accuracy"] = em.instance_accuracy;
-  data["class_accuracy"] = em.class_accuracy;
-  data["precision"] = em.precision;
-  data["recall"] = em.recall;
-  data["f1_score"] = em.f1_score;
-  data["threshold"] = em.threshold;
-  data["pred_labels"] = em.pred_labels;
-  data["truth_labels"] = em.truth_labels;
-
-  std::string filename = std::to_string(number) + ".json";
-  std::ofstream o(path + filename);
-  o << std::setw(4) << data << std::endl;
-  o.close();
-}
-
-}; // namespace Files
-}; // namespace Processing
+  }; // namespace Files
+};   // namespace Processing
