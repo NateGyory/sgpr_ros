@@ -41,4 +41,5 @@ public:
   int GetSize(int filtering_opts, int sample_size, double filter_percent,
                int q_size, int r_size) override;
   void Laplacian(int laplacian_type, SpectralObject &so) override;
+  void SaveGFA() override;
 };

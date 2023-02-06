@@ -832,6 +832,10 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     // key - query scan
     // value - array<Pair<string,Pair<int,int>>
     std::unordered_map<std::string, std::vector<Result>> result_map;
+
+    // FIRST SAVE GFA
+    pl->SaveGFA();
+
     for (auto &q_kv : pl->mSceneMap) {
       if (q_kv.second.is_reference)
         continue;

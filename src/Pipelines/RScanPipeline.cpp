@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <pcl/common/io.h>
 #include <string>
+#include <vector>
 
 // NOTE: for gdb debugging
 std::string make_string(const char *x) { return x; }
@@ -459,4 +460,70 @@ void RScanPipeline::GetEigs(sgpr_ros::Eigenvalues &eig_srv,
       mSceneMap[query_scan].spectral_objects[query_obj_idx].gfaFeatures;
   eig_srv.request.r_gfa =
       mSceneMap[ref_scan].spectral_objects[ref_obj_idx].gfaFeatures;
+}
+
+void RScanPipeline::SaveGFA() {
+  // {
+  //   query : [{
+  //     scan_id:
+  //     ref_match_id:
+  //     global_ids: []
+  //     scene_ids: []
+  //     gfa_features: []
+  //   }],
+  //
+  //   ref : [{
+  //     scan_id:
+  //     global_ids: []
+  //     scene_ids: []
+  //     gfa_features: []
+  //   }]
+  // }
+
+  std::vector<json> query_list;
+  std::vector<json> ref_list;
+  for(auto const &kv: mSceneMap) {
+    if(kv.second.is_reference) {
+      json reference;
+      reference["scan_id"] = kv.second.scan_id;
+      std::vector<int> global_ids;
+      std::vector<int> scene_ids;
+      std::vector<std::vector<double>> gfa_features;
+      for (auto const so : kv.second.spectral_objects) {
+        global_ids.push_back(so.global_id);
+        scene_ids.push_back(so.scene_id);
+        gfa_features.push_back(so.gfaFeatures);
+      }
+      reference["global_ids"] = global_ids;
+      reference["scene_ids"] = scene_ids;
+      reference["gfa_features"] = gfa_features;
+      ref_list.push_back(reference);
+    } else {
+      json query;
+      query["scan_id"] = kv.second.scan_id;
+      query["ref_match_id"] = kv.second.reference_id_match;
+      std::vector<int> global_ids;
+      std::vector<int> scene_ids;
+      std::vector<std::vector<double>> gfa_features;
+      for (auto const so : kv.second.spectral_objects) {
+        global_ids.push_back(so.global_id);
+        scene_ids.push_back(so.scene_id);
+        gfa_features.push_back(so.gfaFeatures);
+      }
+      query["global_ids"] = global_ids;
+      query["scene_ids"] = scene_ids;
+      query["gfa_features"] = gfa_features;
+      query_list.push_back(query);
+    }
+  }
+
+  std::string file_path = "/home/nate/Development/catkin_ws/src/sgpr_ros/results/gfa/pr.json";
+
+  std::ofstream o(file_path);
+
+  json data;
+  data["reference"] = ref_list; 
+  data["query"] = query_list; 
+
+  o << std::setw(4) << data << std::endl;
 }
