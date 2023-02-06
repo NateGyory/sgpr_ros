@@ -998,11 +998,11 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     //   ]
     // }
 
-    std::string file_name = "/pr.json";
+    std::string file_extension = ".json";
     std::string path =
-        "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/";
+        "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/";
     std::string lap_name = ImGuiState::DatasetTesting::GetLaplacianName();
-    std::string save_path = path + lap_name + file_name;
+    std::string save_path = path + lap_name + file_extension;
     std::ofstream o(save_path);
     json data;
     for (auto kv : result_map) {
