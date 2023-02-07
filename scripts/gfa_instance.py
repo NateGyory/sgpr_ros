@@ -39,9 +39,17 @@ TN = 0
 FP = 0
 FN = 0
 for i in range(len(query_gfa)):
+    skip_flag = False
+    for val in query_gfa[i]:
+        if val == None:
+            skip_flag = True
+    if skip_flag: continue
+
     key_tuple = (q_global_id[i], q_scene_id[i])
     distance_list, indicie_list = knn.kneighbors([query_gfa[i]])
     predicted_class_id = indicie_list[0][0]
+    if not key_tuple in instance_id_map:
+        continue
     actual_class = instance_id_map[key_tuple]
 
     if actual_class == predicted_class_id:

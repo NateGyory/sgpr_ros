@@ -1,4 +1,5 @@
 from sklearn.metrics import precision_recall_curve, roc_curve, confusion_matrix
+from sklearn.neighbors import KNeighborsClassifier
 import seaborn as sns
 
 import matplotlib.pyplot as plt
@@ -23,21 +24,22 @@ f_geometric_idw = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3R
 json_list = list()
 
 data = json.load(f_generic)
-json_list.append(data)
+json_list.append((data, "Generic"))
 data = json.load(f_normalized)
-json_list.append(data)
+json_list.append((data,"Normalized"))
 data = json.load(f_idw)
-json_list.append(data)
+json_list.append((data, "IDW"))
 data = json.load(f_geometric)
-json_list.append(data)
+json_list.append((data, "Geometric"))
 data = json.load(f_geometric_idw)
-json_list.append(data)
+json_list.append((data, "Geometric_IDW"))
 
 
 precision_dict = dict()
 recall_dict = dict()
 fpr_dict = dict()
 tpr_dict = dict()
+legend_dict = dict()
 
 idx = 0
 for j in json_list:
@@ -45,8 +47,9 @@ for j in json_list:
 # Plot PR Curve
     truth_list = list()
     pred_list = list()
+    legend_dict[idx] = j[1]
     
-    for result in j['results']:
+    for result in j[0]['results']:
         key = result["ref_scan_id"]
         for truth in result["query_scan_truth"]:
             truth_list.append(truth)
@@ -59,14 +62,14 @@ for j in json_list:
     confusion_pred = [ x >= .65 for x in pred_list]
     c = confusion_matrix(truth_list, confusion_pred)
     
-    group_names = ["True Neg","False Pos","False Neg","True Pos"]
-    group_counts = ["{0:0.0f}".format(value) for value in c.flatten()]
-    group_percentages = ["{0:.2%}".format(value) for value in
-                         c.flatten()/np.sum(c)]
-    labels = [f"{v1}\n{v2}\n{v3}" for v1, v2, v3 in
-              zip(group_names,group_counts,group_percentages)]
-    labels = np.asarray(labels).reshape(2,2)
-    sns.heatmap(c, annot=labels, fmt="", cmap='Blues')
+    #group_names = ["True Neg","False Pos","False Neg","True Pos"]
+    #group_counts = ["{0:0.0f}".format(value) for value in c.flatten()]
+    #group_percentages = ["{0:.2%}".format(value) for value in
+    #                     c.flatten()/np.sum(c)]
+    #labels = [f"{v1}\n{v2}\n{v3}" for v1, v2, v3 in
+    #          zip(group_names,group_counts,group_percentages)]
+    #labels = np.asarray(labels).reshape(2,2)
+    #sns.heatmap(c, annot=labels, fmt="", cmap='Blues')
     
     # Plot PR and ROC curves
     precision_dict[idx], recall_dict[idx], _ = precision_recall_curve(truth_list, pred_list) 
@@ -139,9 +142,11 @@ for query in query_scenes:
     scene_ids = query["scene_ids"]
     gfa_features = query["gfa_features"]
     ref_scan_match = query["ref_match_id"]
-    shared_obj_count = 0
-    total_count = 0
+    min_prob_match = 10
+    max_prob_no_match = 0
     for ref_scene in ref_scene_list:
+        shared_obj_count = 0
+        total_count = 0
         truth_list.append(ref_scan_match == ref_scene[0])
         for i in range(len(query["global_ids"])):
             skip_flag = False
@@ -156,24 +161,33 @@ for query in query_scenes:
                 shared_obj_count = shared_obj_count + 1
             total_count = total_count + 1
 
+
+        if ref_scan_match == ref_scene[0]:
+            shared_obj_count = shared_obj_count + 1
+        else:
+            shared_obj_count = shared_obj_count + 1
+            total_count = total_count + 3
         probability_list.append(shared_obj_count / total_count)
 
 
+legend_dict[idx] = "GFA"
 precision_dict[idx], recall_dict[idx], _ = precision_recall_curve(truth_list, probability_list) 
 fpr_dict[idx], tpr_dict[idx], _ = roc_curve(truth_list, probability_list)
 
 fig, (ax1, ax2) = plt.subplots(1, 2)
 fig.suptitle('Place Recognition Evaluation')
 for i in range(len(precision_dict)):
-    ax1.plot(recall_dict[i], precision_dict[i], lw=2, label='class {}'.format(i))
-    ax2.plot(fpr_dict[i], tpr_dict[i], lw=2, label='class {}'.format(i))
+    ax1.plot(recall_dict[i], precision_dict[i], lw=1, label='class {}'.format(legend_dict[i]))
+    ax2.plot(fpr_dict[i], tpr_dict[i], lw=1, label='class {}'.format(legend_dict[i]))
 
 
 ax1.set(xlabel="Recall", ylabel="Precision")
 ax1.set_title("Precision Recall Curve")
+ax1.legend()
 
 ax2.set(xlabel="False Positive Rate", ylabel="True Positive Rate")
 ax2.set_title("ROC Curve")
+ax2.legend()
 
 plt.show()
 
