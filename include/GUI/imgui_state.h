@@ -28,6 +28,8 @@ inline static std::mutex mtx, eigs_mtx;
 inline static std::vector<std::string> query_scans;
 inline static std::vector<std::string> ref_scans;
 inline static std::vector<int> query_obj_scene_ids;
+inline static std::string key1;
+inline static std::string key2;
 
 // Indexes for drop down arrays
 inline static int dataset_idx = 0;

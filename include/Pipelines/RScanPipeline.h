@@ -3,14 +3,17 @@
 #include "Pipelines/Pipeline.h"
 #include <string>
 #include <vector>
+#include <dirent.h>
+#include <unistd.h>
 
 class RScanPipeline : public Pipeline {
 public:
   RScanPipeline() = default;
   ~RScanPipeline() = default;
 
-  void ParseDataset() override;
+  void ParseDataset(int dataset_idx) override;
   void ExtractObjectPointClouds(int max_pts) override;
+  void ExtractObjsSemanticKitti(int max_pts) override;
   void ComputeSOR(int meanK, double stdThresh) override;
   void ComputeSceneFPS(Scene &scene, int filtering_opts,
                                     int sample_size, double percent);
@@ -42,4 +45,5 @@ public:
                int q_size, int r_size) override;
   void Laplacian(int laplacian_type, SpectralObject &so) override;
   void SaveGFA() override;
+  void ParseSemanticKitti();
 };

@@ -26,8 +26,9 @@ class Pipeline {
 public:
   virtual ~Pipeline(){};
 
-  virtual void ParseDataset() = 0;
+  virtual void ParseDataset(int dataset_idx) = 0;
   virtual void ExtractObjectPointClouds(int max_pts) = 0;
+  virtual void ExtractObjsSemanticKitti(int max_pts) = 0;
   virtual void ComputeSOR(int meanK, double stdThresh) = 0;
   virtual void ComputeFPS(int filtering_opts, int sample_size,
                           double percent) = 0;

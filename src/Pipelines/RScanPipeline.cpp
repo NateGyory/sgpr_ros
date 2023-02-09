@@ -2,6 +2,7 @@
 #include "Processing/Laplacian.hpp"
 #include "Processing/PointCloud.hpp"
 #include <algorithm>
+#include <cstdlib>
 #include <pcl/common/io.h>
 #include <string>
 #include <vector>
@@ -31,6 +32,15 @@ void RScanPipeline::Laplacian(int laplacian_type, SpectralObject &so) {
   }
 }
 
+void RScanPipeline::ExtractObjsSemanticKitti(int max_pts) {
+  std::cout << "SemanticKitti extracting objs" << std::endl;
+  std::for_each(mSceneMap.begin(), mSceneMap.end(),
+                [](std::pair<const std::string, Scene> &pair) {
+                  Processing::PointCloud::PopulateSpectralObjs(pair.second);
+                });
+  std::cout << "Finished Extracting Objs" << std::endl;
+}
+
 int RScanPipeline::GetSize(int filtering_opts, int sample_size,
                            double filter_percent, int q_size, int r_size) {
 
@@ -55,8 +65,82 @@ int RScanPipeline::GetSize(int filtering_opts, int sample_size,
   return ret;
 }
 
-void RScanPipeline::ParseDataset() {
+void RScanPipeline::ParseSemanticKitti() {
+  // Go through all files in folder and save to files array
+  // std::string directory = "/home/nate/Datasets/SemanticKittiPLY/00";
+  // std::vector<std::string> files;
+  // std::vector<std::string> file_names;
+  // DIR *dir = opendir(directory.c_str());
+  // if (dir == nullptr) {
+  //  std::cout << "DIR does not exist" << std::endl;
+  //  std::exit(1);
+  //}
+  // dirent *ent;
+  // while ((ent = readdir(dir)) != nullptr) {
+  //  if (ent->d_type == DT_REG) {
+  //    files.push_back(directory + "/" + ent->d_name);
+  //    file_names.push_back(ent->d_name);
+  //  }
+  //}
+  // closedir(dir);
+
+  //// TODO Print and verify file names
+  //// for each file it contains a scene
+  // int idx = 0;
+  // for (const auto &file : files) {
+  //   std::cout << file << std::endl;
+
+  //  // Read the file into a pcl obj
+  //  pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(
+  //      new pcl::PointCloud<pcl::PointXYZRGB>);
+
+  //  if (pcl::io::loadPLYFile(file, *cloud) == -1) {
+  //    std::cout << "Could not read PLY file for SemanticKitti" << std::endl;
+  //    exit(1);
+  //  }
+
+  //  Scene scene;
+  //  scene.is_reference = false;
+  //  scene.reference_id_match = "";
+  //  scene.ply_file_path = file;
+  //  scene.scan_id = file_names[idx];
+
+  //  mSceneMap[file_names[idx]] = scene;
+  //  idx++;
+  //}
+
+  std::string directory = "/home/nate/Datasets/SemanticKittiPLY/00/";
+  std::string file1 = "0.ply";
+  std::string file2 = "1000.ply";
+
+  Scene scene;
+  scene.is_reference = false;
+  scene.reference_id_match = "";
+  scene.ply_file_path = directory + file1;
+  scene.scan_id = file1;
+
+  mSceneMap[file1] = scene;
+
+  scene.is_reference = true;
+  scene.reference_id_match = "";
+  scene.ply_file_path = directory + file2;
+  scene.scan_id = file2;
+
+  mSceneMap[file2] = scene;
+
+  return;
+}
+
+void RScanPipeline::ParseDataset(int dataset_idx) {
   std::cout << "Parsing Dataset" << std::endl;
+  if (dataset_idx == 2) {
+    std::cout << "SemanticKitti" << std::endl;
+    ParseSemanticKitti();
+    std::cout << "Done Parsing SemanticKitti" << std::endl;
+    return;
+  }
+
+  std::cout << "Parsing 3RScan" << std::endl;
   std::string dataset_dir, config_dir, rscan_json, config_json, objects_json;
   mSceneMap.clear();
 
@@ -164,12 +248,12 @@ void RScanPipeline::ExtractObjectPointClouds(int max_pts) {
                 });
   std::cout << "Finished ExtractObjectPointClouds" << std::endl;
 
-  std::cout << "Calculating GFA Features" << std::endl;
-  std::for_each(mSceneMap.begin(), mSceneMap.end(),
-                [](std::pair<const std::string, Scene> &pair) {
-                  Processing::PointCloud::CalculateGFAFeatures(pair.second);
-                });
-  std::cout << "Finished Calculating GFA Features" << std::endl;
+  // std::cout << "Calculating GFA Features" << std::endl;
+  // std::for_each(mSceneMap.begin(), mSceneMap.end(),
+  //               [](std::pair<const std::string, Scene> &pair) {
+  //                 Processing::PointCloud::CalculateGFAFeatures(pair.second);
+  //               });
+  // std::cout << "Finished Calculating GFA Features" << std::endl;
 }
 
 void RScanPipeline::ComputeSOR(int meanK, double stdThresh) {
@@ -482,8 +566,8 @@ void RScanPipeline::SaveGFA() {
 
   std::vector<json> query_list;
   std::vector<json> ref_list;
-  for(auto const &kv: mSceneMap) {
-    if(kv.second.is_reference) {
+  for (auto const &kv : mSceneMap) {
+    if (kv.second.is_reference) {
       json reference;
       reference["scan_id"] = kv.second.scan_id;
       std::vector<int> global_ids;
@@ -517,13 +601,14 @@ void RScanPipeline::SaveGFA() {
     }
   }
 
-  std::string file_path = "/home/nate/Development/catkin_ws/src/sgpr_ros/results/gfa/pr.json";
+  std::string file_path =
+      "/home/nate/Development/catkin_ws/src/sgpr_ros/results/gfa/pr.json";
 
   std::ofstream o(file_path);
 
   json data;
-  data["reference"] = ref_list; 
-  data["query"] = query_list; 
+  data["reference"] = ref_list;
+  data["query"] = query_list;
 
   o << std::setw(4) << data << std::endl;
 }
