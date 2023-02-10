@@ -224,6 +224,10 @@ inline void computeMCAR(SpectralObject &spectral_object) {
   spectral_object.kdTree.setInputCloud(spectral_object.cloud);
 
   int size = spectral_object.cloud->size();
+  if (size == 1) {
+    spectral_object.mcar = 100.0;
+    return;
+  }
 
   double radius = 0.01f;
   for (int i = 0; i < size; i++) {

@@ -3,6 +3,7 @@
 #include "Processing/PointCloud.hpp"
 #include <algorithm>
 #include <cstdlib>
+#include <matplot/util/colors.h>
 #include <pcl/common/io.h>
 #include <string>
 #include <vector>
@@ -109,24 +110,23 @@ void RScanPipeline::ParseSemanticKitti() {
   //  idx++;
   //}
 
+  // TODO first 100 files
+
+  int end_idx = 200;
   std::string directory = "/home/nate/Datasets/SemanticKittiPLY/00/";
-  std::string file1 = "0.ply";
-  std::string file2 = "1000.ply";
 
-  Scene scene;
-  scene.is_reference = false;
-  scene.reference_id_match = "";
-  scene.ply_file_path = directory + file1;
-  scene.scan_id = file1;
+  for (int current_idx = 0; current_idx <= end_idx; current_idx++) {
+    std::string scan_id = std::to_string(current_idx) + ".ply";
+    std::string file_path = directory + scan_id;
 
-  mSceneMap[file1] = scene;
+    Scene scene;
+    scene.is_reference = false;
+    scene.reference_id_match = "";
+    scene.ply_file_path = file_path;
+    scene.scan_id = scan_id;
 
-  scene.is_reference = true;
-  scene.reference_id_match = "";
-  scene.ply_file_path = directory + file2;
-  scene.scan_id = file2;
-
-  mSceneMap[file2] = scene;
+    mSceneMap[scan_id] = scene;
+  }
 
   return;
 }
@@ -266,44 +266,29 @@ void RScanPipeline::ComputeSOR(int meanK, double stdThresh) {
 
 void RScanPipeline::ComputeSceneFPS(Scene &scene, int filtering_opts,
                                     int sample_size, double percent) {
-  // Do not process if it is a reference scene
-  if (scene.is_reference)
-    return;
+
   for (SpectralObject &so : scene.spectral_objects) {
-    // Find the matching object in the reference_scan
-    auto begin_it =
-        mSceneMap[scene.reference_id_match].spectral_objects.begin();
-    auto end_it = mSceneMap[scene.reference_id_match].spectral_objects.end();
 
-    int scene_id = so.scene_id;
-
-    auto it =
-        std::find_if(begin_it, end_it, [scene_id](const SpectralObject &r_so) {
-          return r_so.scene_id == scene_id;
-        });
-
-    int ref_obj_idx = it - begin_it;
-
-    if (it != end_it) {
-      // Now do check
-      double size =
-          GetSize(filtering_opts, sample_size, percent, so.cloud->size(),
-                  mSceneMap[scene.reference_id_match]
-                      .spectral_objects[ref_obj_idx]
-                      .cloud->size());
-
-      Processing::PointCloud::computeFPS(so, size);
-      Processing::PointCloud::computeFPS(
-          mSceneMap[scene.reference_id_match].spectral_objects[ref_obj_idx],
-          size);
-
-      if (so.cloud->size() != mSceneMap[scene.reference_id_match]
-                                  .spectral_objects[ref_obj_idx]
-                                  .cloud->size()) {
-        std::cout << "ERROR clouds not same" << std::endl;
-        exit(1);
-      }
+    int cloud_size = so.cloud->size();
+    double final_size;
+    switch (filtering_opts) {
+    case 0:
+      // TODO smallest cloud
+      final_size = cloud_size;
+      break;
+    case 1:
+      // TODO percent
+      final_size = int(cloud_size * percent);
+      break;
+    case 2:
+      // TODO sample size
+      final_size = (cloud_size < sample_size) ? cloud_size : sample_size;
+      break;
+    default:
+      break;
     }
+
+    Processing::PointCloud::computeFPS(so, final_size);
   }
 }
 

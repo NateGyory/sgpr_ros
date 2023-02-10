@@ -49,6 +49,9 @@ inline void SaveEigenvalues(json &j,
 inline void computeEigenvalues(SpectralObject &spectral_object, int max_eigs) {
   arma::mat eigvec;
 
+  if (spectral_object.cloud->size() == 1)
+    return;
+
   int eig_n =
       (max_eigs == -1) ? spectral_object.laplacian.n_cols - 1 : max_eigs;
 
