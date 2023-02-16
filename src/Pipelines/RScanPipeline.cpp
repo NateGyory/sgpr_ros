@@ -35,9 +35,12 @@ void RScanPipeline::Laplacian(int laplacian_type, SpectralObject &so) {
 
 void RScanPipeline::ExtractObjsSemanticKitti(int max_pts) {
   std::cout << "SemanticKitti extracting objs" << std::endl;
+  int count = 0;
   std::for_each(mSceneMap.begin(), mSceneMap.end(),
-                [](std::pair<const std::string, Scene> &pair) {
+                [&count](std::pair<const std::string, Scene> &pair) {
                   Processing::PointCloud::PopulateSpectralObjs(pair.second);
+                  std::cout << count << std::endl;
+                  count++;
                 });
   std::cout << "Finished Extracting Objs" << std::endl;
 }
@@ -110,22 +113,21 @@ void RScanPipeline::ParseSemanticKitti() {
   //  idx++;
   //}
 
-  // TODO first 100 files
-
-  int end_idx = 200;
   std::string directory = "/home/nate/Datasets/SemanticKittiPLY/00/";
 
-  for (int current_idx = 0; current_idx <= end_idx; current_idx++) {
-    std::string scan_id = std::to_string(current_idx) + ".ply";
-    std::string file_path = directory + scan_id;
+  for (int current_idx = 0; current_idx <= last_scene_id; current_idx++) {
+    if (current_idx % 10 == 0) {
+      std::string scan_id = std::to_string(current_idx) + ".ply";
+      std::string file_path = directory + scan_id;
 
-    Scene scene;
-    scene.is_reference = false;
-    scene.reference_id_match = "";
-    scene.ply_file_path = file_path;
-    scene.scan_id = scan_id;
+      Scene scene;
+      scene.is_reference = false;
+      scene.reference_id_match = "";
+      scene.ply_file_path = file_path;
+      scene.scan_id = scan_id;
 
-    mSceneMap[scan_id] = scene;
+      mSceneMap[scan_id] = scene;
+    }
   }
 
   return;

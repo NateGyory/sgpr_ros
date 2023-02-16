@@ -59,8 +59,10 @@ for j in json_list:
     
     
     # Confusion Matrix
-    confusion_pred = [ x >= .65 for x in pred_list]
+    confusion_pred = [ x >= .5 for x in pred_list]
     c = confusion_matrix(truth_list, confusion_pred)
+    print(j[1])
+    print(c)
     
     #group_names = ["True Neg","False Pos","False Neg","True Pos"]
     #group_counts = ["{0:0.0f}".format(value) for value in c.flatten()]

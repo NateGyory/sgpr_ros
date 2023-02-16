@@ -52,12 +52,6 @@ struct Result {
   bool is_match;
 };
 
-struct SemanticKittiResult {
-  std::string query_id;
-  std::string ref_id;
-  double obj_match_ratio;
-};
-
 ros::ServiceClient evaluation_service_client;
 pcl::visualization::PCLVisualizer::Ptr viewer;
 matplot::figure_handle f;
@@ -371,6 +365,8 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   // ImGui::InputInt("Max number of points in point cloud",
   //                 &ImGuiState::DatasetTesting::max_pts);
 
+  ImGui::InputInt("Final Scene ID", &ImGuiState::DatasetTesting::last_scene);
+
   if (ImGui::Button("Button 1")) {
     pl.reset();
     switch (ImGuiState::DatasetTesting::dataset_idx) {
@@ -382,6 +378,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       break;
     case 2:
       pl = std::make_shared<RScanPipeline>();
+      pl->last_scene_id = ImGuiState::DatasetTesting::last_scene;
       // pl = std::make_shared<SemanticKittiPipeline>();
       break;
     default:
@@ -556,6 +553,10 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::Separator();
   ImGui::Text("Place Recognition");
 
+  ImGui::InputInt("Scan buffer", &ImGuiState::DatasetTesting::scan_buffer);
+  ImGui::InputDouble("Threshold For Match",
+                     &ImGuiState::DatasetTesting::match_thresh);
+
   if (ImGui::Button("Compute Spectral Features")) {
     // SOR
     pl->ComputeSOR(ImGuiState::DatasetTesting::meanK,
@@ -600,14 +601,14 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     // For every scan, test against all previous scans
 
     int query_scan_idx = 0;
-    int final_scan_number = 200;
 
-    while (query_scan_idx <= final_scan_number) {
+    while (query_scan_idx <= ImGuiState::DatasetTesting::last_scene) {
       std::string query_key = std::to_string(query_scan_idx) + ".ply";
       std::cout << "Query: " << query_key << std::endl;
 
       int ref_scan_idx = 0;
-      while (ref_scan_idx < query_scan_idx) {
+      while (ref_scan_idx <
+             query_scan_idx - ImGuiState::DatasetTesting::scan_buffer) {
         std::string ref_key = std::to_string(ref_scan_idx) + ".ply";
         std::cout << "ref_key: " << ref_key << std::endl;
         Scene ref_scan_id = pl->mSceneMap[ref_key];
@@ -615,8 +616,16 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         // Compare all the objects in the reference and query scene
         int obj_match_vote = 0;
         int obj_dnm_vote = 0;
+        int total_objs = 0;
         bool ks_result, ad_result;
         for (auto &so : pl->mSceneMap[query_key].spectral_objects) {
+
+          // Determine if to skip the object or not
+          if (Processing::PointCloud::ShouldSkip(so))
+            continue;
+
+          total_objs++;
+
           // Find the matching object
           auto begin_it = pl->mSceneMap[ref_key].spectral_objects.begin();
           auto end_it = pl->mSceneMap[ref_key].spectral_objects.end();
@@ -641,73 +650,73 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
               continue;
             }
 
-            ImGuiState::DatasetTesting::mtx.lock();
+            //ImGuiState::DatasetTesting::mtx.lock();
 
             ImGuiState::DatasetTesting::q_so = so;
 
             ImGuiState::DatasetTesting::r_so =
                 pl->mSceneMap[ref_key].spectral_objects[ref_obj_idx];
 
-            //Processing::PointCloud::computeSOR(
-            //    ImGuiState::DatasetTesting::q_so,
-            //    ImGuiState::DatasetTesting::meanK,
-            //    ImGuiState::DatasetTesting::stdThresh);
-            //Processing::PointCloud::computeSOR(
-            //    ImGuiState::DatasetTesting::r_so,
-            //    ImGuiState::DatasetTesting::meanK,
-            //    ImGuiState::DatasetTesting::stdThresh);
+            // Processing::PointCloud::computeSOR(
+            //     ImGuiState::DatasetTesting::q_so,
+            //     ImGuiState::DatasetTesting::meanK,
+            //     ImGuiState::DatasetTesting::stdThresh);
+            // Processing::PointCloud::computeSOR(
+            //     ImGuiState::DatasetTesting::r_so,
+            //     ImGuiState::DatasetTesting::meanK,
+            //     ImGuiState::DatasetTesting::stdThresh);
 
-            //double size =
-            //    pl->GetSize(ImGuiState::DatasetTesting::filtering_opts,
-            //                ImGuiState::DatasetTesting::sample_size,
-            //                ImGuiState::DatasetTesting::filter_percent,
-            //                ImGuiState::DatasetTesting::q_so.cloud->size(),
-            //                ImGuiState::DatasetTesting::r_so.cloud->size());
+            // double size =
+            //     pl->GetSize(ImGuiState::DatasetTesting::filtering_opts,
+            //                 ImGuiState::DatasetTesting::sample_size,
+            //                 ImGuiState::DatasetTesting::filter_percent,
+            //                 ImGuiState::DatasetTesting::q_so.cloud->size(),
+            //                 ImGuiState::DatasetTesting::r_so.cloud->size());
 
-            //Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so,
-            //                                   size);
-            //Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so,
-            //                                   size);
+            // Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so,
+            //                                    size);
+            // Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so,
+            //                                    size);
 
-            //if (ImGuiState::DatasetTesting::double_sor) {
-            //  Processing::PointCloud::computeSOR(
-            //      ImGuiState::DatasetTesting::q_so,
-            //      ImGuiState::DatasetTesting::meanK,
-            //      ImGuiState::DatasetTesting::stdThresh);
-            //  Processing::PointCloud::computeSOR(
-            //      ImGuiState::DatasetTesting::r_so,
-            //      ImGuiState::DatasetTesting::meanK,
-            //      ImGuiState::DatasetTesting::stdThresh);
-            //}
+            // if (ImGuiState::DatasetTesting::double_sor) {
+            //   Processing::PointCloud::computeSOR(
+            //       ImGuiState::DatasetTesting::q_so,
+            //       ImGuiState::DatasetTesting::meanK,
+            //       ImGuiState::DatasetTesting::stdThresh);
+            //   Processing::PointCloud::computeSOR(
+            //       ImGuiState::DatasetTesting::r_so,
+            //       ImGuiState::DatasetTesting::meanK,
+            //       ImGuiState::DatasetTesting::stdThresh);
+            // }
 
-            //Processing::PointCloud::computeMCAR(
-            //    ImGuiState::DatasetTesting::q_so);
-            //Processing::PointCloud::computeMCAR(
-            //    ImGuiState::DatasetTesting::r_so);
+            // Processing::PointCloud::computeMCAR(
+            //     ImGuiState::DatasetTesting::q_so);
+            // Processing::PointCloud::computeMCAR(
+            //     ImGuiState::DatasetTesting::r_so);
 
-            //if (ImGuiState::DatasetTesting::same_radius) {
-            //  double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
-            //                         ImGuiState::DatasetTesting::r_so.mcar);
-            //  ImGuiState::DatasetTesting::q_so.mcar = mcar;
-            //  ImGuiState::DatasetTesting::r_so.mcar = mcar;
-            //}
+            // if (ImGuiState::DatasetTesting::same_radius) {
+            //   double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
+            //                          ImGuiState::DatasetTesting::r_so.mcar);
+            //   ImGuiState::DatasetTesting::q_so.mcar = mcar;
+            //   ImGuiState::DatasetTesting::r_so.mcar = mcar;
+            // }
 
-            //pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
-            //              ImGuiState::DatasetTesting::q_so);
-            //pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
-            //              ImGuiState::DatasetTesting::r_so);
+            // pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+            //               ImGuiState::DatasetTesting::q_so);
+            // pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+            //               ImGuiState::DatasetTesting::r_so);
 
-            //int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
-            //if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
-            //  number_eigs = ImGuiState::DatasetTesting::eigs_number;
-            //}
+            // int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
+            // if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
+            //   number_eigs = ImGuiState::DatasetTesting::eigs_number;
+            // }
 
-            //Processing::Eigen::computeEigenvalues(
-            //    ImGuiState::DatasetTesting::q_so, number_eigs);
-            //Processing::Eigen::computeEigenvalues(
-            //    ImGuiState::DatasetTesting::r_so, number_eigs);
+            // Processing::Eigen::computeEigenvalues(
+            //     ImGuiState::DatasetTesting::q_so, number_eigs);
+            // Processing::Eigen::computeEigenvalues(
+            //     ImGuiState::DatasetTesting::r_so, number_eigs);
 
-            ImGuiState::DatasetTesting::eigs_mtx.lock();
+            //ImGuiState::DatasetTesting::eigs_mtx.lock();
 
             ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
                 arma::conv_to<std::vector<double>>::from(
@@ -723,8 +732,8 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             // Eval service
             if (evaluation_service_client.call(
                     ImGuiState::DatasetTesting::eig_srv)) {
-              ROS_INFO("eval service success!!! %f",
-                       ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+              //ROS_INFO("eval service success!!! %f",
+              //         ImGuiState::DatasetTesting::eig_srv.response.results[0]);
 
               ks_result =
                   ImGuiState::DatasetTesting::eig_srv.response.results[0];
@@ -737,33 +746,40 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             // TODO need to throw the evaluation code here
             if (ks_result || ad_result) {
               obj_match_vote++;
+              //std::cout << "Label: " << so.label << std::endl;
             } else {
               obj_dnm_vote++;
             }
 
             ImGuiState::DatasetTesting::update_cloud = true;
             ImGuiState::DatasetTesting::update_hist = true;
-            ImGuiState::DatasetTesting::mtx.unlock();
-            ImGuiState::DatasetTesting::eigs_mtx.unlock();
+            //ImGuiState::DatasetTesting::mtx.unlock();
+            //ImGuiState::DatasetTesting::eigs_mtx.unlock();
           }
         }
 
         // TODO need to add the eval totaling here, ref scene is done
         SemanticKittiResult scene_result;
+        scene_result.sequence = "00";
         scene_result.query_id = query_key;
         scene_result.ref_id = ref_key;
-        scene_result.obj_match_ratio =
-            obj_match_vote / (double(obj_match_vote + obj_dnm_vote));
+        scene_result.obj_match_ratio = obj_match_vote / double(total_objs);
         // scene_result.obj_match_ratio =
-        //     obj_match_vote / double(r_kv.second.spectral_objects.size());
-        // scene_result.is_match = r_kv.first == q_kv.second.reference_id_match;
+        //     obj_match_vote / (double(obj_match_vote + obj_dnm_vote));
+        //  scene_result.obj_match_ratio =
+        //      obj_match_vote / double(r_kv.second.spectral_objects.size());
+        //  scene_result.is_match = r_kv.first ==
+        //  q_kv.second.reference_id_match;
         results.push_back(scene_result);
 
-        ref_scan_idx++;
+        ref_scan_idx+=10;
       }
 
-      query_scan_idx++;
+      query_scan_idx+=10;
     }
+
+    // TODO Save to a file
+    // Processing::Files::SaveSemanticKittiResults(results);
 
     // TODO add final eval tally here
     // Will eventually need to figure out where the actual loop closures are and
@@ -771,10 +787,14 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     for (auto &result : results) {
       if (isnan(result.obj_match_ratio))
         continue;
-      std::cout << "query_id: " << result.query_id << std::endl;
-      std::cout << "ref_id: " << result.ref_id << std::endl;
-      std::cout << "score: " << result.obj_match_ratio << std::endl;
+      if (result.obj_match_ratio > ImGuiState::DatasetTesting::match_thresh) {
+        std::cout << "query_id: " << result.query_id << std::endl;
+        std::cout << "ref_id: " << result.ref_id << std::endl;
+        std::cout << "score: " << result.obj_match_ratio << std::endl;
+      }
     }
+
+    // TODO: save the pose array with markers where there are loop closures
   }
 
   // --------------------------------------------------------------
@@ -1786,11 +1806,11 @@ int main(int argc, char **argv) {
   std::shared_ptr<Pipeline> datasetPipeline;
 
   // Background threads running
-  std::thread viz_t(BackgroundVizThread);
-  viz_t.detach();
+  //std::thread viz_t(BackgroundVizThread);
+  //viz_t.detach();
 
-  std::thread spectra_t(PlotSpectra);
-  spectra_t.detach();
+  //std::thread spectra_t(PlotSpectra);
+  //spectra_t.detach();
 
   GLFWwindow *window = initGUI();
 

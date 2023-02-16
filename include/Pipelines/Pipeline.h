@@ -61,6 +61,7 @@ public:
   virtual void SaveGFA() = 0;
 
   scene_map_t mSceneMap;
+  int last_scene_id;
 
 protected:
   spKeyFrameDB mKeyFrameDB;

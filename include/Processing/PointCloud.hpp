@@ -81,6 +81,38 @@ inline std::unordered_map<int, std::string> id_label = {
     {258, "moving-truck"},
     {259, "moving-other-vehicle"}};
 
+inline bool ShouldSkip(SpectralObject &so) {
+  bool ret = true;
+  switch (so.global_id) {
+  case 10:
+  case 11:
+  case 13:
+  case 15:
+  case 16:
+  case 18:
+  case 20:
+  case 40:
+  case 44:
+  case 48:
+  case 49:
+  case 50:
+  case 51:
+  case 52:
+  case 60:
+  case 70:
+  case 71:
+  case 72:
+  case 80:
+  case 81:
+    ret = false;
+    break;
+  default:
+    break;
+  }
+
+  return ret;
+}
+
 inline void PopulateSpectralObjs(Scene &scene) {
   // For every possible color
   pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(
@@ -130,7 +162,6 @@ inline void PopulateSpectralObjs(Scene &scene) {
       so.ply_color = kv.first;
       color_visited_map[kv.first] = true;
       scene.spectral_objects.push_back(so);
-      std::cout << "ply_color: " << so.ply_color << std::endl;
     }
   }
 }

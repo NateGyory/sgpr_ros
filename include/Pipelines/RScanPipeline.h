@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Pipelines/Pipeline.h"
-#include <string>
-#include <vector>
 #include <dirent.h>
+#include <string>
 #include <unistd.h>
+#include <vector>
 
 class RScanPipeline : public Pipeline {
 public:
@@ -15,10 +15,9 @@ public:
   void ExtractObjectPointClouds(int max_pts) override;
   void ExtractObjsSemanticKitti(int max_pts) override;
   void ComputeSOR(int meanK, double stdThresh) override;
-  void ComputeSceneFPS(Scene &scene, int filtering_opts,
-                                    int sample_size, double percent);
-  void ComputeFPS(int filtering_opts, int sample_size,
-                          double percent) override;
+  void ComputeSceneFPS(Scene &scene, int filtering_opts, int sample_size,
+                       double percent);
+  void ComputeFPS(int filtering_opts, int sample_size, double percent) override;
   void ComputeEdges(int edge_heuristic) override;
   void ComputeLaplacian(int laplacian_type) override;
   void ComputeEigs(int max_eigs) override;
@@ -42,7 +41,7 @@ public:
                int query_obj_idx, std::string ref_scan,
                int ref_obj_idx) override;
   int GetSize(int filtering_opts, int sample_size, double filter_percent,
-               int q_size, int r_size) override;
+              int q_size, int r_size) override;
   void Laplacian(int laplacian_type, SpectralObject &so) override;
   void SaveGFA() override;
   void ParseSemanticKitti();

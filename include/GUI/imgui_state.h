@@ -64,6 +64,9 @@ inline static int meanK = 3;
 inline static int sample_size = 1000;
 inline static double stdThresh = 3;
 inline static double filter_percent = 0.75f;
+inline static int last_scene = 50;
+inline static int scan_buffer = 20;
+inline static double match_thresh = -1.0;
 
 // GUI state variables
 inline static bool dataset_parsed = false;
