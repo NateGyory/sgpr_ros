@@ -366,6 +366,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   //                 &ImGuiState::DatasetTesting::max_pts);
 
   ImGui::InputInt("Final Scene ID", &ImGuiState::DatasetTesting::last_scene);
+  ImGui::InputInt("Sequence", &ImGuiState::DatasetTesting::sequence);
 
   if (ImGui::Button("Button 1")) {
     pl.reset();
@@ -385,7 +386,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       break;
     }
 
-    pl->ParseDataset(ImGuiState::DatasetTesting::dataset_idx);
+    pl->ParseDataset(ImGuiState::DatasetTesting::dataset_idx, ImGuiState::DatasetTesting::sequence);
     pl->ExtractObjsSemanticKitti(ImGuiState::DatasetTesting::max_pts);
     // pl->ExtractObjectPointClouds(ImGuiState::DatasetTesting::max_pts);
     ImGuiState::DatasetTesting::dataset_parsed = true;

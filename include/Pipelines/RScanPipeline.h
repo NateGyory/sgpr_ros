@@ -11,7 +11,7 @@ public:
   RScanPipeline() = default;
   ~RScanPipeline() = default;
 
-  void ParseDataset(int dataset_idx) override;
+  void ParseDataset(int dataset_idx, int sequence) override;
   void ExtractObjectPointClouds(int max_pts) override;
   void ExtractObjsSemanticKitti(int max_pts) override;
   void ComputeSOR(int meanK, double stdThresh) override;
@@ -44,5 +44,5 @@ public:
               int q_size, int r_size) override;
   void Laplacian(int laplacian_type, SpectralObject &so) override;
   void SaveGFA() override;
-  void ParseSemanticKitti();
+  void ParseSemanticKitti(int sequence);
 };

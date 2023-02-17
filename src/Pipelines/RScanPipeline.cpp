@@ -69,7 +69,7 @@ int RScanPipeline::GetSize(int filtering_opts, int sample_size,
   return ret;
 }
 
-void RScanPipeline::ParseSemanticKitti() {
+void RScanPipeline::ParseSemanticKitti(int sequence) {
   // Go through all files in folder and save to files array
   // std::string directory = "/home/nate/Datasets/SemanticKittiPLY/00";
   // std::vector<std::string> files;
@@ -113,7 +113,34 @@ void RScanPipeline::ParseSemanticKitti() {
   //  idx++;
   //}
 
-  std::string directory = "/home/nate/Datasets/SemanticKittiPLY/00/";
+  std::string seq_string;
+
+  switch (sequence) {
+  case 0:
+    seq_string = "/00/";
+    break;
+  case 1:
+    seq_string = "/01/";
+    break;
+  case 2:
+    seq_string = "/02/";
+    break;
+  case 3:
+    seq_string = "/03/";
+    break;
+  case 4:
+    seq_string = "/04/";
+    break;
+  case 5:
+    seq_string = "/05/";
+    break;
+  case 6:
+    seq_string = "/06/";
+    break;
+  default:
+    break;
+  }
+  std::string directory = "/home/nate/Datasets/SemanticKittiPLY" + seq_string;
 
   for (int current_idx = 0; current_idx <= last_scene_id; current_idx++) {
     if (current_idx % 10 == 0) {
@@ -133,11 +160,11 @@ void RScanPipeline::ParseSemanticKitti() {
   return;
 }
 
-void RScanPipeline::ParseDataset(int dataset_idx) {
+void RScanPipeline::ParseDataset(int dataset_idx, int sequence) {
   std::cout << "Parsing Dataset" << std::endl;
   if (dataset_idx == 2) {
     std::cout << "SemanticKitti" << std::endl;
-    ParseSemanticKitti();
+    ParseSemanticKitti(sequence);
     std::cout << "Done Parsing SemanticKitti" << std::endl;
     return;
   }
