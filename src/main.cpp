@@ -62,6 +62,36 @@ static void glfw_error_callback(int error, const char *description) {
   fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+std::string GetSequenceString(int val) {
+  std::string seq_string;
+  switch (val) {
+  case 0:
+    seq_string = "/00/";
+    break;
+  case 1:
+    seq_string = "/01/";
+    break;
+  case 2:
+    seq_string = "/02/";
+    break;
+  case 3:
+    seq_string = "/03/";
+    break;
+  case 4:
+    seq_string = "/04/";
+    break;
+  case 5:
+    seq_string = "/05/";
+    break;
+  case 6:
+    seq_string = "/06/";
+    break;
+  default:
+    break;
+  }
+  return seq_string;
+}
+
 void PlotSpectra() {
   if (f.use_count() == 0) {
     f = matplot::figure(true);
@@ -386,10 +416,13 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       break;
     }
 
-    pl->ParseDataset(ImGuiState::DatasetTesting::dataset_idx, ImGuiState::DatasetTesting::sequence);
+    pl->ParseDataset(ImGuiState::DatasetTesting::dataset_idx,
+                     ImGuiState::DatasetTesting::sequence);
     pl->ExtractObjsSemanticKitti(ImGuiState::DatasetTesting::max_pts);
     // pl->ExtractObjectPointClouds(ImGuiState::DatasetTesting::max_pts);
     ImGuiState::DatasetTesting::dataset_parsed = true;
+    ImGuiState::DatasetTesting::sequence_string =
+        GetSequenceString(ImGuiState::DatasetTesting::sequence);
   }
 
   ImGui::SameLine();
@@ -651,7 +684,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
               continue;
             }
 
-            //ImGuiState::DatasetTesting::mtx.lock();
+            // ImGuiState::DatasetTesting::mtx.lock();
 
             ImGuiState::DatasetTesting::q_so = so;
 
@@ -717,7 +750,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             // Processing::Eigen::computeEigenvalues(
             //     ImGuiState::DatasetTesting::r_so, number_eigs);
 
-            //ImGuiState::DatasetTesting::eigs_mtx.lock();
+            // ImGuiState::DatasetTesting::eigs_mtx.lock();
 
             ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
                 arma::conv_to<std::vector<double>>::from(
@@ -733,8 +766,8 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             // Eval service
             if (evaluation_service_client.call(
                     ImGuiState::DatasetTesting::eig_srv)) {
-              //ROS_INFO("eval service success!!! %f",
-              //         ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+              // ROS_INFO("eval service success!!! %f",
+              //          ImGuiState::DatasetTesting::eig_srv.response.results[0]);
 
               ks_result =
                   ImGuiState::DatasetTesting::eig_srv.response.results[0];
@@ -747,21 +780,21 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
             // TODO need to throw the evaluation code here
             if (ks_result || ad_result) {
               obj_match_vote++;
-              //std::cout << "Label: " << so.label << std::endl;
+              // std::cout << "Label: " << so.label << std::endl;
             } else {
               obj_dnm_vote++;
             }
 
             ImGuiState::DatasetTesting::update_cloud = true;
             ImGuiState::DatasetTesting::update_hist = true;
-            //ImGuiState::DatasetTesting::mtx.unlock();
-            //ImGuiState::DatasetTesting::eigs_mtx.unlock();
+            // ImGuiState::DatasetTesting::mtx.unlock();
+            // ImGuiState::DatasetTesting::eigs_mtx.unlock();
           }
         }
 
         // TODO need to add the eval totaling here, ref scene is done
         SemanticKittiResult scene_result;
-        scene_result.sequence = "00";
+        scene_result.sequence = ImGuiState::DatasetTesting::sequence_string;
         scene_result.query_id = query_key;
         scene_result.ref_id = ref_key;
         scene_result.obj_match_ratio = obj_match_vote / double(total_objs);
@@ -773,27 +806,27 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         //  q_kv.second.reference_id_match;
         results.push_back(scene_result);
 
-        ref_scan_idx+=10;
+        ref_scan_idx += 10;
       }
 
-      query_scan_idx+=10;
+      query_scan_idx += 10;
     }
 
     // TODO Save to a file
-    // Processing::Files::SaveSemanticKittiResults(results);
+    Processing::Files::SaveSemanticKittiResults(results);
 
     // TODO add final eval tally here
     // Will eventually need to figure out where the actual loop closures are and
     // save to a file with the pred and ground truth labels for PR Curve results
-    for (auto &result : results) {
-      if (isnan(result.obj_match_ratio))
-        continue;
-      if (result.obj_match_ratio > ImGuiState::DatasetTesting::match_thresh) {
-        std::cout << "query_id: " << result.query_id << std::endl;
-        std::cout << "ref_id: " << result.ref_id << std::endl;
-        std::cout << "score: " << result.obj_match_ratio << std::endl;
-      }
-    }
+    // for (auto &result : results) {
+    //  if (isnan(result.obj_match_ratio))
+    //    continue;
+    //  if (result.obj_match_ratio > ImGuiState::DatasetTesting::match_thresh) {
+    //    std::cout << "query_id: " << result.query_id << std::endl;
+    //    std::cout << "ref_id: " << result.ref_id << std::endl;
+    //    std::cout << "score: " << result.obj_match_ratio << std::endl;
+    //  }
+    //}
 
     // TODO: save the pose array with markers where there are loop closures
   }
@@ -1807,11 +1840,11 @@ int main(int argc, char **argv) {
   std::shared_ptr<Pipeline> datasetPipeline;
 
   // Background threads running
-  //std::thread viz_t(BackgroundVizThread);
-  //viz_t.detach();
+  // std::thread viz_t(BackgroundVizThread);
+  // viz_t.detach();
 
-  //std::thread spectra_t(PlotSpectra);
-  //spectra_t.detach();
+  // std::thread spectra_t(PlotSpectra);
+  // spectra_t.detach();
 
   GLFWwindow *window = initGUI();
 

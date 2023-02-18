@@ -1,0 +1,79 @@
+{
+    "comparisons": [
+        {
+            "probability": 0.07142857142857142,
+            "query_id": "10.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.07142857142857142,
+            "query_id": "20.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "20.ply",
+            "ref_id": "10.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "30.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "30.ply",
+            "ref_id": "10.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "30.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "40.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "40.ply",
+            "ref_id": "10.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "40.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.2857142857142857,
+            "query_id": "40.ply",
+            "ref_id": "30.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "50.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.46153846153846156,
+            "query_id": "50.ply",
+            "ref_id": "10.ply"
+        },
+        {
+            "probability": 0.15384615384615385,
+            "query_id": "50.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "50.ply",
+            "ref_id": "30.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "50.ply",
+            "ref_id": "40.ply"
+        }
+    ]
+}

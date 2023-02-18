@@ -46,46 +46,39 @@ struct GFAFeatures {
 namespace Processing {
 namespace Files {
 
-//inline void
-//SaveSemanticKittiResults(std::vector<SemanticKittiResult> &results) {
-//  std::string sequence = results[0].sequence std::string path =
-//      "/home/nate/Development/catkin_ws/src/sgpr_ros/results/SemanticKitti/" +
-//      sequence + "/results.json";
-//
-//  std::unordered_map<int, json> json_map;
-//
-//  for(auto &result : results) {
-//    json_map[result.query_id][]
-//  }
-//
-//      // {
-//      //   queries:
-//      //   [
-//      //    {
-//      //       scan_id:
-//      //       referes: [
-//      //         {
-//      //           scan_id:
-//      //           probability:
-//      //         } ...
-//      //       ]
-//      //    } ...
-//      //   ]
-//      // }
-//
-//      json data;
-//  data["q_gfa"] = gfa.query_gfa;
-//  data["r_gfa"] = gfa.ref_gfa;
-//  data["truth_labels"] = gfa.match_results;
-//  data["q_global_id"] = gfa.q_global_id;
-//  data["r_global_id"] = gfa.r_global_id;
-//  data["q_scene_id"] = gfa.q_scene_id;
-//  data["r_scene_id"] = gfa.r_scene_id;
-//
-//  std::ofstream o(path);
-//  o << std::setw(4) << data << std::endl;
-//  o.close();
-//}
+inline void
+SaveSemanticKittiResults(std::vector<SemanticKittiResult> &results) {
+  std::string sequence = results[0].sequence;
+  std::string path =
+      "/home/nate/Development/catkin_ws/src/sgpr_ros/results/SemanticKitti/" +
+      sequence + "/results.json";
+
+  std::unordered_map<int, json> json_map;
+
+  json j;
+  // {
+  //   comparisons:
+  //   [
+  //    {
+  //       query_id:
+  //       ref_id:
+  //       probability:
+  //    } ...
+  //   ]
+  // }
+
+  for (auto &result : results) {
+    json comparison;
+    comparison["query_id"] = result.query_id;
+    comparison["ref_id"] = result.ref_id;
+    comparison["probability"] = result.obj_match_ratio;
+    j["comparisons"].push_back(comparison);
+  }
+
+  std::ofstream o(path);
+  o << std::setw(4) << j << std::endl;
+  o.close();
+}
 
 inline std::vector<std::string> GetFilenameFromFolder(std::string folder_path) {
   std::vector<std::string> filenames;
