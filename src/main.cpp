@@ -86,6 +86,9 @@ std::string GetSequenceString(int val) {
   case 6:
     seq_string = "/06/";
     break;
+  case 7:
+    seq_string = "/07/";
+    break;
   default:
     break;
   }
@@ -613,7 +616,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       // get the query scene
       Scene q_scene;
       q_scene.ply_file_path =
-          "/home/nate/Datasets/SemanticKittiPLY/05/" + query_key;
+          "/home/nate/Datasets/SemanticKittiPLY/06/" + query_key;
       Processing::PointCloud::PopulateSpectralObjs(q_scene);
 
       int ref_scan_idx = 0;
@@ -623,7 +626,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         std::cout << "ref_key: " << ref_key << std::endl;
         Scene r_scene;
         r_scene.ply_file_path =
-            "/home/nate/Datasets/SemanticKittiPLY/05/" + ref_key;
+            "/home/nate/Datasets/SemanticKittiPLY/06/" + ref_key;
 
         Processing::PointCloud::PopulateSpectralObjs(r_scene);
 
