@@ -15,18 +15,18 @@ import numpy as np
 #  ]
 #}
 
-f_generic = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Generic.json")
-f_normalized = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Normalized.json")
+f_geometric_idw = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Generic.json")
+#f_normalized = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Normalized.json")
 f_idw = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/IDW.json")
 f_geometric = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Geometric.json")
-f_geometric_idw = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Geometric_IDW.json")
+f_generic = open("/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/Geometric_IDW.json")
 
 json_list = list()
 
 data = json.load(f_generic)
 json_list.append((data, "Generic"))
-data = json.load(f_normalized)
-json_list.append((data,"Normalized"))
+#data = json.load(f_normalized)
+#json_list.append((data,"Normalized"))
 data = json.load(f_idw)
 json_list.append((data, "IDW"))
 data = json.load(f_geometric)
@@ -176,21 +176,36 @@ legend_dict[idx] = "GFA"
 precision_dict[idx], recall_dict[idx], _ = precision_recall_curve(truth_list, probability_list) 
 fpr_dict[idx], tpr_dict[idx], _ = roc_curve(truth_list, probability_list)
 
+confusion_pred = [ x >= .5 for x in probability_list]
+c = confusion_matrix(truth_list, confusion_pred)
+print("GFA")
+print(c)
+
 fig, (ax1, ax2) = plt.subplots(1, 2)
 fig.suptitle('Place Recognition Evaluation')
 for i in range(len(precision_dict)):
-    ax1.plot(recall_dict[i], precision_dict[i], lw=1, label='class {}'.format(legend_dict[i]))
-    ax2.plot(fpr_dict[i], tpr_dict[i], lw=1, label='class {}'.format(legend_dict[i]))
+    ax1.plot(recall_dict[i], precision_dict[i], lw=3, label='{}'.format(legend_dict[i]))
+    ax2.plot(fpr_dict[i], tpr_dict[i], lw=3, label='{}'.format(legend_dict[i]))
 
 
-ax1.set(xlabel="Recall", ylabel="Precision")
-ax1.set_title("Precision Recall Curve")
+#ax1.set(xlabel="Recall", ylabel="Precision")
+ax1.set_xlabel('Recall', fontsize=20)
+ax1.xaxis.set_tick_params(labelsize=20)
+ax1.set_ylabel('Precision', fontsize=20)
+ax1.yaxis.set_tick_params(labelsize=20)
+ax1.set_title("Precision Recall Curve", fontsize=20)
 ax1.legend()
 
-ax2.set(xlabel="False Positive Rate", ylabel="True Positive Rate")
-ax2.set_title("ROC Curve")
+#ax2.set(xlabel="False Positive Rate", ylabel="True Positive Rate")
+ax2.set_xlabel('False Positive Rate', fontsize=20)
+ax2.xaxis.set_tick_params(labelsize=20)
+ax2.set_ylabel('True Positive Rate', fontsize=20)
+ax2.yaxis.set_tick_params(labelsize=20)
+ax2.set_title("ROC Curve", fontsize=20)
 ax2.legend()
 
+ax1.legend(prop=dict(size=15))
+ax2.legend(prop=dict(size=15))
 plt.show()
 
 f.close()

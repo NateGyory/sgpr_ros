@@ -1,0 +1,34 @@
+{
+    "comparisons": [
+        {
+            "probability": 0.35714285714285715,
+            "query_id": "30.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.42857142857142855,
+            "query_id": "40.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.14285714285714285,
+            "query_id": "40.ply",
+            "ref_id": "10.ply"
+        },
+        {
+            "probability": 0.23076923076923078,
+            "query_id": "50.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "50.ply",
+            "ref_id": "10.ply"
+        },
+        {
+            "probability": 0.15384615384615385,
+            "query_id": "50.ply",
+            "ref_id": "20.ply"
+        }
+    ]
+}
