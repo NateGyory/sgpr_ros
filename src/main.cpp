@@ -2047,7 +2047,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 // }
 
 int main(int argc, char **argv) {
-  ros::init(argc, argv, "sgpr_ros_node");
+  ros::init(argc, argv, "sgpr_ros_node", ros::init_options::AnonymousName);
   ros::NodeHandle n;
 
   evaluation_service_client =
