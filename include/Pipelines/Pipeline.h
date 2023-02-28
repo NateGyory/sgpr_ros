@@ -61,6 +61,7 @@ public:
   virtual void SaveGFA() = 0;
 
   scene_map_t mSceneMap;
+  int start_scene_id;
   int last_scene_id;
 
 protected:

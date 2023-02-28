@@ -398,7 +398,12 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   // ImGui::InputInt("Max number of points in point cloud",
   //                 &ImGuiState::DatasetTesting::max_pts);
 
-  ImGui::InputInt("Final Scene ID", &ImGuiState::DatasetTesting::last_scene);
+  ImGui::InputInt("Start Ref ID", &ImGuiState::DatasetTesting::start_ref_scene);
+  ImGui::InputInt("Final Ref ID", &ImGuiState::DatasetTesting::last_ref_scene);
+  ImGui::InputInt("Start Query ID",
+                  &ImGuiState::DatasetTesting::start_query_scene);
+  ImGui::InputInt("Final Query ID",
+                  &ImGuiState::DatasetTesting::last_query_scene);
   ImGui::InputInt("Sequence", &ImGuiState::DatasetTesting::sequence);
 
   if (ImGui::Button("Button 1")) {
@@ -412,8 +417,9 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       break;
     case 2:
       pl = std::make_shared<RScanPipeline>();
-      pl->last_scene_id = ImGuiState::DatasetTesting::last_scene;
-      // pl = std::make_shared<SemanticKittiPipeline>();
+      // pl->last_scene_id = ImGuiState::DatasetTesting::last_scene;
+      // pl->start_scene_id = ImGuiState::DatasetTesting::start_scene;
+      //  pl = std::make_shared<SemanticKittiPipeline>();
       break;
     default:
       break;
@@ -605,28 +611,35 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         GetSequenceString(ImGuiState::DatasetTesting::sequence);
     std::vector<SemanticKittiResult> results;
 
-    int query_scan_idx = 0;
-    pl = std::make_shared<RScanPipeline>();
-    pl->last_scene_id = ImGuiState::DatasetTesting::last_scene;
+    std::cout << "Sequence string: "
+              << ImGuiState::DatasetTesting::sequence_string << std::endl;
 
-    while (query_scan_idx <= ImGuiState::DatasetTesting::last_scene) {
+    int query_scan_idx = ImGuiState::DatasetTesting::start_query_scene;
+    pl = std::make_shared<RScanPipeline>();
+    // pl->last_scene_id = ImGuiState::DatasetTesting::last_scene;
+    // pl->start_scene_id = ImGuiState::DatasetTesting::start_scene;
+
+    while (query_scan_idx <= ImGuiState::DatasetTesting::last_query_scene) {
       std::string query_key = std::to_string(query_scan_idx) + ".ply";
       std::cout << "Query: " << query_key << std::endl;
 
       // get the query scene
       Scene q_scene;
-      q_scene.ply_file_path =
-          "/home/nate/Datasets/SemanticKittiPLY/06/" + query_key;
+      q_scene.ply_file_path = "/home/nate/Datasets/SemanticKittiPLY/" +
+                              ImGuiState::DatasetTesting::sequence_string +
+                              "/" + query_key;
       Processing::PointCloud::PopulateSpectralObjs(q_scene);
 
-      int ref_scan_idx = 0;
-      while (ref_scan_idx <
-             query_scan_idx - ImGuiState::DatasetTesting::scan_buffer) {
+      int ref_scan_idx = ImGuiState::DatasetTesting::start_ref_scene;
+      //while (ref_scan_idx <
+      //       query_scan_idx - ImGuiState::DatasetTesting::scan_buffer) {
+      while (ref_scan_idx <= ImGuiState::DatasetTesting::last_ref_scene) {
         std::string ref_key = std::to_string(ref_scan_idx) + ".ply";
         std::cout << "ref_key: " << ref_key << std::endl;
         Scene r_scene;
-        r_scene.ply_file_path =
-            "/home/nate/Datasets/SemanticKittiPLY/06/" + ref_key;
+        r_scene.ply_file_path = "/home/nate/Datasets/SemanticKittiPLY/" +
+                                ImGuiState::DatasetTesting::sequence_string +
+                                "/" + ref_key;
 
         Processing::PointCloud::PopulateSpectralObjs(r_scene);
 
@@ -789,10 +802,10 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         //  q_kv.second.reference_id_match;
         results.push_back(scene_result);
 
-        ref_scan_idx += 10;
+        ref_scan_idx++;
       }
 
-      query_scan_idx += 10;
+      query_scan_idx++;
     }
 
     // TODO Save to a file
@@ -844,7 +857,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
 
     int query_scan_idx = 0;
 
-    while (query_scan_idx <= ImGuiState::DatasetTesting::last_scene) {
+    while (query_scan_idx <= ImGuiState::DatasetTesting::last_query_scene) {
       std::string query_key = std::to_string(query_scan_idx) + ".ply";
       std::cout << "Query: " << query_key << std::endl;
 
