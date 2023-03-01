@@ -89,6 +89,9 @@ std::string GetSequenceString(int val) {
   case 7:
     seq_string = "/07/";
     break;
+  case 8:
+    seq_string = "/08/";
+    break;
   default:
     break;
   }
@@ -809,7 +812,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     }
 
     // TODO Save to a file
-    Processing::Files::SaveSemanticKittiResults(results);
+    Processing::Files::SaveSemanticKittiResults(results, ImGuiState::DatasetTesting::start_ref_scene, ImGuiState::DatasetTesting::start_query_scene);
   }
 
   if (ImGui::Button("Compute Spectral Features")) {
@@ -1035,7 +1038,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     }
 
     // TODO Save to a file
-    Processing::Files::SaveSemanticKittiResults(results);
+    Processing::Files::SaveSemanticKittiResults(results, ImGuiState::DatasetTesting::start_ref_scene, ImGuiState::DatasetTesting::start_query_scene);
 
     // TODO add final eval tally here
     // Will eventually need to figure out where the actual loop closures are
