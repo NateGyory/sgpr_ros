@@ -46,14 +46,15 @@ struct GFAFeatures {
 namespace Processing {
 namespace Files {
 
-inline void
-SaveSemanticKittiResults(std::vector<SemanticKittiResult> &results, int start_r, int start_q) {
+inline void SaveSemanticKittiResults(std::vector<SemanticKittiResult> &results,
+                                     int start_r, int start_q, std::string samp,
+                                     std::string inc) {
   std::string r = std::to_string(start_r);
   std::string q = std::to_string(start_q);
   std::string sequence = results[0].sequence;
   std::string path =
       "/home/nate/Development/catkin_ws/src/sgpr_ros/results/SemanticKitti/" +
-      sequence + "/results" + r + "_" + q + ".json";
+      sequence + "/results" + r + "_" + q + "_" + samp + +"_" + inc + ".json";
 
   std::unordered_map<int, json> json_map;
 

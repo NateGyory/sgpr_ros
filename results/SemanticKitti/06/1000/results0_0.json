@@ -1,0 +1,954 @@
+{
+    "comparisons": [
+        {
+            "probability": 0.15384615384615385,
+            "query_id": "720.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "740.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.15384615384615385,
+            "query_id": "740.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "760.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "760.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "760.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "780.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "780.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "780.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "780.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "800.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "800.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "800.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "800.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "800.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.14285714285714285,
+            "query_id": "820.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.14285714285714285,
+            "query_id": "820.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "820.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.14285714285714285,
+            "query_id": "820.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "820.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "820.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "840.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.21428571428571427,
+            "query_id": "840.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.14285714285714285,
+            "query_id": "840.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "840.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "840.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "840.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "840.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.1875,
+            "query_id": "860.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.1875,
+            "query_id": "860.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0625,
+            "query_id": "860.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0625,
+            "query_id": "860.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0625,
+            "query_id": "860.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "860.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "860.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "860.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.06666666666666667,
+            "query_id": "880.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "880.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.06666666666666667,
+            "query_id": "880.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.13333333333333333,
+            "query_id": "880.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.06666666666666667,
+            "query_id": "880.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.06666666666666667,
+            "query_id": "880.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "880.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.06666666666666667,
+            "query_id": "880.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "880.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.07142857142857142,
+            "query_id": "900.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.07142857142857142,
+            "query_id": "900.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "900.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.14285714285714285,
+            "query_id": "900.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.07142857142857142,
+            "query_id": "900.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "900.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "900.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "900.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.07142857142857142,
+            "query_id": "900.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "900.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "920.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "920.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "920.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "920.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "920.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "940.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "940.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "960.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "960.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "980.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "980.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.15384615384615385,
+            "query_id": "980.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "980.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "980.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "980.ply",
+            "ref_id": "260.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1000.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.15384615384615385,
+            "query_id": "1000.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1000.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1000.ply",
+            "ref_id": "260.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1000.ply",
+            "ref_id": "280.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1020.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1020.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.46153846153846156,
+            "query_id": "1020.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1020.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "260.ply"
+        },
+        {
+            "probability": 0.07692307692307693,
+            "query_id": "1020.ply",
+            "ref_id": "280.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1020.ply",
+            "ref_id": "300.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.08333333333333333,
+            "query_id": "1040.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.08333333333333333,
+            "query_id": "1040.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.16666666666666666,
+            "query_id": "1040.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.5833333333333334,
+            "query_id": "1040.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.25,
+            "query_id": "1040.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.08333333333333333,
+            "query_id": "1040.ply",
+            "ref_id": "260.ply"
+        },
+        {
+            "probability": 0.08333333333333333,
+            "query_id": "1040.ply",
+            "ref_id": "280.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "300.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1040.ply",
+            "ref_id": "320.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.25,
+            "query_id": "1060.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "260.ply"
+        },
+        {
+            "probability": 0.08333333333333333,
+            "query_id": "1060.ply",
+            "ref_id": "280.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "300.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "320.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1060.ply",
+            "ref_id": "340.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "0.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "20.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "40.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "60.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "80.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "100.ply"
+        },
+        {
+            "probability": 0.18181818181818182,
+            "query_id": "1080.ply",
+            "ref_id": "120.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "140.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "160.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "180.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "200.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "220.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "240.ply"
+        },
+        {
+            "probability": 0.36363636363636365,
+            "query_id": "1080.ply",
+            "ref_id": "260.ply"
+        },
+        {
+            "probability": 0.18181818181818182,
+            "query_id": "1080.ply",
+            "ref_id": "280.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "300.ply"
+        },
+        {
+            "probability": 0.0,
+            "query_id": "1080.ply",
+            "ref_id": "320.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "340.ply"
+        },
+        {
+            "probability": 0.09090909090909091,
+            "query_id": "1080.ply",
+            "ref_id": "360.ply"
+        }
+    ]
+}

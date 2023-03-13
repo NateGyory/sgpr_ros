@@ -407,6 +407,7 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
                   &ImGuiState::DatasetTesting::start_query_scene);
   ImGui::InputInt("Final Query ID",
                   &ImGuiState::DatasetTesting::last_query_scene);
+  ImGui::InputInt("Key Frame Size", &ImGuiState::DatasetTesting::inc);
   ImGui::InputInt("Sequence", &ImGuiState::DatasetTesting::sequence);
 
   if (ImGui::Button("Button 1")) {
@@ -634,9 +635,9 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
       Processing::PointCloud::PopulateSpectralObjs(q_scene);
 
       int ref_scan_idx = ImGuiState::DatasetTesting::start_ref_scene;
-      //while (ref_scan_idx <
-      //       query_scan_idx - ImGuiState::DatasetTesting::scan_buffer) {
-      while (ref_scan_idx <= ImGuiState::DatasetTesting::last_ref_scene) {
+      while (ref_scan_idx <
+             query_scan_idx - ImGuiState::DatasetTesting::scan_buffer) {
+        // while (ref_scan_idx <= ImGuiState::DatasetTesting::last_ref_scene) {
         std::string ref_key = std::to_string(ref_scan_idx) + ".ply";
         std::cout << "ref_key: " << ref_key << std::endl;
         Scene r_scene;
@@ -805,14 +806,18 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
         //  q_kv.second.reference_id_match;
         results.push_back(scene_result);
 
-        ref_scan_idx++;
+        ref_scan_idx += ImGuiState::DatasetTesting::inc;
       }
 
-      query_scan_idx++;
+      query_scan_idx += ImGuiState::DatasetTesting::inc;
     }
 
     // TODO Save to a file
-    Processing::Files::SaveSemanticKittiResults(results, ImGuiState::DatasetTesting::start_ref_scene, ImGuiState::DatasetTesting::start_query_scene);
+    Processing::Files::SaveSemanticKittiResults(
+        results, ImGuiState::DatasetTesting::start_ref_scene,
+        ImGuiState::DatasetTesting::start_query_scene,
+        std::to_string(ImGuiState::DatasetTesting::sample_size),
+        std::to_string(ImGuiState::DatasetTesting::inc));
   }
 
   if (ImGui::Button("Compute Spectral Features")) {
@@ -1038,7 +1043,9 @@ void semanticKittiTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     }
 
     // TODO Save to a file
-    Processing::Files::SaveSemanticKittiResults(results, ImGuiState::DatasetTesting::start_ref_scene, ImGuiState::DatasetTesting::start_query_scene);
+    //Processing::Files::SaveSemanticKittiResults(
+    //    results, ImGuiState::DatasetTesting::start_ref_scene,
+    //    ImGuiState::DatasetTesting::start_query_scene);
 
     // TODO add final eval tally here
     // Will eventually need to figure out where the actual loop closures are

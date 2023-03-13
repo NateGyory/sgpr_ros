@@ -69,9 +69,10 @@ inline static int start_ref_scene = 0;
 inline static int last_ref_scene = 50;
 inline static int start_query_scene = 0;
 inline static int last_query_scene = 50;
-inline static int scan_buffer = 20;
+inline static int scan_buffer = 600;
 inline static double match_thresh = -1.0;
 inline static int sequence = 5;
+inline static int inc= 10;
 
 // GUI state variables
 inline static bool dataset_parsed = false;
