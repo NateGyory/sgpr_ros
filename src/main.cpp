@@ -1434,7 +1434,7 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
   ImGui::Checkbox("Debug Bulk Eval",
   &ImGuiState::DatasetTesting::debug_eval);
 
-  if (ImGui::Button("Funky")) {
+  if (ImGui::Button("Eval Dataset")) {
 
     int total_compared = 0;
     int TP = 0;
@@ -1586,8 +1586,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
               ad_result =
                   ImGuiState::DatasetTesting::eig_srv.response.results[1];
             } else {
-              ROS_ERROR("eval service failed");
-              exit(1);
+              //ROS_ERROR("eval service failed");
+              //exit(1);
             }
 
             // Save GFA
@@ -1656,8 +1656,8 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     std::cout << "f1_score: " << f1_score << std::endl;
     std::cout << "\nConfusion Matrix" << std::endl;
     std::cout << "          Negative | Poistive" << std::endl;
-    std::cout << "Negative | " << TN << "    | " << FN << std::endl;
-    std::cout << "Positive | " << FP << "    | " << TP << std::endl;
+    std::cout << "Negative | TN: " << TN << "    | FN: " << FN << std::endl;
+    std::cout << "Positive | FP: " << FP << "    | TP: " << TP << std::endl;
 
     EvalMetrics em;
     em.dataset = (ImGuiState::DatasetTesting::dataset_idx == 0)
@@ -1687,9 +1687,9 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     gfa.r_scene_id = r_scene_id;
 
     // Save GFA results
-    Processing::Files::SaveGFAFeatures(gfa);
+    //Processing::Files::SaveGFAFeatures(gfa);
 
-    Processing::Files::SaveEvalMetrics(em);
+    //Processing::Files::SaveEvalMetrics(em);
     // File name will be results/3RScan/laplacian_name/idx.json
     // TODO need to save a, p, r, f1 to json file
     // {
@@ -1710,210 +1710,210 @@ void datasetTestingPipeline(std::shared_ptr<Pipeline> &pl) {
     }
   }
 
-  if (ImGui::Button("Eval Place Recognition Precision Recall")) {
-    int total_compared = 0;
-    int TP = 0;
-    int FP = 0;
-    int FN = 0;
-    int TN = 0;
-    bool TN_flag = false;
-    // key - query scan
-    // value - array<Pair<string,Pair<int,int>>
-    std::unordered_map<std::string, std::vector<Result>> result_map;
+  //if (ImGui::Button("Eval Place Recognition Precision Recall")) {
+  //  int total_compared = 0;
+  //  int TP = 0;
+  //  int FP = 0;
+  //  int FN = 0;
+  //  int TN = 0;
+  //  bool TN_flag = false;
+  //  // key - query scan
+  //  // value - array<Pair<string,Pair<int,int>>
+  //  std::unordered_map<std::string, std::vector<Result>> result_map;
 
-    // FIRST SAVE GFA
-    pl->SaveGFA();
+  //  // FIRST SAVE GFA
+  //  pl->SaveGFA();
 
-    for (auto &q_kv : pl->mSceneMap) {
-      if (q_kv.second.is_reference)
-        continue;
+  //  for (auto &q_kv : pl->mSceneMap) {
+  //    if (q_kv.second.is_reference)
+  //      continue;
 
-      // Compare against all reference scans
-      for (auto &r_kv : pl->mSceneMap) {
-        if (!r_kv.second.is_reference)
-          continue;
+  //    // Compare against all reference scans
+  //    for (auto &r_kv : pl->mSceneMap) {
+  //      if (!r_kv.second.is_reference)
+  //        continue;
 
-        // For all the objects in the query scan
-        int obj_match_vote = 0;
-        int obj_dnm_vote = 0;
-        bool ks_result, ad_result;
-        for (auto &q_so : q_kv.second.spectral_objects) {
+  //      // For all the objects in the query scan
+  //      int obj_match_vote = 0;
+  //      int obj_dnm_vote = 0;
+  //      bool ks_result, ad_result;
+  //      for (auto &q_so : q_kv.second.spectral_objects) {
 
-          // If there is no corresponding obj then continue
-          auto begin_it = r_kv.second.spectral_objects.begin();
-          auto end_it = r_kv.second.spectral_objects.end();
+  //        // If there is no corresponding obj then continue
+  //        auto begin_it = r_kv.second.spectral_objects.begin();
+  //        auto end_it = r_kv.second.spectral_objects.end();
 
-          int global_id = q_so.global_id;
+  //        int global_id = q_so.global_id;
 
-          auto it = std::find_if(begin_it, end_it,
-                                 [global_id](const SpectralObject &r_so) {
-                                   return r_so.global_id == global_id;
-                                 });
+  //        auto it = std::find_if(begin_it, end_it,
+  //                               [global_id](const SpectralObject &r_so) {
+  //                                 return r_so.global_id == global_id;
+  //                               });
 
-          int ref_obj_idx = it - begin_it;
+  //        int ref_obj_idx = it - begin_it;
 
-          if (it == end_it)
-            continue;
+  //        if (it == end_it)
+  //          continue;
 
-          ImGuiState::DatasetTesting::mtx.lock();
-          ImGuiState::DatasetTesting::q_so = q_so;
-          ImGuiState::DatasetTesting::r_so =
-              r_kv.second.spectral_objects[ref_obj_idx];
+  //        ImGuiState::DatasetTesting::mtx.lock();
+  //        ImGuiState::DatasetTesting::q_so = q_so;
+  //        ImGuiState::DatasetTesting::r_so =
+  //            r_kv.second.spectral_objects[ref_obj_idx];
 
-          Processing::PointCloud::computeSOR(
-              ImGuiState::DatasetTesting::q_so,
-              ImGuiState::DatasetTesting::meanK,
-              ImGuiState::DatasetTesting::stdThresh);
-          Processing::PointCloud::computeSOR(
-              ImGuiState::DatasetTesting::r_so,
-              ImGuiState::DatasetTesting::meanK,
-              ImGuiState::DatasetTesting::stdThresh);
+  //        Processing::PointCloud::computeSOR(
+  //            ImGuiState::DatasetTesting::q_so,
+  //            ImGuiState::DatasetTesting::meanK,
+  //            ImGuiState::DatasetTesting::stdThresh);
+  //        Processing::PointCloud::computeSOR(
+  //            ImGuiState::DatasetTesting::r_so,
+  //            ImGuiState::DatasetTesting::meanK,
+  //            ImGuiState::DatasetTesting::stdThresh);
 
-          double size =
-              pl->GetSize(ImGuiState::DatasetTesting::filtering_opts,
-                          ImGuiState::DatasetTesting::sample_size,
-                          ImGuiState::DatasetTesting::filter_percent,
-                          ImGuiState::DatasetTesting::q_so.cloud->size(),
-                          ImGuiState::DatasetTesting::r_so.cloud->size());
+  //        double size =
+  //            pl->GetSize(ImGuiState::DatasetTesting::filtering_opts,
+  //                        ImGuiState::DatasetTesting::sample_size,
+  //                        ImGuiState::DatasetTesting::filter_percent,
+  //                        ImGuiState::DatasetTesting::q_so.cloud->size(),
+  //                        ImGuiState::DatasetTesting::r_so.cloud->size());
 
-          Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so,
-                                             size);
-          Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so,
-                                             size);
+  //        Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::q_so,
+  //                                           size);
+  //        Processing::PointCloud::computeFPS(ImGuiState::DatasetTesting::r_so,
+  //                                           size);
 
-          if (ImGuiState::DatasetTesting::double_sor) {
-            Processing::PointCloud::computeSOR(
-                ImGuiState::DatasetTesting::q_so,
-                ImGuiState::DatasetTesting::meanK,
-                ImGuiState::DatasetTesting::stdThresh);
-            Processing::PointCloud::computeSOR(
-                ImGuiState::DatasetTesting::r_so,
-                ImGuiState::DatasetTesting::meanK,
-                ImGuiState::DatasetTesting::stdThresh);
-          }
+  //        if (ImGuiState::DatasetTesting::double_sor) {
+  //          Processing::PointCloud::computeSOR(
+  //              ImGuiState::DatasetTesting::q_so,
+  //              ImGuiState::DatasetTesting::meanK,
+  //              ImGuiState::DatasetTesting::stdThresh);
+  //          Processing::PointCloud::computeSOR(
+  //              ImGuiState::DatasetTesting::r_so,
+  //              ImGuiState::DatasetTesting::meanK,
+  //              ImGuiState::DatasetTesting::stdThresh);
+  //        }
 
-          Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
-          Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
+  //        Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::q_so);
+  //        Processing::PointCloud::computeMCAR(ImGuiState::DatasetTesting::r_so);
 
-          if (ImGuiState::DatasetTesting::same_radius) {
-            double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
-                                   ImGuiState::DatasetTesting::r_so.mcar);
-            ImGuiState::DatasetTesting::q_so.mcar = mcar;
-            ImGuiState::DatasetTesting::r_so.mcar = mcar;
-          }
+  //        if (ImGuiState::DatasetTesting::same_radius) {
+  //          double mcar = std::max(ImGuiState::DatasetTesting::q_so.mcar,
+  //                                 ImGuiState::DatasetTesting::r_so.mcar);
+  //          ImGuiState::DatasetTesting::q_so.mcar = mcar;
+  //          ImGuiState::DatasetTesting::r_so.mcar = mcar;
+  //        }
 
-          // TODO will need to add Laplacian choice when adding more in
-          // the future
-          pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
-                        ImGuiState::DatasetTesting::q_so);
-          pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
-                        ImGuiState::DatasetTesting::r_so);
+  //        // TODO will need to add Laplacian choice when adding more in
+  //        // the future
+  //        pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+  //                      ImGuiState::DatasetTesting::q_so);
+  //        pl->Laplacian(ImGuiState::DatasetTesting::laplacian_idx,
+  //                      ImGuiState::DatasetTesting::r_so);
 
-          int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
-          if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
-            number_eigs = ImGuiState::DatasetTesting::eigs_number;
-          }
+  //        int number_eigs = ImGuiState::DatasetTesting::q_so.cloud->size();
+  //        if (ImGuiState::DatasetTesting::eigendecomposition_method == 1) {
+  //          number_eigs = ImGuiState::DatasetTesting::eigs_number;
+  //        }
 
-          Processing::Eigen::computeEigenvalues(
-              ImGuiState::DatasetTesting::q_so, number_eigs);
-          Processing::Eigen::computeEigenvalues(
-              ImGuiState::DatasetTesting::r_so, number_eigs);
+  //        Processing::Eigen::computeEigenvalues(
+  //            ImGuiState::DatasetTesting::q_so, number_eigs);
+  //        Processing::Eigen::computeEigenvalues(
+  //            ImGuiState::DatasetTesting::r_so, number_eigs);
 
-          ImGuiState::DatasetTesting::update_cloud = true;
-          ImGuiState::DatasetTesting::mtx.unlock();
+  //        ImGuiState::DatasetTesting::update_cloud = true;
+  //        ImGuiState::DatasetTesting::mtx.unlock();
 
-          ImGuiState::DatasetTesting::eigs_mtx.lock();
+  //        ImGuiState::DatasetTesting::eigs_mtx.lock();
 
-          ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
-              arma::conv_to<std::vector<double>>::from(
-                  ImGuiState::DatasetTesting::q_so.eigenvalues);
-          ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
-              arma::conv_to<std::vector<double>>::from(
-                  ImGuiState::DatasetTesting::r_so.eigenvalues);
-          ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
-              ImGuiState::DatasetTesting::q_so.gfaFeatures;
-          ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
-              ImGuiState::DatasetTesting::r_so.gfaFeatures;
+  //        ImGuiState::DatasetTesting::eig_srv.request.q_eigs =
+  //            arma::conv_to<std::vector<double>>::from(
+  //                ImGuiState::DatasetTesting::q_so.eigenvalues);
+  //        ImGuiState::DatasetTesting::eig_srv.request.r_eigs =
+  //            arma::conv_to<std::vector<double>>::from(
+  //                ImGuiState::DatasetTesting::r_so.eigenvalues);
+  //        ImGuiState::DatasetTesting::eig_srv.request.q_gfa =
+  //            ImGuiState::DatasetTesting::q_so.gfaFeatures;
+  //        ImGuiState::DatasetTesting::eig_srv.request.r_gfa =
+  //            ImGuiState::DatasetTesting::r_so.gfaFeatures;
 
-          ImGuiState::DatasetTesting::update_hist = true;
-          ImGuiState::DatasetTesting::eigs_mtx.unlock();
+  //        ImGuiState::DatasetTesting::update_hist = true;
+  //        ImGuiState::DatasetTesting::eigs_mtx.unlock();
 
-          // Eval service
-          if (evaluation_service_client.call(
-                  ImGuiState::DatasetTesting::eig_srv)) {
-            // ROS_INFO("eval service success!!! %f",
-            // ImGuiState::DatasetTesting::eig_srv.response.results[0]);
-            ks_result =
-            ImGuiState::DatasetTesting::eig_srv.response.results[0];
-            ad_result =
-            ImGuiState::DatasetTesting::eig_srv.response.results[1];
-          } else {
-            ROS_ERROR("eval service failed");
-            exit(1);
-          }
+  //        // Eval service
+  //        if (evaluation_service_client.call(
+  //                ImGuiState::DatasetTesting::eig_srv)) {
+  //          // ROS_INFO("eval service success!!! %f",
+  //          // ImGuiState::DatasetTesting::eig_srv.response.results[0]);
+  //          ks_result =
+  //          ImGuiState::DatasetTesting::eig_srv.response.results[0];
+  //          ad_result =
+  //          ImGuiState::DatasetTesting::eig_srv.response.results[1];
+  //        } else {
+  //          ROS_ERROR("eval service failed");
+  //          exit(1);
+  //        }
 
-          if (ks_result || ad_result) {
-            obj_match_vote++;
-          } else {
-            obj_dnm_vote++;
-          }
+  //        if (ks_result || ad_result) {
+  //          obj_match_vote++;
+  //        } else {
+  //          obj_dnm_vote++;
+  //        }
 
-          if (ImGuiState::DatasetTesting::debug_eval) {
-            std::cout << '\n' << "Press Enter";
-            while (std::cin.get() != '\n') {
-            }
-          }
-        }
+  //        if (ImGuiState::DatasetTesting::debug_eval) {
+  //          std::cout << '\n' << "Press Enter";
+  //          while (std::cin.get() != '\n') {
+  //          }
+  //        }
+  //      }
 
-        Result scene_result;
-        // scene_result.ref_scan_id = r_kv.first;
-        // scene_result.correct_ref_scan_id =
-        q_kv.second.reference_id_match;
-        // scene_result.obj_match_vote = obj_match_vote;
-        // scene_result.obj_dnm_vote = obj_dnm_vote;
-        // scene_result.obj_total = r_kv.second.spectral_objects.size();
-        // scene_result.obj_match_ratio = obj_match_vote /
-        // (double(obj_match_vote + obj_dnm_vote));
-        scene_result.obj_match_ratio =
-            obj_match_vote / double(r_kv.second.spectral_objects.size());
-        scene_result.is_match = r_kv.first ==
-        q_kv.second.reference_id_match;
-        result_map[r_kv.first].push_back(scene_result);
-      }
-    }
+  //      Result scene_result;
+  //      // scene_result.ref_scan_id = r_kv.first;
+  //      // scene_result.correct_ref_scan_id =
+  //      q_kv.second.reference_id_match;
+  //      // scene_result.obj_match_vote = obj_match_vote;
+  //      // scene_result.obj_dnm_vote = obj_dnm_vote;
+  //      // scene_result.obj_total = r_kv.second.spectral_objects.size();
+  //      // scene_result.obj_match_ratio = obj_match_vote /
+  //      // (double(obj_match_vote + obj_dnm_vote));
+  //      scene_result.obj_match_ratio =
+  //          obj_match_vote / double(r_kv.second.spectral_objects.size());
+  //      scene_result.is_match = r_kv.first ==
+  //      q_kv.second.reference_id_match;
+  //      result_map[r_kv.first].push_back(scene_result);
+  //    }
+  //  }
 
-    // {
-    //   results : [
-    //     ref_scan_id: scan_id
-    //     query_scan_truth: [... 0 or 1 for correct pred]
-    //     query_scan_pred: [... the pred percent]
-    //   ]
-    // }
+  //  // {
+  //  //   results : [
+  //  //     ref_scan_id: scan_id
+  //  //     query_scan_truth: [... 0 or 1 for correct pred]
+  //  //     query_scan_pred: [... the pred percent]
+  //  //   ]
+  //  // }
 
-    std::string file_extension = ".json";
-    std::string path =
-        "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/";
-    std::string lap_name = ImGuiState::DatasetTesting::GetLaplacianName();
-    std::string save_path = path + lap_name + file_extension;
-    std::ofstream o(save_path);
-    json data;
-    for (auto kv : result_map) {
-      json result;
-      result["ref_scan_id"] = kv.first;
-      // std::cout << "Ref: " << kv.first << std::endl;
-      for (auto res : kv.second) {
-        // std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
-        // std::cout << "truth" << res.is_match << std::endl;
-        result["query_scan_truth"].push_back(res.is_match);
-        result["query_scan_pred"].push_back(res.obj_match_ratio);
-      }
-      data["results"].push_back(result);
-    }
+  //  std::string file_extension = ".json";
+  //  std::string path =
+  //      "/home/nate/Development/catkin_ws/src/sgpr_ros/results/3RScan/PlaceRecognition/";
+  //  std::string lap_name = ImGuiState::DatasetTesting::GetLaplacianName();
+  //  std::string save_path = path + lap_name + file_extension;
+  //  std::ofstream o(save_path);
+  //  json data;
+  //  for (auto kv : result_map) {
+  //    json result;
+  //    result["ref_scan_id"] = kv.first;
+  //    // std::cout << "Ref: " << kv.first << std::endl;
+  //    for (auto res : kv.second) {
+  //      // std::cout << "pred ratio" << res.obj_match_ratio << std::endl;
+  //      // std::cout << "truth" << res.is_match << std::endl;
+  //      result["query_scan_truth"].push_back(res.is_match);
+  //      result["query_scan_pred"].push_back(res.obj_match_ratio);
+  //    }
+  //    data["results"].push_back(result);
+  //  }
 
-    o << std::setw(4) << data << std::endl;
-    o.close();
+  //  o << std::setw(4) << data << std::endl;
+  //  o.close();
 
-  }
+  //}
 
   // --------------------------------------------------------------
   ImGui::Separator();
