@@ -10,12 +10,12 @@ Objects between scenes are compared though a two sample Anderson-Darling test to
 The full SGPR method is summariezed by the image below
 ![Fig1_final_1(1)](https://user-images.githubusercontent.com/45575958/231811520-7f5480e3-9d93-4d66-bad4-7b66da0cdf38.png)
 
-##Place Recogntion Demo
+## Place Recogntion Demo
 This video demonstrates place recogntion using SGPR on the SemanticKitti Dataset. The green markers represent place recognition events when the driver revisits a previously visited strip of road.
 
 https://user-images.githubusercontent.com/45575958/231815925-1c8c9aa3-06d6-4270-bd01-c8d128c06e32.mp4
 
-##Evaluation GUI Demo
+## Evaluation GUI Demo
 The evaluation GUI allows a user to analyze various spectral graph algorithms when computing the feature vector. The GUI allows you to:
 
 https://user-images.githubusercontent.com/45575958/231816229-1e3c660b-613e-40a9-a84b-8388d3d448a5.mp4
