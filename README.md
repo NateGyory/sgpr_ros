@@ -12,10 +12,13 @@ The full SGPR method is summariezed by the image below
 
 ##Place Recogntion Demo
 This video demonstrates place recogntion using SGPR on the SemanticKitti Dataset. The green markers represent place recognition events when the driver revisits a previously visited strip of road.
+```html
 <iframe src="https://player.vimeo.com/video/813694525?h=9e865c5615" width="560" height="315" frameborder="0" allowfullscreen></iframe>
+```
 
-
+```html
 <iframe src="https://player.vimeo.com/video/813694525?h=9e865c5615&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1920" height="1080" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="semnaticKittiDemo"></iframe>
+```
 
 ##Evaluation GUI Demo
 The evaluation GUI allows a user to analyze various spectral graph algorithms when computing the feature vector. The GUI allows you to:
