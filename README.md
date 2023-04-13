@@ -1,5 +1,5 @@
 # sgpr_ros
-ROS package for a 3D SLAM loop closure pipeline. SGPR (Spectral Graph Place Recogntion) uses semantically segemented input point cloud scenes to extract object class features from each object present. The feature vector for each object is comprised of the eigenvalues which are computed through the following three steps
+ROS package for a 3D SLAM place recognition pipeline. SGPR (Spectral Graph Place Recogntion) uses semantically segemented input point cloud scenes to extract object class features from each object present. The feature vector for each object is comprised of the object point cloud's eigenvalues which are computed through the following three steps
 
 1. Convert each object point cloud to a graph representation through the novel Minimally Connected Adaptive Radius graph formulation algorithm
 2. Create a Geometric Laplacian representation of the graph using inverse distance weights and curvature values
@@ -12,18 +12,13 @@ The full SGPR method is summariezed by the image below
 
 ##Place Recogntion Demo
 This video demonstrates place recogntion using SGPR on the SemanticKitti Dataset. The green markers represent place recognition events when the driver revisits a previously visited strip of road.
-```html
-<iframe src="https://player.vimeo.com/video/813694525?h=9e865c5615" width="560" height="315" frameborder="0" allowfullscreen></iframe>
-```
 
-```html
-<iframe src="https://player.vimeo.com/video/813694525?h=9e865c5615&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1920" height="1080" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="semnaticKittiDemo"></iframe>
-```
+https://user-images.githubusercontent.com/45575958/231815925-1c8c9aa3-06d6-4270-bd01-c8d128c06e32.mp4
 
 ##Evaluation GUI Demo
 The evaluation GUI allows a user to analyze various spectral graph algorithms when computing the feature vector. The GUI allows you to:
 
-<iframe src="https://player.vimeo.com/video/808135753?h=2c3c58a134&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" width="1848" height="1024" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen title="eval_pipeline"></iframe>
+https://user-images.githubusercontent.com/45575958/231816229-1e3c660b-613e-40a9-a84b-8388d3d448a5.mp4
 
 1. Change datasets
 2. Change filtering/sampling algorithms
